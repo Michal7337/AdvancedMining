@@ -5,3 +5,35 @@ api-version: '1.20'
 authors: [Michal737]
 description: A plugin that adds a custom mining system
 website: https://hangar.papermc.io/Michal737/AdvancedMining
+
+commands:
+  test:
+    description: Test command
+
+permissions:
+  advancedmining.*:
+    description: The parent permission which gives the user full access to the plugin
+    children:
+      advancedmining.admin.*: true
+      advancedmining.player.*: true
+
+  advancedmining.admin.*:
+    description: Gives the user full access to all the admin functions
+    default: op
+    children:
+      improvedmining.admin.block.*: true
+      improvedmining.admin.config: true
+
+  advancedmining.player.*:
+    description: Gives the user access to all the player functions of the plugin
+    default: not op
+
+  advancedmining.admin.block.*:
+    description: Gives the user full access to block features of the plugin
+    default: op
+    children:
+      advancedmining.admin.block.create: true
+      advancedmining.admin.block.delete: true
+      advancedmining.admin.block.modify: true
+      advancedmining.admin.block.set: true
+      advancedmining.admin.block.unset: true
