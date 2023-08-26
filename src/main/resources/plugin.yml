@@ -1,0 +1,7 @@
+name: AdvancedMining
+version: '${version}'
+main: me.michal737.advancedmining.AdvancedMining
+api-version: '1.20'
+authors: [Michal737]
+description: A plugin that adds a custom mining system
+website: https://hangar.papermc.io/Michal737/AdvancedMining
