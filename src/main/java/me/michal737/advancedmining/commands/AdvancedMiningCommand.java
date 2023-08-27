@@ -41,7 +41,7 @@ public class AdvancedMiningCommand {
 
                                                                                     CustomBlock customBlock = new CustomBlock(name, strength, resistance, material, breakType, List.of(), 0, Material.AIR);
 
-                                                                                    CustomBlock.storeInFile(customBlock);
+                                                                                    CustomBlockManager.storeBlock(customBlock);
 
                                                                         })))))))
                         .then(new LiteralArgument("delete").withPermission("advancedmining.admin.block.delete")

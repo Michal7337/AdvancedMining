@@ -1,13 +1,9 @@
 package me.michal737.advancedmining;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
