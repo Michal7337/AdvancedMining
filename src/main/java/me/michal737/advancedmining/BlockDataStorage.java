@@ -21,6 +21,7 @@ import java.util.ArrayList;
 @SuppressWarnings("unused")
 public class BlockDataStorage {
 
+    private static final String MAIN_NAMESPACE = "blockdatastorage";
     private static File blockDatabaseFile;
 
     public static void initialise(File file){
@@ -78,10 +79,10 @@ public class BlockDataStorage {
     public static void setData(@NotNull Block block, String namespace, String key, String data){
 
         PersistentDataContainer chunkPDC = block.getChunk().getPersistentDataContainer();
-        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey("blockdatastorage", locationToString(block)), PersistentDataType.TAG_CONTAINER);
+        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)), PersistentDataType.TAG_CONTAINER);
         if (dataContainer == null) dataContainer = chunkPDC.getAdapterContext().newPersistentDataContainer();
         dataContainer.set(new NamespacedKey(namespace, key), PersistentDataType.STRING, data);
-        chunkPDC.set(new NamespacedKey("blockdatastorage", locationToString(block)), PersistentDataType.TAG_CONTAINER, dataContainer);
+        chunkPDC.set(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)), PersistentDataType.TAG_CONTAINER, dataContainer);
 
     }
 
@@ -90,12 +91,12 @@ public class BlockDataStorage {
      * @param block The block to read data from
      * @param namespace The namespace containing the key
      * @param key The key under which the data is stored
-     * @return The stored data
+     * @return The stored data or null if no data is stored
      */
     public static @Nullable String getData(@NotNull Block block, String namespace, String key){
 
         PersistentDataContainer chunkPDC = block.getChunk().getPersistentDataContainer();
-        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey("blockdatastorage", locationToString(block)), PersistentDataType.TAG_CONTAINER);
+        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)), PersistentDataType.TAG_CONTAINER);
         if (dataContainer == null) return null;
 
         return dataContainer.get(new NamespacedKey(namespace, key), PersistentDataType.STRING);
@@ -111,7 +112,7 @@ public class BlockDataStorage {
 
         PersistentDataContainer chunkPDC = block.getChunk().getPersistentDataContainer();
 
-        return chunkPDC.has(new NamespacedKey("blockdatastorage", locationToString(block)));
+        return chunkPDC.has(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)));
 
     }
 
@@ -125,7 +126,7 @@ public class BlockDataStorage {
     public static boolean hasData(@NotNull Block block, String namespace, String key){
 
         PersistentDataContainer chunkPDC = block.getChunk().getPersistentDataContainer();
-        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey("blockdatastorage", locationToString(block)), PersistentDataType.TAG_CONTAINER);
+        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)), PersistentDataType.TAG_CONTAINER);
         if (dataContainer == null) return false;
 
         return dataContainer.has(new NamespacedKey(namespace, key));
@@ -142,10 +143,10 @@ public class BlockDataStorage {
     public static void removeData(@NotNull Block block, String namespace, String key){
 
         PersistentDataContainer chunkPDC = block.getChunk().getPersistentDataContainer();
-        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey("blockdatastorage", locationToString(block)), PersistentDataType.TAG_CONTAINER);
+        PersistentDataContainer dataContainer = chunkPDC.get(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)), PersistentDataType.TAG_CONTAINER);
         if (dataContainer == null) return;
         dataContainer.remove(new NamespacedKey(namespace, key));
-        chunkPDC.set(new NamespacedKey("blockdatastorage", locationToString(block)), PersistentDataType.TAG_CONTAINER, dataContainer);
+        chunkPDC.set(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)), PersistentDataType.TAG_CONTAINER, dataContainer);
 
     }
 
@@ -156,7 +157,7 @@ public class BlockDataStorage {
     public static void removeData(@NotNull Block block){
 
         PersistentDataContainer chunkPDC = block.getChunk().getPersistentDataContainer();
-        chunkPDC.remove(new NamespacedKey("blockdatastorage", locationToString(block)));
+        chunkPDC.remove(new NamespacedKey(MAIN_NAMESPACE, locationToString(block)));
 
 
     }

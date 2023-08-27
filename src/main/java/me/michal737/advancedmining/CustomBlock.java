@@ -2,14 +2,12 @@ package me.michal737.advancedmining;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +20,7 @@ public class CustomBlock {
     private Material material;
     private BreakType breakType;
     private List<blockDrop> drops;
+    private Material replacementMaterial;
 
     /**
      * @param name The name of the block
@@ -31,7 +30,7 @@ public class CustomBlock {
      * @param breakType What happens when the block is broken
      * @param drops The items the block drops
      */
-    public CustomBlock(String name, int strength, int resistance, Material material, BreakType breakType, List<blockDrop> drops, int time) {
+    public CustomBlock(String name, int strength, int resistance, Material material, BreakType breakType, List<blockDrop> drops, int time, Material replacementMaterial) {
 
         this.name = name;
         this.strength = strength;
@@ -114,10 +113,10 @@ public class CustomBlock {
 
     public enum BreakType{
 
-        REPLACE_WITH_BEDROCK(),
-        BREAK_PERMANENTLY(),
+        BREAK(),
+        REPLACE(),
         BREAK_TEMPORARILY(),
-        REPLACE()
+        REPLACE_TEMPORARILY()
 
     }
 
@@ -187,84 +186,6 @@ public class CustomBlock {
             result = 31 * result + Arrays.hashCode(item);
             return result;
         }
-
-    }
-
-    public static String toJson(CustomBlock customBlock){
-
-        return new GsonBuilder().setPrettyPrinting().create().toJson(customBlock);
-
-    }
-
-    public static CustomBlock fromJson(String json){
-
-        return new Gson().fromJson(json, CustomBlock.class);
-
-    }
-
-    public static void storeInFile(@NotNull CustomBlock customBlock){
-
-        File customBlockFile = new File(AdvancedMining.getCustomBlocksFolder().getAbsolutePath() + "/" + customBlock.getName() + ".json");
-
-        try {
-
-            //noinspection ResultOfMethodCallIgnored
-            customBlockFile.createNewFile();
-            FileWriter fileWriter = new FileWriter(customBlockFile);
-            new GsonBuilder().setPrettyPrinting().create().toJson(customBlock, fileWriter);
-            fileWriter.close();
-
-        } catch (IOException e) {throw new RuntimeException(e);}
-
-    }
-
-    public static @Nullable CustomBlock readFromFile(String name){
-
-        File customBlockFile = new File(AdvancedMining.getCustomBlocksFolder().getAbsolutePath() + "/" + name + ".json");
-        if (!customBlockFile.exists()) return null;
-
-        try {
-
-            FileReader fileReader = new FileReader(customBlockFile);
-            return new Gson().fromJson(fileReader, CustomBlock.class);
-
-        } catch (FileNotFoundException e) {throw new RuntimeException(e);}
-
-    }
-
-    public void storeInFile(){
-
-        CustomBlock customBlock = this;
-        File customBlockFile = new File(AdvancedMining.getCustomBlocksFolder().getAbsolutePath() + "/" + customBlock.getName() + ".json");
-
-        try {
-
-            //noinspection ResultOfMethodCallIgnored
-            customBlockFile.createNewFile();
-            FileWriter fileWriter = new FileWriter(customBlockFile);
-            new GsonBuilder().setPrettyPrinting().create().toJson(customBlock, fileWriter);
-            fileWriter.close();
-
-        } catch (IOException e) {throw new RuntimeException(e);}
-
-    }
-
-    public static @NotNull List<String> getAllCustomBlocks(){
-        String[] blockFiles = AdvancedMining.getCustomBlocksFolder().list();
-        if (blockFiles == null) return new ArrayList<>();
-        ArrayList<String> blockNames = new ArrayList<>();
-
-        for (String blockFile: blockFiles) blockNames.add(FilenameUtils.removeExtension(blockFile));
-
-        return blockNames;
-
-    }
-
-    public static void deleteCustomBlock(String name){
-
-        File customBlockFile = new File(AdvancedMining.getCustomBlocksFolder().getAbsolutePath() + "/" + name + ".json");
-        //noinspection ResultOfMethodCallIgnored
-        customBlockFile.delete();
 
     }
 

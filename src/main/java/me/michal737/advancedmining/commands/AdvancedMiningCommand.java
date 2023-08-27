@@ -3,6 +3,7 @@ package me.michal737.advancedmining.commands;
 import dev.jorel.commandapi.CommandTree;
 import dev.jorel.commandapi.arguments.*;
 import me.michal737.advancedmining.CustomBlock;
+import me.michal737.advancedmining.CustomBlockManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -26,8 +27,7 @@ public class AdvancedMiningCommand {
                                                 .then(new IntegerArgument("resistance")
                                                         .then(new ItemStackArgument("material")
                                                                 .then(new MultiLiteralArgument("breakType", List.of("REPLACE_WITH_BEDROCK", "BREAK_PERMANENTLY", "BREAK_TEMPORARILY", "REPLACE"))
-                                                                        .then(new IntegerArgument("time")
-                                                                                .executes((sender, args) -> {
+                                                                        .executes((sender, args) -> {
 
                                                                                     String name = (String) args.get("name");
                                                                                     int strength = (int) args.get("strength");
@@ -36,20 +36,19 @@ public class AdvancedMiningCommand {
                                                                                     Material material = itemStack.getType();
                                                                                     String breakTypeName = (String) args.get("breakType");
                                                                                     CustomBlock.BreakType breakType = CustomBlock.BreakType.valueOf(breakTypeName);
-                                                                                    int time = (int) args.get("time");
 
                                                                                     if (!material.isBlock()) {sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>This material is not a block!")); return;}
 
-                                                                                    CustomBlock customBlock = new CustomBlock(name, strength, resistance, material, breakType, List.of(), time);
+                                                                                    CustomBlock customBlock = new CustomBlock(name, strength, resistance, material, breakType, List.of(), 0, Material.AIR);
 
                                                                                     CustomBlock.storeInFile(customBlock);
 
-                                                                                }))))))))
+                                                                        })))))))
                         .then(new LiteralArgument("delete").withPermission("advancedmining.admin.block.delete")
-                                .then(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(CustomBlock.getAllCustomBlocks()))
+                                .then(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(CustomBlockManager.getCustomBlockNames()))
                                         .executes((sender, args) -> {
 
-                                            CustomBlock.deleteCustomBlock((String) args.get("name"));
+                                            CustomBlockManager.deleteCustomBlock((String) args.get("name"));
 
                                         }))))
                 .register();
