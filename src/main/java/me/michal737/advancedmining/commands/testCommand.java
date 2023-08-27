@@ -1,6 +1,5 @@
 package me.michal737.advancedmining.commands;
 
-import me.michal737.advancedmining.CustomBlock;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
