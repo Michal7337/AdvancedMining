@@ -16,7 +16,7 @@ public class CustomBlock {
     private Material material;
     private BreakType breakType;
     private List<blockDrop> drops;
-    private Material replacementMaterial;
+    private String replacement;
 
     /**
      * @param name The name of the block
@@ -26,7 +26,7 @@ public class CustomBlock {
      * @param breakType What happens when the block is broken
      * @param drops The items the block drops
      */
-    public CustomBlock(String name, int strength, int resistance, Material material, BreakType breakType, List<blockDrop> drops, int time, Material replacementMaterial) {
+    public CustomBlock(String name, int strength, int resistance, Material material, BreakType breakType, List<blockDrop> drops, int time, String replacement) {
 
         this.name = name;
         this.strength = strength;
@@ -35,6 +35,7 @@ public class CustomBlock {
         this.drops = drops;
         this.breakType = breakType;
         this.time = time;
+        this.replacement = replacement;
 
     }
 
@@ -94,6 +95,14 @@ public class CustomBlock {
         this.time = time;
     }
 
+    public String getReplacement() {
+        return replacement;
+    }
+
+    public void setReplacement(String replacement) {
+        this.replacement = replacement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -111,8 +120,10 @@ public class CustomBlock {
 
         BREAK(),
         REPLACE(),
+        REPLACE_VANILLA(),
         BREAK_TEMPORARILY(),
-        REPLACE_TEMPORARILY()
+        REPLACE_TEMPORARILY(),
+        REPLACE_TEMPORARILY_VANILLA()
 
     }
 

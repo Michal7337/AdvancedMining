@@ -28,6 +28,7 @@ public final class AdvancedMining extends JavaPlugin {
         BlockDataStorage.initialise(new File(getDataFolder().getAbsolutePath() + "/blockDatabase.json"));
 
         registerCommands();
+        CustomBlockManager.updateBlockList();
 
         getLogger().info("ImprovedMining enabled!");
 
