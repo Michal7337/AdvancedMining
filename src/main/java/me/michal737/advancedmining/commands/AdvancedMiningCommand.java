@@ -43,14 +43,14 @@ public class AdvancedMiningCommand {
 
                                                                 }))))))
                         .then(new LiteralArgument("delete").withPermission("advancedmining.admin.block.delete")
-                                .then(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(CustomBlockManager.getCustomBlockNames()))
+                                .then(new StringArgument("name").replaceSuggestions(CustomBlockManager.getAllBlocksArgumentSuggestions()))
                                         .executes((sender, args) -> {
 
                                             CustomBlockManager.deleteCustomBlock((String) args.get("name"));
 
-                                        })))
+                                        }))
                         .then(new LiteralArgument("edit").withPermission("advancedmining.admin.block.edit")
-                                .then(new StringArgument("block").replaceSuggestions(ArgumentSuggestions.strings(CustomBlockManager.getCustomBlockNames()))
+                                .then(new StringArgument("block").replaceSuggestions(CustomBlockManager.getAllBlocksArgumentSuggestions())
                                         .then(new LiteralArgument("name")
                                                 .then(new StringArgument("new_name")
                                                         .executes((sender, args) -> {
@@ -141,7 +141,8 @@ public class AdvancedMiningCommand {
 
                                                                     CustomBlock block = CustomBlockManager.getBlock((String) args.get("block"));
                                                                     BlockData blockData = (BlockData) args.get("replacement");
-                                                                    block.setReplacement(blockData.getMaterial().getKey().getKey());
+                                                                    block.setReplacement(blockData.getMaterial().getKey().asString());
+                                                                    block.setBreakType(CustomBlock.BreakType.REPLACE_VANILLA);
                                                                     CustomBlockManager.storeBlock(block);
 
                                                                 })))
@@ -154,6 +155,7 @@ public class AdvancedMiningCommand {
                                                                             int time = (int) args.get("time");
                                                                             block.setReplacement((String) args.get("replacement"));
                                                                             block.setTime(time);
+                                                                            block.setBreakType(CustomBlock.BreakType.REPLACE_TEMPORARILY);
                                                                             CustomBlockManager.storeBlock(block);
 
                                                                         }))))
@@ -165,8 +167,9 @@ public class AdvancedMiningCommand {
                                                                             CustomBlock block = CustomBlockManager.getBlock((String) args.get("block"));
                                                                             int time = (int) args.get("time");
                                                                             BlockData blockData = (BlockData) args.get("replacement");
-                                                                            block.setReplacement(blockData.getMaterial().getKey().getKey());
+                                                                            block.setReplacement(blockData.getMaterial().getKey().asString());
                                                                             block.setTime(time);
+                                                                            block.setBreakType(CustomBlock.BreakType.REPLACE_TEMPORARILY_VANILLA);
                                                                             CustomBlockManager.storeBlock(block);
 
                                                                         })))))

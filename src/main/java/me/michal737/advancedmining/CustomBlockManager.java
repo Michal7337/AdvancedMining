@@ -2,17 +2,21 @@ package me.michal737.advancedmining;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
 public class CustomBlockManager {
 
-    private static ArrayList<CustomBlock> customBlocks;
+    private static ArrayList<CustomBlock> customBlocks = new ArrayList<>();
 
     public static void updateBlockList(){
 
@@ -61,6 +65,17 @@ public class CustomBlockManager {
 
     }
 
+    public static String[] getCustomBlockNamesArray(){
+
+        String[] names = new String[customBlocks.size()];
+        for (int i = 0; i <= customBlocks.size(); i++){
+            names[i] = customBlocks.get(i).getName();
+        }
+
+        return names;
+
+    }
+
     public static void deleteCustomBlock(String name){
 
         File customBlockFile = new File(AdvancedMining.getCustomBlocksFolder().getAbsolutePath() + "/" + name + ".json");
@@ -81,6 +96,13 @@ public class CustomBlockManager {
         } catch (IOException e) {throw new RuntimeException(e);}
 
         updateBlockList();
+
+    }
+
+    @Contract(pure = true)
+    public static @NotNull ArgumentSuggestions<CommandSender> getAllBlocksArgumentSuggestions(){
+
+        return ArgumentSuggestions.stringsAsync(suggestionInfo -> CompletableFuture.supplyAsync(CustomBlockManager::getCustomBlockNamesArray));
 
     }
 
