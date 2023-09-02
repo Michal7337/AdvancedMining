@@ -3,7 +3,7 @@ package me.michal737.advancedmining;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import me.michal737.advancedmining.MiningSystem.MiningListeners;
-import me.michal737.advancedmining.commands.OldAdvancedMiningCommand;
+import me.michal737.advancedmining.commands.AdvancedMiningCommand;
 import me.michal737.advancedmining.commands.testCommand;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -73,7 +73,7 @@ public final class AdvancedMining extends JavaPlugin {
         getCommand("test").setExecutor(new testCommand());
         //new AdvancedMiningCommand().registerCommand();
 
-        new OldAdvancedMiningCommand();
+        new AdvancedMiningCommand();
 
     }
 
