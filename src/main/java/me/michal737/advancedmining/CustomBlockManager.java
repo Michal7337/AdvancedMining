@@ -16,12 +16,13 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings("unused")
 public class CustomBlockManager {
 
-    private static ArrayList<CustomBlock> customBlocks = new ArrayList<>();
+    private static ArrayList<CustomBlock> customBlocks;
 
     public static void updateBlockList(){
 
         File[] customBlockFiles = AdvancedMining.getCustomBlocksFolder().listFiles();
         if (customBlockFiles == null) return;
+        customBlocks = new ArrayList<>();
 
         for (File customBlockFile : customBlockFiles){
 
@@ -50,6 +51,21 @@ public class CustomBlockManager {
         if (blockName == null) return null;
 
         return getBlock(blockName);
+
+    }
+
+    public static void setBlock(String blockName, Block block){
+
+        BlockDataStorage.setData(block, "advancedmining", "block_name", blockName);
+        //todo: fix block database
+        //BlockDataStorage.addBlockToDatabase(block);
+
+    }
+
+    public static void setBlock(@NotNull CustomBlock customBlock, Block block){
+
+        BlockDataStorage.setData(block, "advancedmining", "block_name", customBlock.getName());
+        //BlockDataStorage.addBlockToDatabase(block);
 
     }
 

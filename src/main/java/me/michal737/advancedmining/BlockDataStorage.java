@@ -1,7 +1,7 @@
 package me.michal737.advancedmining;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -23,21 +23,20 @@ public class BlockDataStorage {
 
     private static final String MAIN_NAMESPACE = "blockdatastorage";
     private static File blockDatabaseFile;
+    private static ArrayList<String> customBlockList;
 
-    public static void initialise(File file){
+    private BlockDataStorage(){}
+
+    public static void initialiseBlockDatabase(File file){
 
         blockDatabaseFile = file;
 
     }
 
-    /**
-     * Adds or removes a block from the block database
-     * @param block The block to add/remove from the database
-     * @param action The action. Can be "add" or "remove"
-     */
-    public static void updateBlockDatabase(Block block, String action){
+    public static void addBlockToDatabase(Block block){
 
-        if (blockDatabaseFile == null) return;
+        if (blockDatabaseFile == null) throw new RuntimeException("Block database not initialised!");
+        customBlockList = new ArrayList<>();
 
         try {
 
@@ -45,27 +44,29 @@ public class BlockDataStorage {
             blockDatabaseFile.createNewFile();
 
             FileReader fileReader = new FileReader(blockDatabaseFile);
-            CustomBlockList customBlockList = new Gson().fromJson(fileReader, CustomBlockList.class);
-            fileReader.close();
-            ArrayList<String> blockList = customBlockList.getBlocks();
+            customBlockList = new GsonBuilder().setPrettyPrinting().create().fromJson(fileReader, new TypeToken<ArrayList<String>>() {}.getType());
+            customBlockList.add(locationToString(block));
+            new GsonBuilder().setPrettyPrinting().create().toJson(customBlockList, new FileWriter(blockDatabaseFile));
 
-            if (action.equals("add")){
+        } catch (IOException e) {throw new RuntimeException(e);}
 
-                blockList.add(locationToString(block));
-                customBlockList.setBlocks(blockList);
+    }
 
-            }if (action.equals("remove")){
+    public static void removeBlockFromDatabase(Block block){
 
-                blockList.remove(locationToString(block));
-                customBlockList.setBlocks(blockList);
+        if (blockDatabaseFile == null) throw new RuntimeException("Block database not initialised!");
 
-            }else return;
+        try {
 
-            FileWriter fileWriter = new FileWriter(blockDatabaseFile);
-            new GsonBuilder().setPrettyPrinting().create().toJson(customBlockList, fileWriter);
-            fileWriter.close();
+            //noinspection ResultOfMethodCallIgnored
+            blockDatabaseFile.createNewFile();
 
-        }catch (IOException e){throw new RuntimeException();}
+            FileReader fileReader = new FileReader(blockDatabaseFile);
+            customBlockList = new GsonBuilder().setPrettyPrinting().create().fromJson(fileReader, new TypeToken<ArrayList<String>>() {}.getType());
+            customBlockList.remove(locationToString(block));
+            new GsonBuilder().setPrettyPrinting().create().toJson(customBlockList, new FileWriter(blockDatabaseFile));
+
+        } catch (IOException e) {throw new RuntimeException(e);}
 
     }
 
@@ -165,24 +166,6 @@ public class BlockDataStorage {
     private static @NotNull String locationToString(@NotNull Block block){
 
         return block.getX() + "_" + block.getY() + "_" + block.getZ() + "_";
-
-    }
-
-    public static class CustomBlockList {
-
-        private ArrayList<String> blocks;
-
-        public CustomBlockList(ArrayList<String> blocks) {
-            this.blocks = blocks;
-        }
-
-        public ArrayList<String> getBlocks() {
-            return blocks;
-        }
-
-        public void setBlocks(ArrayList<String> blocks) {
-            this.blocks = blocks;
-        }
 
     }
 
