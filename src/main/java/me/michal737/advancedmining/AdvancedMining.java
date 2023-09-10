@@ -34,6 +34,7 @@ public final class AdvancedMining extends JavaPlugin {
 
         registerCommands();
         getServer().getPluginManager().registerEvents(new MiningListeners(), this);
+        setupConfig();
 
         getLogger().info("ImprovedMining enabled!");
 
@@ -74,6 +75,14 @@ public final class AdvancedMining extends JavaPlugin {
         //new AdvancedMiningCommand().registerCommand();
 
         new AdvancedMiningCommand();
+
+    }
+
+    private void setupConfig(){
+
+        saveDefaultConfig();
+
+
 
     }
 

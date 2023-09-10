@@ -11,7 +11,7 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class CustomBlock {
 
-    private String name;
+    private String name, displayName;
     private int strength, resistance, time;
     private Material material;
     private BreakType breakType;
@@ -26,7 +26,7 @@ public class CustomBlock {
      * @param breakType What happens when the block is broken
      * @param drops The items the block drops
      */
-    public CustomBlock(String name, int strength, int resistance, Material material, BreakType breakType, List<blockDrop> drops, int time, String replacement) {
+    public CustomBlock(String name, String displayName, int strength, int resistance, Material material, BreakType breakType, List<blockDrop> drops, int time, String replacement) {
 
         this.name = name;
         this.strength = strength;
@@ -36,6 +36,7 @@ public class CustomBlock {
         this.breakType = breakType;
         this.time = time;
         this.replacement = replacement;
+        this.displayName = displayName;
 
     }
 
@@ -101,6 +102,14 @@ public class CustomBlock {
 
     public void setReplacement(String replacement) {
         this.replacement = replacement;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @Override

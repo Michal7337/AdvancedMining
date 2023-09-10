@@ -15,12 +15,7 @@ public class testCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
 
-        int value = Integer.parseInt(args[1]);
-        Player player = (Player) sender;
 
-        if (args[0].equals("speed")) {
-            PlayerStats.setMiningSpeed(player, value);
-        }else if (args[0].equals("power")) PlayerStats.setBreakingPower(player, value);
 
         return true;
 

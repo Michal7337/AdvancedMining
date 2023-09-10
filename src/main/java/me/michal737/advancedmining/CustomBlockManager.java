@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
@@ -57,6 +58,7 @@ public class CustomBlockManager {
     public static void setBlock(String blockName, Block block){
 
         BlockDataStorage.setData(block, "advancedmining", "block_name", blockName);
+        block.setType(Objects.requireNonNull(getBlock(blockName)).getMaterial());
         //todo: fix block database
         //BlockDataStorage.addBlockToDatabase(block);
 
@@ -65,7 +67,14 @@ public class CustomBlockManager {
     public static void setBlock(@NotNull CustomBlock customBlock, Block block){
 
         BlockDataStorage.setData(block, "advancedmining", "block_name", customBlock.getName());
+        block.setType(customBlock.getMaterial());
         //BlockDataStorage.addBlockToDatabase(block);
+
+    }
+
+    public static void removeBlock(Block block){
+
+        BlockDataStorage.removeData(block, "advancedmining", "block_name");
 
     }
 

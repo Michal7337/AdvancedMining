@@ -2,13 +2,17 @@ package me.michal737.advancedmining.commands;
 
 import dev.jorel.commandapi.CommandTree;
 import dev.jorel.commandapi.arguments.*;
+import me.michal737.advancedmining.AdvancedMining;
 import me.michal737.advancedmining.CustomBlock;
 import me.michal737.advancedmining.CustomBlockManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 
@@ -25,12 +29,14 @@ public class AdvancedMiningCommand {
                 .then(new LiteralArgument("block").withPermission("advancedmining.admin.block")
                         .then(new LiteralArgument("create").withPermission("advancedmining.admin.block.create")
                                 .then(new StringArgument("name")
-                                        .then(new IntegerArgument("strength")
-                                                .then(new IntegerArgument("resistance")
-                                                        .then(new ItemStackArgument("material")
-                                                                .executes((sender, args) -> {
+                                        .then(new TextArgument("display_name")
+                                                .then(new IntegerArgument("strength")
+                                                        .then(new IntegerArgument("resistance")
+                                                                .then(new ItemStackArgument("material")
+                                                                        .executes((sender, args) -> {
 
                                                                     String name = (String) args.get("name");
+                                                                    String displayName = (String) args.get("display_name");
                                                                     int strength = (int) args.get("strength");
                                                                     int resistance = (int) args.get("resistance");
                                                                     ItemStack itemStack = (ItemStack) args.get("material");
@@ -38,11 +44,11 @@ public class AdvancedMiningCommand {
 
                                                                     if (!material.isBlock()) {sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>This material is not a block!")); return;}
 
-                                                                    CustomBlock customBlock = new CustomBlock(name, strength, resistance, material, CustomBlock.BreakType.BREAK, List.of(), 0, null);
+                                                                    CustomBlock customBlock = new CustomBlock(name, displayName, strength, resistance, material, CustomBlock.BreakType.BREAK, List.of(), 0, null);
 
                                                                     CustomBlockManager.storeBlock(customBlock);
 
-                                                                }))))))
+                                                                    })))))))
                         .then(new LiteralArgument("delete").withPermission("advancedmining.admin.block.delete")
                                 .then(new StringArgument("name").replaceSuggestions(CustomBlockManager.getAllBlocksArgumentSuggestions()))
                                         .executes((sender, args) -> {
@@ -184,7 +190,32 @@ public class AdvancedMiningCommand {
                                                     String blockName = (String) args.get("block");
                                                     CustomBlockManager.setBlock(blockName, location.getBlock());
 
-                                                })))))
+                                                }))))
+                        .then(new LiteralArgument("give")
+                            .then(new StringArgument("block")
+                                            .executesPlayer((sender, args) -> {
+
+                                                CustomBlock customBlock = CustomBlockManager.getBlock((String) args.get("block"));
+                                                if (customBlock == null) return;
+                                                ItemStack item = new ItemStack(customBlock.getMaterial());
+                                                ItemMeta itemMeta = item.getItemMeta();
+                                                itemMeta.getPersistentDataContainer().set(new NamespacedKey(AdvancedMining.getInstance(), "placeable_block"), PersistentDataType.STRING, (String) args.get("block"));
+                                                itemMeta.displayName(MiniMessage.miniMessage().deserialize(customBlock.getDisplayName()));
+                                                item.setItemMeta(itemMeta);
+                                                sender.getInventory().addItem(item);
+                                            }))))
+                .then(new LiteralArgument("tool")
+                        .then(new IntegerArgument("mining_speed")
+                                .then(new IntegerArgument("breaking_power")
+                                        .executesPlayer((sender, args) -> {
+
+                                            ItemStack item = sender.getInventory().getItemInMainHand();
+                                            ItemMeta itemMeta = item.getItemMeta();
+                                            itemMeta.getPersistentDataContainer().set(new NamespacedKey(AdvancedMining.getInstance(), "stat_mining_speed"), PersistentDataType.INTEGER, (int) args.get("mining_speed"));
+                                            itemMeta.getPersistentDataContainer().set(new NamespacedKey(AdvancedMining.getInstance(), "stat_breaking_power"), PersistentDataType.INTEGER, (int) args.get("breaking_power"));
+                                            item.setItemMeta(itemMeta);
+
+                                        }))))
                 .register();
 
     }
