@@ -1,7 +1,7 @@
 name: AdvancedMining
 version: '1.0-SNAPSHOT'
-main: win.codingboulder.advancedMining.AdvancedMining
+main: win.codingboulder.advancedmining.AdvancedMining
 api-version: '1.21'
 authors: [ Michal737 ]
-description: A plugin that adds the HeadWars minigame
+description: A plugin that adds a custom mining system
 website: https://github.com/michal7337

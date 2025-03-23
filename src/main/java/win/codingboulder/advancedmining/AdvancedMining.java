@@ -1,4 +1,4 @@
-package win.codingboulder.advancedMining;
+package win.codingboulder.advancedmining;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,4 +14,5 @@ public final class AdvancedMining extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
     }
+
 }
