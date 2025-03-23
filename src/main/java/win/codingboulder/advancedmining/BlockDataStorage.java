@@ -25,9 +25,27 @@ public class BlockDataStorage {
 
     }
 
+    public static PersistentDataContainer getDataContainer(@NotNull Block block, String namespace) {
+
+        NamespacedKey blockKey = getBockKey(block, namespace);
+        PersistentDataContainer chunkPdc = block.getChunk().getPersistentDataContainer();
+
+        if (chunkPdc.has(blockKey, PersistentDataType.TAG_CONTAINER)) return chunkPdc.get(blockKey, PersistentDataType.TAG_CONTAINER);
+
+        PersistentDataContainer newPdc = chunkPdc.getAdapterContext().newPersistentDataContainer();
+        chunkPdc.set(blockKey, PersistentDataType.TAG_CONTAINER, newPdc);
+
+        return newPdc;
+
+    }
+
     @Contract("_ -> new")
     public static @NotNull NamespacedKey getBockKey(@NotNull Block block) {
         return new NamespacedKey("BlockDataStorage", block.getX() + "," + block.getY() + "," + block.getZ());
+    }
+
+    public static @NotNull NamespacedKey getBockKey(@NotNull Block block, String namespace) {
+        return new NamespacedKey(namespace, block.getX() + "," + block.getY() + "," + block.getZ());
     }
 
 }
