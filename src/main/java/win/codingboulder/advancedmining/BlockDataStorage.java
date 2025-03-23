@@ -7,10 +7,22 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <h3>A class for storing data "in blocks"</h3>
+ * It works by saving data in the {@link PersistentDataContainer} of the chunk the block is in
+ */
 public class BlockDataStorage {
+
+    public static String DEFAULT_NAMESPACE = "BlockDataStorage";
 
     private BlockDataStorage() {}
 
+    /**
+     * Gets the {@link PersistentDataContainer} associated with this block in the default namespace.
+     * If the block doesn't have a PDC a new one is created
+     * @param block The block
+     * @return The {@link PersistentDataContainer} associated with the block
+     */
     public static PersistentDataContainer getDataContainer(@NotNull Block block) {
 
         NamespacedKey blockKey = getBockKey(block);
@@ -25,6 +37,13 @@ public class BlockDataStorage {
 
     }
 
+    /**
+     * Gets the {@link PersistentDataContainer} associated with this block in the specified namespace.
+     * If the block doesn't have a PDC a new one is created
+     * @param block The block
+     * @param namespace The namespace
+     * @return The {@link PersistentDataContainer} associated with the block
+     */
     public static PersistentDataContainer getDataContainer(@NotNull Block block, String namespace) {
 
         NamespacedKey blockKey = getBockKey(block, namespace);
@@ -39,27 +58,63 @@ public class BlockDataStorage {
 
     }
 
+    /**
+     * Gets if the block has an associated PDC in the default namespace
+     * @param block The block
+     * @return Weather the block has a PDC associated with it
+     */
     public static boolean hasContainer(@NotNull Block block) {
         return block.getChunk().getPersistentDataContainer().has(getBockKey(block), PersistentDataType.TAG_CONTAINER);
     }
 
+    /**
+     * Gets if the block has an associated PDC in the specified namespace
+     * @param block The block
+     * @param namespace The namespace
+     * @return Weather the block has a PDC associated with it
+     */
     public static boolean hasContainer(@NotNull Block block, String namespace) {
         return block.getChunk().getPersistentDataContainer().has(getBockKey(block, namespace), PersistentDataType.TAG_CONTAINER);
     }
 
+
+    /**
+     * Sets the {@link PersistentDataContainer} associated with this block in the default namespace
+     * @param block The block
+     * @param container The container to associate
+     */
     public static void setContainer(@NotNull Block block, PersistentDataContainer container) {
         block.getChunk().getPersistentDataContainer().set(getBockKey(block), PersistentDataType.TAG_CONTAINER, container);
     }
 
+    /**
+     * Sets the {@link PersistentDataContainer} associated with this block in the specified namespace
+     * @param block The block
+     * @param container The container to associate
+     * @param namespace The namespace
+     */
     public static void setContainer(@NotNull Block block, PersistentDataContainer container, String namespace) {
         block.getChunk().getPersistentDataContainer().set(getBockKey(block, namespace), PersistentDataType.TAG_CONTAINER, container);
     }
 
+    /**
+     * Gets the {@link NamespacedKey} for the block in the default namespace. <br>
+     * Format: {@code BlockDataStorage:x,y,z}
+     * @param block The block to get key of
+     * @return The key
+     */
     @Contract("_ -> new")
     public static @NotNull NamespacedKey getBockKey(@NotNull Block block) {
-        return new NamespacedKey("BlockDataStorage", block.getX() + "," + block.getY() + "," + block.getZ());
+        return new NamespacedKey(DEFAULT_NAMESPACE, block.getX() + "," + block.getY() + "," + block.getZ());
     }
 
+    /**
+     * Gets the {@link NamespacedKey} for the block in the specified namespace. <br>
+     * Format: {@code namespace:x,y,z}
+     * @param block The block to get key of
+     * @param namespace The namespace
+     * @return The key
+     */
     public static @NotNull NamespacedKey getBockKey(@NotNull Block block, String namespace) {
         return new NamespacedKey(namespace, block.getX() + "," + block.getY() + "," + block.getZ());
     }
