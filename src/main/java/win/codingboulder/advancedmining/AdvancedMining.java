@@ -6,7 +6,8 @@ public final class AdvancedMining extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+
+        new AdvancedMiningCommand(this);
 
     }
 
