@@ -17,6 +17,7 @@ import java.util.UUID;
 
 public class CustomBlock {
 
+    public static final NamespacedKey blockIdKey = new NamespacedKey("advancedmining", "block_id");
     public static HashMap<String, CustomBlock> loadedBlocks = new HashMap<>();
 
     private String id;
@@ -25,19 +26,21 @@ public class CustomBlock {
     private float strength;
     private int hardness;
 
+    private String bestTool;
     private Key texture;
     private Key breakSound;
     private Key placeSound;
     private Material iconMaterial;
     private File dropsFile;
 
-    public CustomBlock(String id, Component name, Material material, float strength, int hardness, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
+    public CustomBlock(String id, Component name, Material material, float strength, int hardness, String bestTool, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
 
         this.id = id;
         this.name = name;
         this.material = material;
         this.strength = strength;
         this.hardness = hardness;
+        this.bestTool = bestTool;
         this.texture = texture;
         this.breakSound = breakSound;
         this.placeSound = placeSound;
@@ -49,17 +52,25 @@ public class CustomBlock {
 
     public static @Nullable CustomBlock getCustomBlock(@NotNull Block block) {
 
-        String blockId = BlockDataStorage.getDataContainer(block).getOrDefault(
-            new NamespacedKey("AdvancedMining", "block_id"), PersistentDataType.STRING, "");
-
+        if (!BlockDataStorage.hasContainer(block)) return null;
+        String blockId = BlockDataStorage.getDataContainer(block).getOrDefault(blockIdKey, PersistentDataType.STRING, "");
         return loadedBlocks.get(blockId);
+
+    }
+
+    public static void setCustomBlock(Block block, String id) {
+
+        BlockDataStorage.getDataContainer(block).set(blockIdKey, PersistentDataType.STRING, id);
+
+        if (!loadedBlocks.containsKey(id)) return;
+        block.setType(loadedBlocks.get(id).material);
 
     }
 
     public static @Nullable ItemDisplay getDisplayEntity(Block block) {
 
         String uuidStr = BlockDataStorage.getDataContainer(block).get(
-            new NamespacedKey("AdvancedMining", "display_entity"), PersistentDataType.STRING);
+            new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING);
 
         if (uuidStr == null) return null;
         return (ItemDisplay) block.getWorld().getEntity(UUID.fromString(uuidStr));
@@ -68,11 +79,11 @@ public class CustomBlock {
 
     public static void setDisplayEntity(Block block, @NotNull ItemDisplay itemDisplay) {
 
-        BlockDataStorage.getDataContainer(block).set(new NamespacedKey("AdvancedMining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString());
+        BlockDataStorage.getDataContainer(block).set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString());
 
     }
 
-    public static CustomBlock constructFromInfo(CustomBlockInfo blockInfo) {
+    public static @NotNull CustomBlock constructFromInfo(@NotNull CustomBlockInfo blockInfo) {
 
         Key texture = !blockInfo.texture().isEmpty() ? Key.key(blockInfo.texture()) : null;
         Key placeSound = !blockInfo.placeSound().isEmpty() ? Key.key(blockInfo.placeSound()) : null;
@@ -84,6 +95,7 @@ public class CustomBlock {
             blockInfo.material(),
             blockInfo.strength(),
             blockInfo.hardness(),
+            blockInfo.bestTool(),
             texture,
             breakSound,
             placeSound,
@@ -141,6 +153,14 @@ public class CustomBlock {
 
     public void setHardness(int hardness) {
         this.hardness = hardness;
+    }
+
+    public String bestTool() {
+        return bestTool;
+    }
+
+    public void setBestTool(String bestTool) {
+        this.bestTool = bestTool;
     }
 
     public Key texture() {

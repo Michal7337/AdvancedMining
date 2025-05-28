@@ -18,6 +18,7 @@ public class CustomBlockInfo {
     private float strength;
     private int hardness;
 
+    private String bestTool;
     private String texture;
     private String breakSound;
     private String placeSound;
@@ -30,6 +31,7 @@ public class CustomBlockInfo {
         Material material,
         float strength,
         int hardness,
+        String bestTool,
         String texture,
         String breakSound,
         String placeSound,
@@ -42,6 +44,7 @@ public class CustomBlockInfo {
         this.material = material;
         this.strength = strength;
         this.hardness = hardness;
+        this.bestTool = bestTool;
         this.texture = texture;
         this.breakSound = breakSound;
         this.placeSound = placeSound;
@@ -52,7 +55,8 @@ public class CustomBlockInfo {
 
     public void saveToFile() {
 
-        try (FileWriter writer = new FileWriter(new File(AdvancedMining.blocksFolder, id + ".json"))) {
+        File file = new File(AdvancedMining.blocksFolder, id + ".json");
+        try (FileWriter writer = new FileWriter(file)) {
             new GsonBuilder().setPrettyPrinting().create().toJson(this, writer);
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while saving custom block!", e);
@@ -105,7 +109,7 @@ public class CustomBlockInfo {
         return strength;
     }
 
-    public void setStrength(int strength) {
+    public void setStrength(float strength) {
         this.strength = strength;
     }
 
@@ -115,6 +119,14 @@ public class CustomBlockInfo {
 
     public void setHardness(int hardness) {
         this.hardness = hardness;
+    }
+
+    public String bestTool() {
+        return bestTool;
+    }
+
+    public void setBestTool(String bestTool) {
+        this.bestTool = bestTool;
     }
 
     @Subst("example:some_ore")

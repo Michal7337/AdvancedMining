@@ -1,6 +1,7 @@
 package win.codingboulder.advancedmining;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import win.codingboulder.advancedmining.mechanics.Events;
 
 import java.io.File;
 
@@ -19,6 +20,10 @@ public final class AdvancedMining extends JavaPlugin {
         blocksFolder = new File(getDataFolder(), "Blocks");
         blockDropsFolder = new File(getDataFolder(), "BlockDrops");
 
+        loadConfig();
+
+        getServer().getPluginManager().registerEvents(new Events(), this);
+
         new AdvancedMiningCommand(this);
 
     }
@@ -30,6 +35,17 @@ public final class AdvancedMining extends JavaPlugin {
 
     public static AdvancedMining getInstance() {
         return instance;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void loadConfig() {
+
+        getDataFolder().mkdir();
+        blocksFolder.mkdir();
+        blockDropsFolder.mkdir();
+
+        CustomBlock.loadBlocks();
+
     }
 
 }

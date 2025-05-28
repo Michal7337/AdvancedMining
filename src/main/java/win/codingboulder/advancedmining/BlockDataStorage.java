@@ -4,16 +4,15 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * <h3>A class for storing data "in blocks"</h3>
- * It works by saving data in the {@link PersistentDataContainer} of the chunk the block is in
+ * It works by saving data in the {@link PersistentDataContainer} of the chunk the block is in.
  */
 public class BlockDataStorage {
 
-    public static String DEFAULT_NAMESPACE = "BlockDataStorage";
+    public static String DEFAULT_NAMESPACE = "blockdatastorage";
 
     private BlockDataStorage() {}
 
@@ -103,9 +102,8 @@ public class BlockDataStorage {
      * @param block The block to get key of
      * @return The key
      */
-    @Contract("_ -> new")
     public static @NotNull NamespacedKey getBockKey(@NotNull Block block) {
-        return new NamespacedKey(DEFAULT_NAMESPACE, block.getX() + "," + block.getY() + "," + block.getZ());
+        return new NamespacedKey(DEFAULT_NAMESPACE, block.getX() + "_" + block.getY() + "_" + block.getZ());
     }
 
     /**
@@ -116,7 +114,7 @@ public class BlockDataStorage {
      * @return The key
      */
     public static @NotNull NamespacedKey getBockKey(@NotNull Block block, String namespace) {
-        return new NamespacedKey(namespace, block.getX() + "," + block.getY() + "," + block.getZ());
+        return new NamespacedKey(namespace, block.getX() + "_" + block.getY() + "_" + block.getZ());
     }
 
 }

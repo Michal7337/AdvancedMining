@@ -4,9 +4,13 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
+import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +37,7 @@ public class AdvancedMiningCommand {
                                             .executes(context -> {
 
                                                 Material mat = context.getArgument("material", BlockState.class).getType();
-                                                if (mat.isEmpty()) {
+                                                if (mat.isAir()) {
                                                     context.getSource().getSender().sendRichMessage("<red>Block material cannot be air!");
                                                     return 1;
                                                 }
@@ -44,6 +48,7 @@ public class AdvancedMiningCommand {
                                                     mat,
                                                     FloatArgumentType.getFloat(context, "strength"),
                                                     IntegerArgumentType.getInteger(context, "hardness"),
+                                                    "",
                                                     "",
                                                     "",
                                                     "",
@@ -60,6 +65,31 @@ public class AdvancedMiningCommand {
                                             })
 
                                         )))))
+                    )
+
+                    .then(literal("place")
+                        .then(argument("block", StringArgumentType.word())
+                            .suggests((context, builder) -> {
+                                CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
+                                return builder.buildFuture();
+                            })
+                            .then(argument("position", ArgumentTypes.blockPosition())
+                                .executes(context -> {
+
+                                    if (!(context.getSource().getSender() instanceof Player player)) {
+                                        context.getSource().getSender().sendRichMessage("<red>You must specify a world!");
+                                        return 1;
+                                    }
+
+                                    BlockPosition pos = context.getArgument("position", BlockPositionResolver.class).resolve(context.getSource());
+                                    String blockId = StringArgumentType.getString(context, "block");
+                                    Block block = pos.toLocation(player.getWorld()).getBlock();
+
+                                    CustomBlock.setCustomBlock(block, blockId);
+
+                                    return 1;
+
+                                })))
                     )
 
                 )
