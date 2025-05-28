@@ -1,8 +1,17 @@
 package win.codingboulder.advancedmining;
 
+import com.google.gson.Gson;
 import org.bukkit.Material;
+import org.intellij.lang.annotations.Subst;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 public class CustomBlockInfo {
+
+    public static ArrayList<CustomBlockInfo> loadedBlocks = new ArrayList<>();
 
     private String id;
     private String name;
@@ -39,6 +48,23 @@ public class CustomBlockInfo {
         this.placeSound = placeSound;
         this.iconMaterial = iconMaterial;
         this.dropsFile = dropsFile;
+
+    }
+
+    public static void loadBlocks() {
+
+        File[] files = AdvancedMining.blocksFolder.listFiles();
+        if (files == null) return;
+
+        loadedBlocks = new ArrayList<>();
+        for (File file : files) {
+            try {
+                CustomBlockInfo blockInfo = new Gson().fromJson(new FileReader(file), CustomBlockInfo.class);
+                loadedBlocks.add(blockInfo);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
     }
 
@@ -82,6 +108,7 @@ public class CustomBlockInfo {
         this.hardness = hardness;
     }
 
+    @Subst("example:some_ore")
     public String texture() {
         return texture;
     }
@@ -90,6 +117,7 @@ public class CustomBlockInfo {
         this.texture = texture;
     }
 
+    @Subst("example:some_ore_break")
     public String breakSound() {
         return breakSound;
     }
@@ -98,6 +126,7 @@ public class CustomBlockInfo {
         this.breakSound = breakSound;
     }
 
+    @Subst("example:some_ore_place")
     public String placeSound() {
         return placeSound;
     }
