@@ -1,12 +1,11 @@
 package win.codingboulder.advancedmining;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.Material;
 import org.intellij.lang.annotations.Subst;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 
 public class CustomBlockInfo {
@@ -16,7 +15,7 @@ public class CustomBlockInfo {
     private String id;
     private String name;
     private Material material;
-    private int strength;
+    private float strength;
     private int hardness;
 
     private String texture;
@@ -29,7 +28,7 @@ public class CustomBlockInfo {
         String id,
         String name,
         Material material,
-        int strength,
+        float strength,
         int hardness,
         String texture,
         String breakSound,
@@ -48,6 +47,16 @@ public class CustomBlockInfo {
         this.placeSound = placeSound;
         this.iconMaterial = iconMaterial;
         this.dropsFile = dropsFile;
+
+    }
+
+    public void saveToFile() {
+
+        try (FileWriter writer = new FileWriter(new File(AdvancedMining.blocksFolder, id + ".json"))) {
+            new GsonBuilder().setPrettyPrinting().create().toJson(this, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while saving custom block!", e);
+        }
 
     }
 
@@ -72,7 +81,7 @@ public class CustomBlockInfo {
         return id;
     }
 
-    public void id(String id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -80,7 +89,7 @@ public class CustomBlockInfo {
         return name;
     }
 
-    public void name(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -88,15 +97,15 @@ public class CustomBlockInfo {
         return material;
     }
 
-    public void material(Material material) {
+    public void setMaterial(Material material) {
         this.material = material;
     }
 
-    public int strength() {
+    public float strength() {
         return strength;
     }
 
-    public void strength(int strength) {
+    public void setStrength(int strength) {
         this.strength = strength;
     }
 
@@ -104,7 +113,7 @@ public class CustomBlockInfo {
         return hardness;
     }
 
-    public void hardness(int hardness) {
+    public void setHardness(int hardness) {
         this.hardness = hardness;
     }
 
@@ -113,7 +122,7 @@ public class CustomBlockInfo {
         return texture;
     }
 
-    public void texture(String texture) {
+    public void setTexture(String texture) {
         this.texture = texture;
     }
 
@@ -122,7 +131,7 @@ public class CustomBlockInfo {
         return breakSound;
     }
 
-    public void breakSound(String breakSound) {
+    public void setBreakSound(String breakSound) {
         this.breakSound = breakSound;
     }
 
@@ -131,7 +140,7 @@ public class CustomBlockInfo {
         return placeSound;
     }
 
-    public void placeSound(String placeSound) {
+    public void setPlaceSound(String placeSound) {
         this.placeSound = placeSound;
     }
 
@@ -139,7 +148,7 @@ public class CustomBlockInfo {
         return iconMaterial;
     }
 
-    public void iconMaterial(Material iconMaterial) {
+    public void setIconMaterial(Material iconMaterial) {
         this.iconMaterial = iconMaterial;
     }
 
@@ -147,7 +156,7 @@ public class CustomBlockInfo {
         return dropsFile;
     }
 
-    public void dropsFile(String dropsFile) {
+    public void setDropsFile(String dropsFile) {
         this.dropsFile = dropsFile;
     }
 

@@ -22,7 +22,7 @@ public class CustomBlock {
     private String id;
     private Component name;
     private Material material;
-    private int strength;
+    private float strength;
     private int hardness;
 
     private Key texture;
@@ -31,7 +31,7 @@ public class CustomBlock {
     private Material iconMaterial;
     private File dropsFile;
 
-    public CustomBlock(String id, Component name, Material material, int strength, int hardness, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
+    public CustomBlock(String id, Component name, Material material, float strength, int hardness, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
 
         this.id = id;
         this.name = name;
@@ -44,6 +44,7 @@ public class CustomBlock {
         this.iconMaterial = iconMaterial;
 
         this.dropsFile = dropsFile;
+
     }
 
     public static @Nullable CustomBlock getCustomBlock(@NotNull Block block) {
@@ -71,33 +72,34 @@ public class CustomBlock {
 
     }
 
+    public static CustomBlock constructFromInfo(CustomBlockInfo blockInfo) {
+
+        Key texture = !blockInfo.texture().isEmpty() ? Key.key(blockInfo.texture()) : null;
+        Key placeSound = !blockInfo.placeSound().isEmpty() ? Key.key(blockInfo.placeSound()) : null;
+        Key breakSound = !blockInfo.breakSound().isEmpty() ? Key.key(blockInfo.breakSound()) : null;
+
+        return new CustomBlock(
+            blockInfo.id(),
+            MiniMessage.miniMessage().deserialize(blockInfo.name()),
+            blockInfo.material(),
+            blockInfo.strength(),
+            blockInfo.hardness(),
+            texture,
+            breakSound,
+            placeSound,
+            blockInfo.iconMaterial(),
+            new File(AdvancedMining.blockDropsFolder, blockInfo.dropsFile())
+        );
+
+    }
+
     public static void loadBlocks() {
 
         CustomBlockInfo.loadBlocks();
 
         loadedBlocks = new HashMap<>();
-        for (CustomBlockInfo blockInfo : CustomBlockInfo.loadedBlocks) {
-
-            Key texture = !blockInfo.texture().isEmpty() ? Key.key(blockInfo.texture()) : null;
-            Key placeSound = !blockInfo.placeSound().isEmpty() ? Key.key(blockInfo.placeSound()) : null;
-            Key breakSound = !blockInfo.breakSound().isEmpty() ? Key.key(blockInfo.breakSound()) : null;
-
-            CustomBlock customBlock = new CustomBlock(
-                blockInfo.id(),
-                MiniMessage.miniMessage().deserialize(blockInfo.name()),
-                blockInfo.material(),
-                blockInfo.strength(),
-                blockInfo.hardness(),
-                texture,
-                breakSound,
-                placeSound,
-                blockInfo.iconMaterial(),
-                new File(AdvancedMining.blockDropsFolder, blockInfo.dropsFile())
-            );
-
-            loadedBlocks.put(blockInfo.id(), customBlock);
-
-        }
+        for (CustomBlockInfo blockInfo : CustomBlockInfo.loadedBlocks)
+            loadedBlocks.put(blockInfo.id(), constructFromInfo(blockInfo));
 
     }
 
@@ -105,7 +107,7 @@ public class CustomBlock {
         return id;
     }
 
-    public void id(String id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -113,7 +115,7 @@ public class CustomBlock {
         return name;
     }
 
-    public void name(Component name) {
+    public void setName(Component name) {
         this.name = name;
     }
 
@@ -121,15 +123,15 @@ public class CustomBlock {
         return material;
     }
 
-    public void material(Material material) {
+    public void setMaterial(Material material) {
         this.material = material;
     }
 
-    public int strength() {
+    public float strength() {
         return strength;
     }
 
-    public void strength(int strength) {
+    public void setStrength(float strength) {
         this.strength = strength;
     }
 
@@ -137,7 +139,7 @@ public class CustomBlock {
         return hardness;
     }
 
-    public void hardness(int hardness) {
+    public void setHardness(int hardness) {
         this.hardness = hardness;
     }
 
@@ -145,7 +147,7 @@ public class CustomBlock {
         return texture;
     }
 
-    public void texture(Key texture) {
+    public void setTexture(Key texture) {
         this.texture = texture;
     }
 
@@ -153,7 +155,7 @@ public class CustomBlock {
         return breakSound;
     }
 
-    public void breakSound(Key breakSound) {
+    public void setBreakSound(Key breakSound) {
         this.breakSound = breakSound;
     }
 
@@ -161,7 +163,7 @@ public class CustomBlock {
         return placeSound;
     }
 
-    public void placeSound(Key placeSound) {
+    public void setPlaceSound(Key placeSound) {
         this.placeSound = placeSound;
     }
 
@@ -169,7 +171,7 @@ public class CustomBlock {
         return iconMaterial;
     }
 
-    public void iconMaterial(Material iconMaterial) {
+    public void setIconMaterial(Material iconMaterial) {
         this.iconMaterial = iconMaterial;
     }
 
@@ -177,7 +179,7 @@ public class CustomBlock {
         return dropsFile;
     }
 
-    public void dropsFile(File dropsFile) {
+    public void setDropsFile(File dropsFile) {
         this.dropsFile = dropsFile;
     }
 
