@@ -44,11 +44,15 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockBreakAbort(@NotNull BlockDamageAbortEvent event) {
 
-        MiningRunnable runnable = miningRunnables.get(event.getPlayer());
+        Player player = event.getPlayer();
+
+        MiningRunnable runnable = miningRunnables.get(player);
         if (runnable == null) return;
 
         runnable.isCanceled = true;
-        event.getPlayer().sendBlockDamage(event.getBlock().getLocation(), 0f, runnable.randomId);
+        player.sendBlockDamage(event.getBlock().getLocation(), 0f, runnable.randomId);
+        player.hideBossBar(runnable.progressbar);
+
 
     }
 

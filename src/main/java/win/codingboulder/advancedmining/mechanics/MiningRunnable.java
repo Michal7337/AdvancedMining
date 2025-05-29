@@ -1,12 +1,17 @@
 package win.codingboulder.advancedmining.mechanics;
 
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Random;
@@ -22,10 +27,12 @@ public class MiningRunnable extends BukkitRunnable {
     public int randomId;
     private final DecimalFormat decimalFormat;
     private float miningProgress;
+    public BossBar progressbar;
+    Component barName;
 
     public boolean isCanceled;
 
-    public MiningRunnable(Block block, CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
+    public MiningRunnable(Block block, @NotNull CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
 
         this.block = block;
         this.customBlock = customBlock;
@@ -37,6 +44,10 @@ public class MiningRunnable extends BukkitRunnable {
         miningProgress = customBlock.strength();
         decimalFormat = new DecimalFormat("#.#");
         decimalFormat.setRoundingMode(RoundingMode.CEILING);
+
+        barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
+        progressbar = BossBar.bossBar(barName, 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
+        player.showBossBar(progressbar);
 
     }
 
@@ -61,7 +72,9 @@ public class MiningRunnable extends BukkitRunnable {
             lastState = breakStage;
         }
 
-        //player.sendRichMessage("progress: " + miningProgress + " fraction: " + breakFraction + " stage: " + breakStage);
+        float barPercent = BigDecimal.valueOf(breakFraction).movePointRight(2).setScale(1, RoundingMode.HALF_UP).floatValue();
+        progressbar.name(barName.append(Component.text(barPercent + "%", NamedTextColor.WHITE)));
+        progressbar.progress(breakFraction);
 
         miningProgress -= miningSpeed;
 
@@ -71,6 +84,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         block.breakNaturally(true, false);
         player.sendBlockDamage(block.getLocation(), 0f, randomId);
+        player.hideBossBar(progressbar);
 
         BlockDataStorage.editContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
