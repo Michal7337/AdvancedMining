@@ -6,12 +6,18 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
+import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.CustomBlock;
 
+import java.util.HashMap;
+
 public class Events implements Listener {
+
+    public static HashMap<Player, MiningRunnable> miningRunnables = new HashMap<>();
 
     @EventHandler
     public void onBlockBreakStart(@NotNull BlockDamageEvent event) {
@@ -29,7 +35,20 @@ public class Events implements Listener {
 
         //checks for instamine, tool and hardness
 
+        MiningRunnable runnable = new MiningRunnable(block, customBlock, player, 10, 5);
+        runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+        miningRunnables.put(player, runnable);
 
+    }
+
+    @EventHandler
+    public void onBlockBreakAbort(@NotNull BlockDamageAbortEvent event) {
+
+        MiningRunnable runnable = miningRunnables.get(event.getPlayer());
+        if (runnable == null) return;
+
+        runnable.isCanceled = true;
+        event.getPlayer().sendBlockDamage(event.getBlock().getLocation(), 0f, runnable.randomId);
 
     }
 

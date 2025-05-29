@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +61,9 @@ public class CustomBlock {
 
     public static void setCustomBlock(Block block, String id) {
 
-        BlockDataStorage.getDataContainer(block).set(blockIdKey, PersistentDataType.STRING, id);
+        PersistentDataContainer pdc =  BlockDataStorage.getDataContainer(block);
+        pdc.set(blockIdKey, PersistentDataType.STRING, id);
+        BlockDataStorage.setContainer(block, pdc);
 
         if (!loadedBlocks.containsKey(id)) return;
         block.setType(loadedBlocks.get(id).material);

@@ -1,10 +1,13 @@
 package win.codingboulder.advancedmining;
 
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 /**
  * <h3>A class for storing data "in blocks"</h3>
@@ -94,6 +97,14 @@ public class BlockDataStorage {
      */
     public static void setContainer(@NotNull Block block, PersistentDataContainer container, String namespace) {
         block.getChunk().getPersistentDataContainer().set(getBockKey(block, namespace), PersistentDataType.TAG_CONTAINER, container);
+    }
+
+    public static void editContainer(Block block, @NotNull Consumer<PersistentDataContainer> pdc) {
+
+        PersistentDataContainer container = getDataContainer(block);
+        pdc.accept(container);
+        setContainer(block, container);
+
     }
 
     /**
