@@ -11,7 +11,6 @@ import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Random;
@@ -57,6 +56,7 @@ public class MiningRunnable extends BukkitRunnable {
     public void run() {
 
         if (isCanceled) {this.cancel(); Events.miningRunnables.remove(player); return;}
+        if (miningSpeed >= customBlock.strength()) {breakBlock(); this.cancel(); Events.miningRunnables.remove(player); return;} //check if instamine
 
         if (miningProgress <= 0) {
             breakBlock();

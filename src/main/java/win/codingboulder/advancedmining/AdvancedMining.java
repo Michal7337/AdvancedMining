@@ -1,5 +1,6 @@
 package win.codingboulder.advancedmining;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.codingboulder.advancedmining.mechanics.Events;
 
@@ -11,6 +12,10 @@ public final class AdvancedMining extends JavaPlugin {
 
     public static File blocksFolder = null;
     public static File blockDropsFolder = null;
+
+    public static final NamespacedKey MINING_SPEED_KEY = new NamespacedKey("advancedmining", "mining_speed");
+    public static final NamespacedKey BREAKING_POWER_KEY = new NamespacedKey("advancedmining", "breaking_power");
+    public static final NamespacedKey TOOL_TYPE_KEY = new NamespacedKey("advancedmining", "tool_type");
 
     @Override
     public void onEnable() {

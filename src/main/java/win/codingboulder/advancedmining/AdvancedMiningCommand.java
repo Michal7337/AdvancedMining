@@ -5,14 +5,21 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import static io.papermc.paper.command.brigadier.Commands.literal;
 import static io.papermc.paper.command.brigadier.Commands.argument;
@@ -64,6 +71,74 @@ public class AdvancedMiningCommand {
 
                                             })
 
+                                            .then(argument("best-tool", StringArgumentType.word())
+
+                                                .executes(context -> {
+
+                                                    Material mat = context.getArgument("material", BlockState.class).getType();
+                                                    if (mat.isAir()) {
+                                                        context.getSource().getSender().sendRichMessage("<red>Block material cannot be air!");
+                                                        return 1;
+                                                    }
+
+                                                    CustomBlockInfo blockInfo = new CustomBlockInfo(
+                                                        StringArgumentType.getString(context, "id"),
+                                                        StringArgumentType.getString(context, "name"),
+                                                        mat,
+                                                        FloatArgumentType.getFloat(context, "strength"),
+                                                        IntegerArgumentType.getInteger(context, "hardness"),
+                                                        StringArgumentType.getString(context, "best-tool"),
+                                                        "",
+                                                        "",
+                                                        "",
+                                                        mat,
+                                                        ""
+                                                    );
+
+                                                    blockInfo.saveToFile();
+                                                    CustomBlockInfo.loadedBlocks.add(blockInfo);
+                                                    CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
+
+                                                    return 1;
+
+                                                })
+
+                                                .then(argument("texture", StringArgumentType.string())
+                                                    .then(argument("break-sound", ArgumentTypes.resourceKey(RegistryKey.SOUND_EVENT))
+                                                        .then(argument("place-sound", ArgumentTypes.resourceKey(RegistryKey.SOUND_EVENT))
+                                                            .then(argument("icon-material", ArgumentTypes.blockState())
+                                                                .then(argument("drops-file", StringArgumentType.word())
+                                                                    .executes(context -> {
+
+                                                                        Material mat = context.getArgument("material", BlockState.class).getType();
+                                                                        if (mat.isAir()) {
+                                                                            context.getSource().getSender().sendRichMessage("<red>Block material cannot be air!");
+                                                                            return 1;
+                                                                        }
+
+                                                                        CustomBlockInfo blockInfo = new CustomBlockInfo(
+                                                                            StringArgumentType.getString(context, "id"),
+                                                                            StringArgumentType.getString(context, "name"),
+                                                                            mat,
+                                                                            FloatArgumentType.getFloat(context, "strength"),
+                                                                            IntegerArgumentType.getInteger(context, "hardness"),
+                                                                            StringArgumentType.getString(context, "best-tool"),
+                                                                            StringArgumentType.getString(context, "texture"),
+                                                                            context.getArgument("break-sound", TypedKey.class).asString(),
+                                                                            context.getArgument("place-sound", TypedKey.class).asString(),
+                                                                            mat,
+                                                                            StringArgumentType.getString(context, "drops-file")
+                                                                        );
+
+                                                                        blockInfo.saveToFile();
+                                                                        CustomBlockInfo.loadedBlocks.add(blockInfo);
+                                                                        CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
+
+                                                                        return 1;
+
+                                                                    }))))))
+                                            )
+
                                         )))))
                     )
 
@@ -91,6 +166,55 @@ public class AdvancedMiningCommand {
 
                                 })))
                     )
+
+                )
+
+                .then(literal("tool")
+                    .then(literal("hand")
+                        .requires(source -> source.getSender() instanceof Player)
+                        .then(argument("mining-speed", FloatArgumentType.floatArg(0))
+                            .then(argument("breaking-power", IntegerArgumentType.integer(0))
+                                .then(argument("tool-type", StringArgumentType.word())
+                                    .executes(context -> {
+
+                                        Player player = (Player) context.getSource().getSender();
+
+                                        ItemStack item = player.getInventory().getItemInMainHand();
+                                        item.editPersistentDataContainer(pdc -> {
+                                            pdc.set(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, FloatArgumentType.getFloat(context, "mining-speed"));
+                                            pdc.set(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, IntegerArgumentType.getInteger(context, "breaking-power"));
+                                            pdc.set(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, StringArgumentType.getString(context, "tool-type"));
+                                        });
+
+                                        player.sendRichMessage("<green>Tool set!");
+
+                                        return 1;
+
+                                    }))))
+                    )
+                    .then(literal("give")
+                        .then(argument("player", ArgumentTypes.players())
+                            .then(argument("item", ArgumentTypes.itemStack())
+                                .then(argument("mining-speed", FloatArgumentType.floatArg(0))
+                                    .then(argument("mining-power", IntegerArgumentType.integer(0))
+                                        .then(argument("tool-type", StringArgumentType.word())
+                                            .executes(context -> {
+
+                                                List<Player> players = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
+
+                                                ItemStack item = context.getArgument("item", ItemStack.class);
+                                                item.editPersistentDataContainer(pdc -> {
+                                                    pdc.set(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, FloatArgumentType.getFloat(context, "mining-speed"));
+                                                    pdc.set(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, IntegerArgumentType.getInteger(context, "breaking-power"));
+                                                    pdc.set(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, StringArgumentType.getString(context, "tool-wype"));
+                                                });
+
+                                                players.forEach(player -> player.give(item));
+
+                                                return 1;
+
+                                            })))))
+                        ))
 
                 )
 
