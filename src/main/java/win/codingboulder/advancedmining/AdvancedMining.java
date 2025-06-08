@@ -14,9 +14,11 @@ public final class AdvancedMining extends JavaPlugin {
     public static File blocksFolder = null;
     public static File blockDropsFolder = null;
 
-    public static final NamespacedKey MINING_SPEED_KEY = new NamespacedKey("advancedmining", "mining_speed");
-    public static final NamespacedKey BREAKING_POWER_KEY = new NamespacedKey("advancedmining", "breaking_power");
-    public static final NamespacedKey TOOL_TYPE_KEY = new NamespacedKey("advancedmining", "tool_type");
+    public static final String NAMESPACE = "advancedmining";
+    public static final NamespacedKey MINING_SPEED_KEY = new NamespacedKey(NAMESPACE, "mining_speed");
+    public static final NamespacedKey BREAKING_POWER_KEY = new NamespacedKey(NAMESPACE, "breaking_power");
+    public static final NamespacedKey TOOL_TYPE_KEY = new NamespacedKey(NAMESPACE, "tool_type");
+    public static final NamespacedKey PLACED_BLOCK_KEY = new NamespacedKey(NAMESPACE, "placed_block");
 
     @Override
     public void onEnable() {

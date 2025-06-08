@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -74,6 +75,16 @@ public class MiningEvents implements Listener {
         player.sendBlockDamage(event.getBlock().getLocation(), 0f, runnable.randomId);
         player.hideBossBar(runnable.progressbar);
 
+
+    }
+
+    @EventHandler
+    public void onBlockPlace(@NotNull BlockPlaceEvent event) {
+
+        ItemStack itemStack = event.getItemInHand();
+        String placedBlock = itemStack.getPersistentDataContainer().get(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING);
+        if (placedBlock == null) return;
+        CustomBlock.setCustomBlock(event.getBlock(), placedBlock);
 
     }
 

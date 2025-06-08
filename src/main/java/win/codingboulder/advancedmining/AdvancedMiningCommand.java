@@ -6,10 +6,12 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -164,6 +166,50 @@ public class AdvancedMiningCommand {
                                     }))
                             )
 
+                            .then(literal("add-drop-itself")
+                                .executes(context -> {
+
+                                    CustomBlock customBlock = CustomBlock.loadedBlocks.get(context.getArgument("block", String.class));
+                                    if (customBlock == null) return 1;
+
+                                    ItemStack item = ItemStack.of(customBlock.iconMaterial());
+                                    item.setData(DataComponentTypes.ITEM_NAME, customBlock.name());
+                                    item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, customBlock.id()));
+
+                                    String dropsFile = customBlock.rawDropsFile();
+                                    if (dropsFile == null || dropsFile.isEmpty()) {
+
+                                        BlockDrops blockDrops = new BlockDrops(customBlock.id());
+                                        blockDrops.entries().add(new BlockDrops.Entry(item, 1, 1, 1));
+                                        BlockDrops.loadedDrops.put(customBlock.id(), blockDrops);
+                                        blockDrops.saveToFile();
+                                        customBlock.setDropsFile(customBlock.id());
+
+                                    } else {
+
+                                        BlockDrops blockDrops = BlockDrops.loadedDrops.get(dropsFile);
+                                        if (blockDrops == null) {
+
+                                            BlockDrops newDrops = new BlockDrops(customBlock.rawDropsFile());
+                                            newDrops.entries().add(new BlockDrops.Entry(item, 1, 1, 1));
+                                            BlockDrops.loadedDrops.put(customBlock.id(), newDrops);
+                                            newDrops.saveToFile();
+
+                                        } else {
+
+                                            blockDrops.entries().add(new BlockDrops.Entry(item, 1, 1, 1));
+                                            blockDrops.saveToFile();
+
+                                        }
+
+                                    }
+
+                                    context.getSource().getSender().sendRichMessage("<green>Drop added!");
+
+                                    return 1;
+
+                                }))
+
                         )
                     )
 
@@ -191,6 +237,32 @@ public class AdvancedMiningCommand {
 
                                 })))
                     )
+
+                    .then(literal("give")
+                        .then(argument("block", StringArgumentType.word())
+                            .suggests((context, builder) -> {
+                                CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
+                                return builder.buildFuture();
+                            })
+                            .executes(context -> {
+
+                                String blockId = StringArgumentType.getString(context, "block");
+                                if (!(context.getSource().getSender() instanceof Player player)) return 1;
+
+                                CustomBlock customBlock = CustomBlock.loadedBlocks.get(blockId);
+                                Material material = customBlock == null ? Material.STONE : customBlock.iconMaterial();
+                                Component name = customBlock == null ? Component.text(blockId) : customBlock.name();
+
+                                ItemStack item = ItemStack.of(material);
+                                item.setData(DataComponentTypes.ITEM_NAME, name);
+                                item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, blockId));
+
+                                player.give(item);
+
+                                return 1;
+
+                            })
+                        ))
 
                 )
 
