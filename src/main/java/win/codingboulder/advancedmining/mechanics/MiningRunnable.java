@@ -58,13 +58,13 @@ public class MiningRunnable extends BukkitRunnable {
     @Override
     public void run() {
 
-        if (isCanceled) {this.cancel(); Events.miningRunnables.remove(player); return;}
-        if (miningSpeed >= customBlock.strength()) {breakBlock(); this.cancel(); Events.miningRunnables.remove(player); return;} //check if instamine
+        if (isCanceled) {this.cancel(); MiningEvents.miningRunnables.remove(player); return;}
+        if (miningSpeed >= customBlock.strength()) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.remove(player); return;} //check if instamine
 
         if (miningProgress <= 0) {
             breakBlock();
             this.cancel();
-            Events.miningRunnables.remove(player);
+            MiningEvents.miningRunnables.remove(player);
             return;
         }
 
@@ -91,7 +91,7 @@ public class MiningRunnable extends BukkitRunnable {
         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getBlockData());
         block.setType(Material.AIR);
 
-        BlockDrops blockDrops = BlockDrops.loadedDrops.get(customBlock.customBlockInfo().dropsFile());
+        BlockDrops blockDrops = BlockDrops.loadedDrops.get(customBlock.rawDropsFile());
         if (blockDrops != null)
             for (ItemStack item : blockDrops.rollDrops()) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 

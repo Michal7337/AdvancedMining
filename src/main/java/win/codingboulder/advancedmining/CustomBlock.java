@@ -1,5 +1,7 @@
 package win.codingboulder.advancedmining;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -9,36 +11,58 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import win.codingboulder.advancedmining.mechanics.BlockDrops;
 
-import java.io.File;
+import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class CustomBlock {
 
     public static final NamespacedKey blockIdKey = new NamespacedKey("advancedmining", "block_id");
     public static HashMap<String, CustomBlock> loadedBlocks = new HashMap<>();
 
-    private CustomBlockInfo customBlockInfo;
-
+    // Main attributes
     private String id;
-    private Component name;
+    private String name;
     private Material material;
     private float strength;
     private int hardness;
 
+    // Additional attributes
     private String bestTool;
-    private Key texture;
-    private Key breakSound;
-    private Key placeSound;
+    private String texture;
+    private String breakSound;
+    private String placeSound;
     private Material iconMaterial;
-    private File dropsFile;
+    private String dropsFile;
 
-    public CustomBlock(CustomBlockInfo customBlockInfo, String id, Component name, Material material, float strength, int hardness, String bestTool, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
+    // Converted attributes
+    private transient Component nameComponent;
+    private transient Key textureKey;
+    private transient Key breakSoundKey;
+    private transient Key placeSoundKey;
+    private transient File blockDropsFile;
+    private transient BlockDrops blockDrops;
 
-        this.customBlockInfo = customBlockInfo;
+    public CustomBlock(
+        String id,
+        String name,
+        Material material,
+        float strength,
+        int hardness,
+        String bestTool,
+        String texture,
+        String breakSound,
+        String placeSound,
+        Material iconMaterial,
+        String dropsFile
+    ) {
+
         this.id = id;
         this.name = name;
         this.material = material;
@@ -49,9 +73,54 @@ public class CustomBlock {
         this.breakSound = breakSound;
         this.placeSound = placeSound;
         this.iconMaterial = iconMaterial;
-
         this.dropsFile = dropsFile;
 
+        constructAttributes();
+
+    }
+
+    public void constructAttributes() {
+
+        this.nameComponent = MiniMessage.miniMessage().deserialize(name);
+        this.textureKey = texture == null || texture.isEmpty() ? null : Key.key(texture);
+        this.placeSoundKey = placeSound == null || placeSound.isEmpty() ? null : Key.key(placeSound);
+        this.breakSoundKey = breakSound == null || breakSound.isEmpty() ? null : Key.key(breakSound);
+        this.blockDropsFile = new File(AdvancedMining.blockDropsFolder, dropsFile);
+
+    }
+
+    public void saveToFile() {
+
+        File file = new File(AdvancedMining.blocksFolder, id + ".json");
+        try (FileWriter writer = new FileWriter(file)) {
+            new GsonBuilder().setPrettyPrinting().create().toJson(this, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while saving custom block!", e);
+        }
+
+    }
+
+    public static void loadBlocks() {
+
+        File[] files = AdvancedMining.blocksFolder.listFiles();
+        if (files == null) return;
+
+        loadedBlocks = new HashMap<>();
+        for (File file : files) {
+            try {
+                CustomBlock customBlock = new Gson().fromJson(new FileReader(file), CustomBlock.class);
+                customBlock.constructAttributes();
+                loadedBlocks.put(customBlock.id(), customBlock);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public void editAndSave(@NotNull Consumer<CustomBlock> block) {
+        block.accept(this);
+        saveToFile();
     }
 
     public static @Nullable CustomBlock getCustomBlock(@NotNull Block block) {
@@ -89,47 +158,6 @@ public class CustomBlock {
 
     }
 
-    public static @NotNull CustomBlock constructFromInfo(@NotNull CustomBlockInfo blockInfo) {
-
-        Key texture = !blockInfo.texture().isEmpty() ? Key.key(blockInfo.texture()) : null;
-        Key placeSound = !blockInfo.placeSound().isEmpty() ? Key.key(blockInfo.placeSound()) : null;
-        Key breakSound = !blockInfo.breakSound().isEmpty() ? Key.key(blockInfo.breakSound()) : null;
-
-        return new CustomBlock(
-            blockInfo,
-            blockInfo.id(),
-            MiniMessage.miniMessage().deserialize(blockInfo.name()),
-            blockInfo.material(),
-            blockInfo.strength(),
-            blockInfo.hardness(),
-            blockInfo.bestTool(),
-            texture,
-            breakSound,
-            placeSound,
-            blockInfo.iconMaterial(),
-            new File(AdvancedMining.blockDropsFolder, blockInfo.dropsFile())
-        );
-
-    }
-
-    public static void loadBlocks() {
-
-        CustomBlockInfo.loadBlocks();
-
-        loadedBlocks = new HashMap<>();
-        for (CustomBlockInfo blockInfo : CustomBlockInfo.loadedBlocks.values())
-            loadedBlocks.put(blockInfo.id(), constructFromInfo(blockInfo));
-
-    }
-
-    public CustomBlockInfo customBlockInfo() {
-        return customBlockInfo;
-    }
-
-    public void setCustomBlockInfo(CustomBlockInfo customBlockInfo) {
-        this.customBlockInfo = customBlockInfo;
-    }
-
     public String id() {
         return id;
     }
@@ -139,11 +167,21 @@ public class CustomBlock {
     }
 
     public Component name() {
+        return nameComponent;
+    }
+
+    public String rawName() {
         return name;
     }
 
-    public void setName(Component name) {
+    public void setName(String name) {
         this.name = name;
+        this.nameComponent = MiniMessage.miniMessage().deserialize(name);
+    }
+
+    public void setName(Component name) {
+        this.nameComponent = name;
+        this.name = MiniMessage.miniMessage().serialize(name);
     }
 
     public Material material() {
@@ -178,28 +216,60 @@ public class CustomBlock {
         this.bestTool = bestTool;
     }
 
-    public Key texture() {
+    @Subst("example:some_ore")
+    public String rawTexture() {
         return texture;
     }
 
-    public void setTexture(Key texture) {
-        this.texture = texture;
+    public Key texture() {
+        return textureKey;
     }
 
-    public Key breakSound() {
+    public void setTexture(String texture) {
+        this.texture = texture;
+        this.textureKey = texture == null || texture.isEmpty() ? null : Key.key(texture);
+    }
+
+    public void setTexture(@NotNull Key texture) {
+        this.textureKey = texture;
+        this.texture = texture.asString();
+    }
+
+    @Subst("example:some_ore_break")
+    public String rawBreakSound() {
         return breakSound;
     }
 
-    public void setBreakSound(Key breakSound) {
-        this.breakSound = breakSound;
+    public Key breakSound() {
+        return breakSoundKey;
     }
 
-    public Key placeSound() {
+    public void setBreakSound(String breakSound) {
+        this.breakSound = breakSound;
+        this.breakSoundKey = breakSound == null || breakSound.isEmpty() ? null : Key.key(breakSound);
+    }
+
+    public void setBreakSound(@NotNull Key breakSound) {
+        this.breakSoundKey = breakSound;
+        this.breakSound = breakSound.asString();
+    }
+
+    @Subst("example:some_ore_place")
+    public String rawPlaceSound() {
         return placeSound;
     }
 
-    public void setPlaceSound(Key placeSound) {
+    public Key placeSound() {
+        return placeSoundKey;
+    }
+
+    public void setPlaceSound(String placeSound) {
         this.placeSound = placeSound;
+        this.placeSoundKey = placeSound == null || placeSound.isEmpty() ? null : Key.key(placeSound);
+    }
+
+    public void setPlaceSound(Key placeSound) {
+        this.placeSoundKey = placeSound;
     }
 
     public Material iconMaterial() {
@@ -210,12 +280,30 @@ public class CustomBlock {
         this.iconMaterial = iconMaterial;
     }
 
-    public File dropsFile() {
+    public String rawDropsFile() {
         return dropsFile;
     }
 
-    public void setDropsFile(File dropsFile) {
+    public File dropsFile() {
+        return blockDropsFile;
+    }
+
+    public void setDropsFile(String dropsFile) {
         this.dropsFile = dropsFile;
+        this.blockDropsFile = new File(AdvancedMining.blockDropsFolder, dropsFile);
+    }
+
+    public void setDropsFile(@NotNull File dropsFile) {
+        this.blockDropsFile = dropsFile;
+        this.dropsFile = dropsFile.getName();
+    }
+
+    public BlockDrops blockDrops() {
+        return blockDrops;
+    }
+
+    public void setBlockDrops(BlockDrops blockDrops) {
+        this.blockDrops = blockDrops;
     }
 
 }

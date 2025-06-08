@@ -50,7 +50,7 @@ public class AdvancedMiningCommand {
                                                     return 1;
                                                 }
 
-                                                CustomBlockInfo blockInfo = new CustomBlockInfo(
+                                                CustomBlock customBlock = new CustomBlock(
                                                     StringArgumentType.getString(context, "id"),
                                                     StringArgumentType.getString(context, "name"),
                                                     mat,
@@ -64,9 +64,8 @@ public class AdvancedMiningCommand {
                                                     ""
                                                 );
 
-                                                blockInfo.saveToFile();
-                                                CustomBlockInfo.loadedBlocks.put(blockInfo.id(), blockInfo);
-                                                CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
+                                                customBlock.saveToFile();
+                                                CustomBlock.loadedBlocks.put(customBlock.id(), customBlock);
 
                                                 return 1;
 
@@ -82,7 +81,7 @@ public class AdvancedMiningCommand {
                                                         return 1;
                                                     }
 
-                                                    CustomBlockInfo blockInfo = new CustomBlockInfo(
+                                                    CustomBlock customBlock = new CustomBlock(
                                                         StringArgumentType.getString(context, "id"),
                                                         StringArgumentType.getString(context, "name"),
                                                         mat,
@@ -96,9 +95,8 @@ public class AdvancedMiningCommand {
                                                         ""
                                                     );
 
-                                                    blockInfo.saveToFile();
-                                                    CustomBlockInfo.loadedBlocks.put(blockInfo.id(), blockInfo);
-                                                    CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
+                                                    customBlock.saveToFile();
+                                                    CustomBlock.loadedBlocks.put(customBlock.id(), customBlock);
 
                                                     return 1;
 
@@ -117,7 +115,7 @@ public class AdvancedMiningCommand {
                                                                             return 1;
                                                                         }
 
-                                                                        CustomBlockInfo blockInfo = new CustomBlockInfo(
+                                                                        CustomBlock customBlock = new CustomBlock(
                                                                             StringArgumentType.getString(context, "id"),
                                                                             StringArgumentType.getString(context, "name"),
                                                                             mat,
@@ -131,9 +129,8 @@ public class AdvancedMiningCommand {
                                                                             StringArgumentType.getString(context, "drops-file")
                                                                         );
 
-                                                                        blockInfo.saveToFile();
-                                                                        CustomBlockInfo.loadedBlocks.put(blockInfo.id(), blockInfo);
-                                                                        CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
+                                                                        customBlock.saveToFile();
+                                                                        CustomBlock.loadedBlocks.put(customBlock.id(), customBlock);
 
                                                                         return 1;
 
@@ -158,7 +155,7 @@ public class AdvancedMiningCommand {
                                     })
                                     .executes(context -> {
 
-                                        CustomBlockInfo blockInfo = CustomBlockInfo.loadedBlocks.get(context.getArgument("block", String.class));
+                                        CustomBlock blockInfo = CustomBlock.loadedBlocks.get(context.getArgument("block", String.class));
                                         if (blockInfo == null) return 1;
                                         blockInfo.editAndSave(block -> block.setDropsFile(context.getArgument("file", String.class)));
 

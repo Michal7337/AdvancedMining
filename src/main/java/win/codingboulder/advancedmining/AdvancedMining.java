@@ -3,7 +3,7 @@ package win.codingboulder.advancedmining;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
-import win.codingboulder.advancedmining.mechanics.Events;
+import win.codingboulder.advancedmining.mechanics.MiningEvents;
 
 import java.io.File;
 
@@ -28,7 +28,7 @@ public final class AdvancedMining extends JavaPlugin {
 
         loadConfig();
 
-        getServer().getPluginManager().registerEvents(new Events(), this);
+        getServer().getPluginManager().registerEvents(new MiningEvents(), this);
 
         new AdvancedMiningCommand(this);
 

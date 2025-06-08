@@ -19,7 +19,7 @@ import win.codingboulder.advancedmining.CustomBlock;
 
 import java.util.HashMap;
 
-public class Events implements Listener {
+public class MiningEvents implements Listener {
 
     public static HashMap<Player, MiningRunnable> miningRunnables = new HashMap<>();
 
