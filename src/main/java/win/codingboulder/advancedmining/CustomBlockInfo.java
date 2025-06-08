@@ -4,13 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.Material;
 import org.intellij.lang.annotations.Subst;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class CustomBlockInfo {
 
-    public static ArrayList<CustomBlockInfo> loadedBlocks = new ArrayList<>();
+    public static HashMap<String, CustomBlockInfo> loadedBlocks = new HashMap<>();
 
     private String id;
     private String name;
@@ -69,16 +72,21 @@ public class CustomBlockInfo {
         File[] files = AdvancedMining.blocksFolder.listFiles();
         if (files == null) return;
 
-        loadedBlocks = new ArrayList<>();
+        loadedBlocks = new HashMap<>();
         for (File file : files) {
             try {
                 CustomBlockInfo blockInfo = new Gson().fromJson(new FileReader(file), CustomBlockInfo.class);
-                loadedBlocks.add(blockInfo);
+                loadedBlocks.put(blockInfo.id(), blockInfo);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
 
+    }
+
+    public void editAndSave(@NotNull Consumer<CustomBlockInfo> block) {
+        block.accept(this);
+        saveToFile();
     }
 
     public String id() {

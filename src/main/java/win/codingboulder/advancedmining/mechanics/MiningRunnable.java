@@ -3,8 +3,11 @@ package win.codingboulder.advancedmining.mechanics;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Effect;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.BlockDataStorage;
@@ -82,9 +85,15 @@ public class MiningRunnable extends BukkitRunnable {
 
     public void breakBlock() {
 
-        block.breakNaturally(true, false);
         player.sendBlockDamage(block.getLocation(), 0f, randomId);
         player.hideBossBar(progressbar);
+
+        block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getBlockData());
+        block.setType(Material.AIR);
+
+        BlockDrops blockDrops = BlockDrops.loadedDrops.get(customBlock.customBlockInfo().dropsFile());
+        if (blockDrops != null)
+            for (ItemStack item : blockDrops.rollDrops()) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 
         BlockDataStorage.editContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 

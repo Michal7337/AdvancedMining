@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import win.codingboulder.advancedmining.mechanics.BlockDrops;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class AdvancedMiningCommand {
                                                 );
 
                                                 blockInfo.saveToFile();
-                                                CustomBlockInfo.loadedBlocks.add(blockInfo);
+                                                CustomBlockInfo.loadedBlocks.put(blockInfo.id(), blockInfo);
                                                 CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
 
                                                 return 1;
@@ -96,7 +97,7 @@ public class AdvancedMiningCommand {
                                                     );
 
                                                     blockInfo.saveToFile();
-                                                    CustomBlockInfo.loadedBlocks.add(blockInfo);
+                                                    CustomBlockInfo.loadedBlocks.put(blockInfo.id(), blockInfo);
                                                     CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
 
                                                     return 1;
@@ -131,7 +132,7 @@ public class AdvancedMiningCommand {
                                                                         );
 
                                                                         blockInfo.saveToFile();
-                                                                        CustomBlockInfo.loadedBlocks.add(blockInfo);
+                                                                        CustomBlockInfo.loadedBlocks.put(blockInfo.id(), blockInfo);
                                                                         CustomBlock.loadedBlocks.put(blockInfo.id(), CustomBlock.constructFromInfo(blockInfo));
 
                                                                         return 1;
@@ -140,6 +141,33 @@ public class AdvancedMiningCommand {
                                             )
 
                                         )))))
+                    )
+
+                    .then(literal("edit")
+                        .then(argument("block", StringArgumentType.word())
+                            .suggests((context, builder) -> {
+                                CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
+                                return builder.buildFuture();
+                            })
+
+                            .then(literal("drops-file")
+                                .then(argument("file", StringArgumentType.word())
+                                    .suggests((context, builder) -> {
+                                        BlockDrops.loadedDrops.keySet().forEach(builder::suggest);
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(context -> {
+
+                                        CustomBlockInfo blockInfo = CustomBlockInfo.loadedBlocks.get(context.getArgument("block", String.class));
+                                        if (blockInfo == null) return 1;
+                                        blockInfo.editAndSave(block -> block.setDropsFile(context.getArgument("file", String.class)));
+
+                                        return 1;
+
+                                    }))
+                            )
+
+                        )
                     )
 
                     .then(literal("place")
@@ -216,6 +244,82 @@ public class AdvancedMiningCommand {
                                             })))))
                         ))
 
+                )
+
+                .then(literal("drops")
+                    .then(literal("create")
+                        .then(argument("name", StringArgumentType.word())
+                            .executes(context -> {
+
+                                BlockDrops blockDrops = new BlockDrops(StringArgumentType.getString(context, "name"));
+                                BlockDrops.loadedDrops.put(blockDrops.id(), blockDrops);
+                                blockDrops.saveToFile();
+
+                                return 1;
+
+                            }))
+                    )
+                    .then(literal("edit")
+                        .then(argument("name", StringArgumentType.word())
+                            .suggests((context, builder) -> {
+                                BlockDrops.loadedDrops.keySet().forEach(builder::suggest);
+                                return builder.buildFuture();
+                            })
+
+                            .then(literal("add-entry")
+                                .then(argument("chance", FloatArgumentType.floatArg(0f, 1f))
+                                    .then(argument("item", ArgumentTypes.itemStack())
+                                        .then(argument("min-amount", IntegerArgumentType.integer(1))
+                                            .then(argument("max-amount", IntegerArgumentType.integer(1))
+                                                .executes(context -> {
+
+                                                    BlockDrops blockDrops = BlockDrops.loadedDrops.get(StringArgumentType.getString(context, "name"));
+                                                    if (blockDrops == null) {
+                                                        context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
+                                                        return 1;
+                                                    }
+
+                                                    blockDrops.entries().add(new BlockDrops.Entry(
+                                                        context.getArgument("item", ItemStack.class),
+                                                        IntegerArgumentType.getInteger(context, "min-amount"),
+                                                        IntegerArgumentType.getInteger(context, "max-amount"),
+                                                        FloatArgumentType.getFloat(context, "chance")
+                                                    ));
+
+                                                    blockDrops.saveToFile();
+
+                                                    return 1;
+
+                                                }))))
+                                    .then(literal("hand")
+                                        .requires(source -> source.getSender() instanceof Player)
+                                        .then(argument("min-amount", IntegerArgumentType.integer(1))
+                                            .then(argument("max-amount", IntegerArgumentType.integer(1))
+                                                .executes(context -> {
+
+                                                    BlockDrops blockDrops = BlockDrops.loadedDrops.get(StringArgumentType.getString(context, "name"));
+                                                    if (blockDrops == null) {
+                                                        context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
+                                                        return 1;
+                                                    }
+
+                                                    Player player = (Player) context.getSource().getSender();
+                                                    ItemStack itemStack = player.getInventory().getItemInMainHand();
+                                                    if (itemStack.isEmpty()) return 1;
+
+                                                    blockDrops.entries().add(new BlockDrops.Entry(
+                                                        itemStack,
+                                                        IntegerArgumentType.getInteger(context, "min-amount"),
+                                                        IntegerArgumentType.getInteger(context, "max-amount"),
+                                                        FloatArgumentType.getFloat(context, "chance")
+                                                    ));
+
+                                                    blockDrops.saveToFile();
+
+                                                    return 1;
+
+                                                })))))
+                            )))
                 )
 
                 .build()

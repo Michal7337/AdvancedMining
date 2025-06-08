@@ -21,6 +21,8 @@ public class CustomBlock {
     public static final NamespacedKey blockIdKey = new NamespacedKey("advancedmining", "block_id");
     public static HashMap<String, CustomBlock> loadedBlocks = new HashMap<>();
 
+    private CustomBlockInfo customBlockInfo;
+
     private String id;
     private Component name;
     private Material material;
@@ -34,8 +36,9 @@ public class CustomBlock {
     private Material iconMaterial;
     private File dropsFile;
 
-    public CustomBlock(String id, Component name, Material material, float strength, int hardness, String bestTool, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
+    public CustomBlock(CustomBlockInfo customBlockInfo, String id, Component name, Material material, float strength, int hardness, String bestTool, Key texture, Key breakSound, Key placeSound, Material iconMaterial, File dropsFile) {
 
+        this.customBlockInfo = customBlockInfo;
         this.id = id;
         this.name = name;
         this.material = material;
@@ -93,6 +96,7 @@ public class CustomBlock {
         Key breakSound = !blockInfo.breakSound().isEmpty() ? Key.key(blockInfo.breakSound()) : null;
 
         return new CustomBlock(
+            blockInfo,
             blockInfo.id(),
             MiniMessage.miniMessage().deserialize(blockInfo.name()),
             blockInfo.material(),
@@ -113,9 +117,17 @@ public class CustomBlock {
         CustomBlockInfo.loadBlocks();
 
         loadedBlocks = new HashMap<>();
-        for (CustomBlockInfo blockInfo : CustomBlockInfo.loadedBlocks)
+        for (CustomBlockInfo blockInfo : CustomBlockInfo.loadedBlocks.values())
             loadedBlocks.put(blockInfo.id(), constructFromInfo(blockInfo));
 
+    }
+
+    public CustomBlockInfo customBlockInfo() {
+        return customBlockInfo;
+    }
+
+    public void setCustomBlockInfo(CustomBlockInfo customBlockInfo) {
+        this.customBlockInfo = customBlockInfo;
     }
 
     public String id() {

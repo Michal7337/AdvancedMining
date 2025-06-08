@@ -24,7 +24,7 @@ public class BlockDrops implements Serializable {
 
         for (Entry entry : entries)
             if (new Random().nextDouble() <= entry.chance)
-                droppedItems.addAll(List.of(getCostItemsArray(entry.itemStack, entry.amount)));
+                droppedItems.addAll(List.of(getCostItemsArray(entry.itemStack, new Random().nextInt(entry.minAmount, entry.maxAmount + 1))));
 
         return droppedItems.toArray(new ItemStack[]{});
 
@@ -102,18 +102,26 @@ public class BlockDrops implements Serializable {
         return entries;
     }
 
-    public static class Entry {
+    public static class Entry implements Serializable {
 
         private transient ItemStack itemStack;
-        private int amount;
+        private int minAmount;
+        private int maxAmount;
         private float chance;
         private byte[] item;
 
-        public Entry(@NotNull ItemStack itemStack, int amount, float chance) {
+        public Entry(@NotNull ItemStack itemStack, int minAmount, int maxAmount, float chance) {
             this.itemStack = itemStack;
-            this.amount = amount;
+            this.minAmount = minAmount;
+            this.maxAmount = maxAmount;
             this.chance = chance;
             this.item = itemStack.serializeAsBytes();
+        }
+
+        @Serial
+        private void readObject(@NotNull ObjectInputStream stream) throws IOException, ClassNotFoundException {
+            stream.defaultReadObject();
+            itemStack = ItemStack.deserializeBytes(item);
         }
 
         public ItemStack item() {
@@ -124,12 +132,20 @@ public class BlockDrops implements Serializable {
             this.itemStack = itemStack;
         }
 
-        public int amount() {
-            return amount;
+        public int minAmount() {
+            return minAmount;
         }
 
-        public void setAmount(int amount) {
-            this.amount = amount;
+        public void setMinAmount(int minAmount) {
+            this.minAmount = minAmount;
+        }
+
+        public int maxAmount() {
+            return maxAmount;
+        }
+
+        public void setMaxAmount(int maxAmount) {
+            this.maxAmount = maxAmount;
         }
 
         public float chance() {

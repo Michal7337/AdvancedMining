@@ -2,6 +2,7 @@ package win.codingboulder.advancedmining;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
+import win.codingboulder.advancedmining.mechanics.BlockDrops;
 import win.codingboulder.advancedmining.mechanics.Events;
 
 import java.io.File;
@@ -50,6 +51,7 @@ public final class AdvancedMining extends JavaPlugin {
         blockDropsFolder.mkdir();
 
         CustomBlock.loadBlocks();
+        BlockDrops.loadAll();
 
     }
 
