@@ -9,6 +9,8 @@ import java.util.*;
 
 public class BlockDrops implements Serializable {
 
+    @Serial private static final long serialVersionUID = 4598191079417030808L;
+
     public static final HashMap<String, BlockDrops> loadedDrops = new HashMap<>();
 
     private String id;
@@ -16,6 +18,12 @@ public class BlockDrops implements Serializable {
 
     public BlockDrops(String id) {
         this.id = id;
+    }
+
+    public static @NotNull BlockDrops singleDrop(String id, ItemStack item, int minAmount, int maxAmount, float chance) {
+        BlockDrops blockDrops = new BlockDrops(id);
+        blockDrops.entries.add(new Entry(item, minAmount, maxAmount, chance));
+        return blockDrops;
     }
 
     public ItemStack[] rollDrops() {
@@ -75,7 +83,7 @@ public class BlockDrops implements Serializable {
             return (BlockDrops) ois.readObject();
 
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
 
     }

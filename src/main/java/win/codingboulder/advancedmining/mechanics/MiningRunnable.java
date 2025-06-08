@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
+import win.codingboulder.advancedmining.api.CustomBlockBreakEvent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -88,14 +89,19 @@ public class MiningRunnable extends BukkitRunnable {
         player.sendBlockDamage(block.getLocation(), 0f, randomId);
         player.hideBossBar(progressbar);
 
-        block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getBlockData());
+        BlockDrops blockDrops = BlockDrops.loadedDrops.get(customBlock.rawDropsFile());
+
+        CustomBlockBreakEvent blockBreakEvent = new CustomBlockBreakEvent(player, block, customBlock, blockDrops, true, true);
+        if (!blockBreakEvent.callEvent()) return;
+
+        if (blockBreakEvent.playBreakEffect()) block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getBlockData());
         block.setType(Material.AIR);
 
-        BlockDrops blockDrops = BlockDrops.loadedDrops.get(customBlock.rawDropsFile());
+        blockDrops = blockBreakEvent.blockDrops();
         if (blockDrops != null)
             for (ItemStack item : blockDrops.rollDrops()) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 
-        BlockDataStorage.editContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
+        if (blockBreakEvent.removeBlockData()) BlockDataStorage.editContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
     }
 
@@ -122,4 +128,5 @@ public class MiningRunnable extends BukkitRunnable {
     public float miningProgress() {
         return miningProgress;
     }
+
 }
