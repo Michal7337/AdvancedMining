@@ -17,6 +17,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.CustomBlock;
+import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
 import java.util.HashMap;
 
@@ -48,6 +49,15 @@ public class MiningEvents implements Listener {
         float miningSpeed = pdc.getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, 0f);
         int breakingPower = pdc.getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, 0);
         String toolType = item.isEmpty() ? "hand" : pdc.getOrDefault(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, "");
+
+        CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, miningSpeed, breakingPower, toolType);
+
+        if (!breakStartEvent.callEvent()) return;
+
+        customBlock = breakStartEvent.getCustomBlock();
+        miningSpeed = breakStartEvent.getMiningSpeed();
+        breakingPower = breakStartEvent.getBreakingPower();
+        toolType = breakStartEvent.getToolType();
 
         //checks for tool and hardness
         if (!customBlock.bestTool().isEmpty() && !toolType.equals(customBlock.bestTool())) return;
