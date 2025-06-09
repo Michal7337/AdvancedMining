@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
 import win.codingboulder.advancedmining.api.CustomBlockBreakEvent;
+import win.codingboulder.advancedmining.api.CustomBlockBreakProgressEvent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,10 +33,11 @@ public class MiningRunnable extends BukkitRunnable {
     private float miningProgress;
     public BossBar progressbar;
     Component barName;
+    public int tick;
 
     public boolean isCanceled;
 
-    public MiningRunnable(Block block, @NotNull CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
+    public MiningRunnable(Block block, @NotNull CustomBlock customBlock, @NotNull Player player, float miningSpeed, int breakingPower) {
 
         this.block = block;
         this.customBlock = customBlock;
@@ -49,7 +51,7 @@ public class MiningRunnable extends BukkitRunnable {
         decimalFormat.setRoundingMode(RoundingMode.CEILING);
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
-        progressbar = BossBar.bossBar(barName, 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
+        progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
         player.showBossBar(progressbar);
 
     }
@@ -71,7 +73,14 @@ public class MiningRunnable extends BukkitRunnable {
 
         float breakFraction = 1 - miningProgress / customBlock.strength();
         float breakStage = Float.parseFloat(decimalFormat.format(breakFraction));
-        if (breakStage > lastState) {
+
+        CustomBlockBreakProgressEvent event = new CustomBlockBreakProgressEvent(player, block, customBlock, miningProgress, miningSpeed, breakStage, tick);
+        if (!event.callEvent()) {tick++; return;}
+
+        miningProgress = event.progress();
+        breakStage = event.breakStage();
+
+        if (breakStage != lastState) {
             player.sendBlockDamage(block.getLocation(), breakStage, randomId);
             lastState = breakStage;
         }
@@ -80,7 +89,8 @@ public class MiningRunnable extends BukkitRunnable {
         progressbar.name(barName.append(Component.text(barPercent + "%", NamedTextColor.WHITE)));
         progressbar.progress(breakFraction);
 
-        miningProgress -= miningSpeed;
+        miningProgress -= event.tickProgress();
+        tick ++;
 
     }
 
