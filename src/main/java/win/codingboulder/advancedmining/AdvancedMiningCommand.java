@@ -11,6 +11,7 @@ import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -143,11 +144,7 @@ public class AdvancedMiningCommand {
                     )
 
                     .then(literal("edit")
-                        .then(argument("block", StringArgumentType.word())
-                            .suggests((context, builder) -> {
-                                CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
-                                return builder.buildFuture();
-                            })
+                        .then(argument("block", CustomBlockArgument.blockArgument())
 
                             .then(literal("drops-file")
                                 .then(argument("file", StringArgumentType.word())
@@ -157,9 +154,68 @@ public class AdvancedMiningCommand {
                                     })
                                     .executes(context -> {
 
-                                        CustomBlock blockInfo = CustomBlock.loadedBlocks.get(context.getArgument("block", String.class));
-                                        if (blockInfo == null) return 1;
-                                        blockInfo.editAndSave(block -> block.setDropsFile(context.getArgument("file", String.class)));
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setDropsFile(context.getArgument("file", String.class)));
+
+                                        return 1;
+
+                                    }))
+                            )
+
+                            .then(literal("best-tool")
+                                .then(argument("tool", StringArgumentType.word())
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setBestTool(context.getArgument("tool", String.class)));
+
+                                        return 1;
+
+                                    }))
+                            )
+
+                            .then(literal("texture")
+                                .then(argument("texture", ArgumentTypes.key())
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setTexture(context.getArgument("texture", Key.class)));
+
+                                        return 1;
+
+                                    }))
+                            )
+
+                            .then(literal("icon-material")
+                                .then(argument("material", ArgumentTypes.blockState())
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setIconMaterial(context.getArgument("material", BlockState.class).getType()));
+
+                                        return 1;
+
+                                    }))
+                            )
+
+                            .then(literal("break-sound")
+                                .then(argument("sound", ArgumentTypes.resourceKey(RegistryKey.SOUND_EVENT))
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setBreakSound(context.getArgument("sound", TypedKey.class)));
+
+                                        return 1;
+
+                                    }))
+                            )
+
+                            .then(literal("place-sound")
+                                .then(argument("sound", ArgumentTypes.resourceKey(RegistryKey.SOUND_EVENT))
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setPlaceSound(context.getArgument("sound", TypedKey.class)));
 
                                         return 1;
 
@@ -169,8 +225,7 @@ public class AdvancedMiningCommand {
                             .then(literal("add-drop-itself")
                                 .executes(context -> {
 
-                                    CustomBlock customBlock = CustomBlock.loadedBlocks.get(context.getArgument("block", String.class));
-                                    if (customBlock == null) return 1;
+                                    CustomBlock customBlock = context.getArgument("block", CustomBlock.class);
 
                                     ItemStack item = ItemStack.of(customBlock.iconMaterial());
                                     item.setData(DataComponentTypes.ITEM_NAME, customBlock.name());

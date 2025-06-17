@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +38,10 @@ public class CustomBlockArgument implements CustomArgumentType.Converted<CustomB
     @Override
     public @NotNull ArgumentType<String> getNativeType() {
         return StringArgumentType.word();
+    }
+
+    public static CustomBlockArgument blockArgument() {
+        return new CustomBlockArgument();
     }
 
 }
