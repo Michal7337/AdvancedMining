@@ -63,7 +63,7 @@ public class MiningEvents implements Listener {
         if (!customBlock.bestTool().isEmpty() && !toolType.equals(customBlock.bestTool())) return;
 
         if (customBlock.hardness() > breakingPower) {
-            if (!item.isEmpty()) player.sendRichMessage("<red>You need a better tool to mine this!");
+            if (!item.isEmpty()) player.sendRichMessage("<red>You need at least Breaking Power " + customBlock.hardness() + " to mine this!");
             return;
         }
 

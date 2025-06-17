@@ -38,6 +38,7 @@ public class MiningRunnable extends BukkitRunnable {
     public int tick;
 
     public boolean isCanceled;
+    public boolean instaMine;
 
     public MiningRunnable(Block block, @NotNull CustomBlock customBlock, @NotNull Player player, float miningSpeed, int breakingPower) {
 
@@ -51,10 +52,11 @@ public class MiningRunnable extends BukkitRunnable {
         miningProgress = customBlock.strength();
         decimalFormat = new DecimalFormat("#.#");
         decimalFormat.setRoundingMode(RoundingMode.CEILING);
+        instaMine = miningSpeed >= customBlock.strength();
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
         progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
-        player.showBossBar(progressbar);
+        if (!instaMine) player.showBossBar(progressbar);
 
     }
 
@@ -64,7 +66,7 @@ public class MiningRunnable extends BukkitRunnable {
     public void run() {
 
         if (isCanceled) {this.cancel(); MiningEvents.miningRunnables.remove(player); return;}
-        if (miningSpeed >= customBlock.strength()) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.remove(player); return;} //check if instamine
+        if (instaMine) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.remove(player); return;}
 
         if (miningProgress <= 0) {
             breakBlock();
