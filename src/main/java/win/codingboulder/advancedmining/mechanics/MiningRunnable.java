@@ -6,6 +6,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -104,7 +106,11 @@ public class MiningRunnable extends BukkitRunnable {
         CustomBlockBreakEvent blockBreakEvent = new CustomBlockBreakEvent(player, block, customBlock, blockDrops, true, true);
         if (!blockBreakEvent.callEvent()) return;
 
-        if (blockBreakEvent.playBreakEffect()) block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getBlockData());
+        ItemDisplay display = CustomBlock.getDisplayEntity(block);
+        BlockData blockData = display == null ? block.getBlockData() : customBlock.iconMaterial().createBlockData();
+        if (display != null) display.remove();
+
+        if (blockBreakEvent.playBreakEffect()) block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, blockData);
         block.setType(Material.AIR);
 
         blockDrops = blockBreakEvent.blockDrops();

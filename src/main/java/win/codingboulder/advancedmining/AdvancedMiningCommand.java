@@ -127,7 +127,7 @@ public class AdvancedMiningCommand {
                                                                             StringArgumentType.getString(context, "texture"),
                                                                             context.getArgument("break-sound", TypedKey.class).asString(),
                                                                             context.getArgument("place-sound", TypedKey.class).asString(),
-                                                                            mat,
+                                                                            context.getArgument("icon-material", BlockState.class).getType(),
                                                                             StringArgumentType.getString(context, "drops-file")
                                                                         );
 

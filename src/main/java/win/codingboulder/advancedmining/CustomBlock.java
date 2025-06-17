@@ -2,6 +2,7 @@ package win.codingboulder.advancedmining;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -9,11 +10,14 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ItemDisplay;
-import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
 
 import java.io.*;
@@ -133,12 +137,12 @@ public class CustomBlock {
 
     public static void setCustomBlock(Block block, String id) {
 
-        PersistentDataContainer pdc =  BlockDataStorage.getDataContainer(block);
-        pdc.set(blockIdKey, PersistentDataType.STRING, id);
-        BlockDataStorage.setContainer(block, pdc);
+        BlockDataStorage.editContainer(block, pdc -> pdc.set(blockIdKey, PersistentDataType.STRING, id));
 
-        if (!loadedBlocks.containsKey(id)) return;
-        block.setType(loadedBlocks.get(id).material);
+        CustomBlock customBlock = loadedBlocks.get(id);
+        if (customBlock == null) return;
+        block.setType(customBlock.material);
+        customBlock.summonDisplayEntity(block);
 
     }
 
@@ -154,7 +158,31 @@ public class CustomBlock {
 
     public static void setDisplayEntity(Block block, @NotNull ItemDisplay itemDisplay) {
 
-        BlockDataStorage.getDataContainer(block).set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString());
+        BlockDataStorage.editContainer(block, pdc ->
+            pdc.set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString()));
+
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public void summonDisplayEntity(Block block) {
+
+        if (textureKey == null) return;
+
+        ItemStack item = ItemStack.of(Material.STONE);
+        item.setData(DataComponentTypes.ITEM_MODEL, textureKey);
+
+        ItemDisplay itemDisplay = block.getWorld().createEntity(block.getLocation().add(0.5, 0.5, 0.5), ItemDisplay.class);
+        itemDisplay.setItemStack(item);
+        itemDisplay.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(1.001f, 1.001f, 1.001f), new AxisAngle4f()));
+        itemDisplay.setViewRange(2);
+        itemDisplay.setShadowStrength(0);
+        itemDisplay.addScoreboardTag("advmining_block");
+        itemDisplay.addScoreboardTag("advmining_block_" + id);
+
+        itemDisplay.spawnAt(block.getLocation().add(0.5, 0.5, 0.5));
+
+        BlockDataStorage.editContainer(block, pdc ->
+            pdc.set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString()));
 
     }
 
