@@ -52,8 +52,9 @@ public final class AdvancedMining extends JavaPlugin {
         blocksFolder.mkdir();
         blockDropsFolder.mkdir();
 
-        CustomBlock.loadBlocks();
+        CustomBlock.loadAll();
         BlockDrops.loadAll();
+        DefaultBlocks.loadFromFile();
 
     }
 

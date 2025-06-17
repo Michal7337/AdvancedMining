@@ -316,8 +316,23 @@ public class AdvancedMiningCommand {
 
                                 return 1;
 
-                            })
-                        ))
+                            }))
+                    )
+
+                    .then(literal("set-default")
+                        .then(argument("material", ArgumentTypes.blockState())
+                            .then(argument("block", CustomBlockArgument.blockArgument())
+                                .executes(context -> {
+
+                                    DefaultBlocks.defaultBlocks().put(
+                                        context.getArgument("material", BlockState.class).getType(),
+                                        context.getArgument("block", CustomBlock.class).id()
+                                    );
+                                    DefaultBlocks.saveToFile();
+
+                                    return 1;
+
+                                }))))
 
                 )
 

@@ -104,7 +104,7 @@ public class CustomBlock {
 
     }
 
-    public static void loadBlocks() {
+    public static void loadAll() {
 
         File[] files = AdvancedMining.blocksFolder.listFiles();
         if (files == null) return;

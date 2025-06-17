@@ -17,6 +17,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.CustomBlock;
+import win.codingboulder.advancedmining.DefaultBlocks;
 import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
 import java.util.HashMap;
@@ -34,8 +35,12 @@ public class MiningEvents implements Listener {
         if (!player.getGameMode().equals(GameMode.SURVIVAL)) return; // Return if the player is not in survival to not break stuff
         if (miningRunnables.containsKey(player)) return; // Return if the player is already mining a block
 
-        CustomBlock customBlock = CustomBlock.getCustomBlock(block);
-        if (customBlock == null) return;
+        // Check if there is a default mapping for this material
+        // If there is no default mapping or if a block is placed there normally set it normally
+        CustomBlock customBlock = DefaultBlocks.getDefaultMapping(block.getType());
+        if (customBlock == null || CustomBlock.getCustomBlock(block) != null) customBlock = CustomBlock.getCustomBlock(block);
+
+        if (customBlock == null) return; // If the block isn't a custom block return
 
         event.setCancelled(true); // prevent breaking of the block if something were to go wrong with mining prevention
 
@@ -44,14 +49,15 @@ public class MiningEvents implements Listener {
         attrib.setBaseValue(0d);
         attrib.getModifiers().forEach(attrib::removeModifier);
 
+        // Get player stats
         ItemStack item = player.getInventory().getItemInMainHand();
         PersistentDataContainerView pdc = item.getPersistentDataContainer();
         float miningSpeed = pdc.getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, 0f);
         int breakingPower = pdc.getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, 0);
         String toolType = item.isEmpty() ? "hand" : pdc.getOrDefault(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, "");
 
+        // Create the event and return if it was cancelled
         CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, miningSpeed, breakingPower, toolType);
-
         if (!breakStartEvent.callEvent()) return;
 
         customBlock = breakStartEvent.getCustomBlock();
@@ -84,7 +90,7 @@ public class MiningEvents implements Listener {
         runnable.isCanceled = true;
         player.sendBlockDamage(event.getBlock().getLocation(), 0f, runnable.randomId);
         player.hideBossBar(runnable.progressbar);
-
+        miningRunnables.remove(player); // note: do not remove the runnable from the list anywhere other than here or breaking blocks
 
     }
 

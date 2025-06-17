@@ -65,7 +65,7 @@ public class MiningRunnable extends BukkitRunnable {
     @Override
     public void run() {
 
-        if (isCanceled) {this.cancel(); MiningEvents.miningRunnables.remove(player); return;}
+        if (isCanceled) {this.cancel(); return;}
         if (instaMine) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.remove(player); return;}
 
         if (miningProgress <= 0) {
