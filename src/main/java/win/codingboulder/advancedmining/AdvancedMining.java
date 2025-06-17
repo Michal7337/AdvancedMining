@@ -1,6 +1,7 @@
 package win.codingboulder.advancedmining;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
 import win.codingboulder.advancedmining.mechanics.MiningEvents;
@@ -45,12 +46,18 @@ public final class AdvancedMining extends JavaPlugin {
         return instance;
     }
 
+    public static boolean showProgressBar;
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void loadConfig() {
 
         getDataFolder().mkdir();
         blocksFolder.mkdir();
         blockDropsFolder.mkdir();
+
+        saveDefaultConfig();
+        FileConfiguration config = getConfig();
+        showProgressBar = config.getBoolean("show-progress-bar", true);
 
         CustomBlock.loadAll();
         BlockDrops.loadAll();

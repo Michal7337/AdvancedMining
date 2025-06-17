@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
 import win.codingboulder.advancedmining.api.CustomBlockBreakEvent;
@@ -56,7 +57,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
         progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
-        if (!instaMine) player.showBossBar(progressbar);
+        if (!instaMine && AdvancedMining.showProgressBar) player.showBossBar(progressbar);
 
     }
 

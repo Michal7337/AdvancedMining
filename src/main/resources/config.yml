@@ -1,0 +1,2 @@
+# Sets if the block breaking progress bar should be shown
+show-progress-bar: true

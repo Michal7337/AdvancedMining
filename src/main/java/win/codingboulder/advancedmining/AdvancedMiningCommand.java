@@ -461,6 +461,14 @@ public class AdvancedMiningCommand {
                             )))
                 )
 
+                .then(literal("reload")
+                    .executes(context -> {
+
+                        AdvancedMining.getInstance().loadConfig();
+                        return 1;
+
+                    }))
+
                 .build()
 
         ));
