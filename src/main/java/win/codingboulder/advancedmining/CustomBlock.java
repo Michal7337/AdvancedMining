@@ -2,6 +2,7 @@ package win.codingboulder.advancedmining;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -115,16 +116,20 @@ public class CustomBlock {
                 CustomBlock customBlock = new Gson().fromJson(new FileReader(file), CustomBlock.class);
                 customBlock.constructAttributes();
                 loadedBlocks.put(customBlock.id(), customBlock);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            } catch (IOException e) {
+                AdvancedMining.getInstance().getLogger().warning("Failed to load block '" + file.getName() + "' - IO exception!");
+            } catch (JsonIOException e) {
+                AdvancedMining.getInstance().getLogger().warning("Failed to load block '" + file.getName() + "' - Invalid JSON!");
             }
         }
 
     }
 
     public void editAndSave(@NotNull Consumer<CustomBlock> block) {
+
         block.accept(this);
         saveToFile();
+
     }
 
     public static @Nullable CustomBlock getCustomBlock(@NotNull Block block) {

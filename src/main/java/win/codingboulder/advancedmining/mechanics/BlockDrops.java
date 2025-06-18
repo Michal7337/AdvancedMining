@@ -2,6 +2,7 @@ package win.codingboulder.advancedmining.mechanics;
 
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import win.codingboulder.advancedmining.AdvancedMining;
 
 import java.io.*;
@@ -75,16 +76,20 @@ public class BlockDrops implements Serializable {
 
     }
 
-    public static BlockDrops loadFromFile(File file) {
+    public static @Nullable BlockDrops loadFromFile(File file) {
 
         try {
 
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
             return (BlockDrops) ois.readObject();
 
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            AdvancedMining.getInstance().getLogger().warning("Failed to load block drops '" + file.getName() + "' - IO exception!");
+        } catch (ClassNotFoundException e) {
+            AdvancedMining.getInstance().getLogger().warning("Failed to load block drops '" + file.getName() + "'!");
         }
+
+        return null;
 
     }
 
