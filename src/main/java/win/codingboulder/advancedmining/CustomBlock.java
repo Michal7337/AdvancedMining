@@ -3,6 +3,7 @@ package win.codingboulder.advancedmining;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -118,7 +119,7 @@ public class CustomBlock {
                 loadedBlocks.put(customBlock.id(), customBlock);
             } catch (IOException e) {
                 AdvancedMining.getInstance().getLogger().warning("Failed to load block '" + file.getName() + "' - IO exception!");
-            } catch (JsonIOException e) {
+            } catch (JsonSyntaxException e) {
                 AdvancedMining.getInstance().getLogger().warning("Failed to load block '" + file.getName() + "' - Invalid JSON!");
             }
         }

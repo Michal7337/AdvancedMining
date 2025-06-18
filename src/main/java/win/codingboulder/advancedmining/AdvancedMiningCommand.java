@@ -38,6 +38,7 @@ public class AdvancedMiningCommand {
         plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> event.registrar().register(
 
             literal("advmining")
+                .requires(source -> source.getSender().hasPermission("advancedmining.command.admin"))
 
                 .then(literal("block")
 
