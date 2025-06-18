@@ -4,6 +4,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
+import win.codingboulder.advancedmining.mechanics.DefaultBlocks;
+import win.codingboulder.advancedmining.mechanics.DefaultTools;
 import win.codingboulder.advancedmining.mechanics.MiningEvents;
 
 import java.io.File;
@@ -62,6 +64,7 @@ public final class AdvancedMining extends JavaPlugin {
         CustomBlock.loadAll();
         BlockDrops.loadAll();
         DefaultBlocks.loadFromFile();
+        DefaultTools.loadFromFile();
 
     }
 

@@ -22,6 +22,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
+import win.codingboulder.advancedmining.mechanics.DefaultBlocks;
 
 import java.util.List;
 
@@ -239,6 +240,7 @@ public class AdvancedMiningCommand {
                                         BlockDrops.loadedDrops.put(customBlock.id(), blockDrops);
                                         blockDrops.saveToFile();
                                         customBlock.setDropsFile(customBlock.id());
+                                        customBlock.saveToFile();
 
                                     } else {
 

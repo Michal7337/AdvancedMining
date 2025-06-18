@@ -1,10 +1,12 @@
-package win.codingboulder.advancedmining;
+package win.codingboulder.advancedmining.mechanics;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
+import win.codingboulder.advancedmining.AdvancedMining;
+import win.codingboulder.advancedmining.CustomBlock;
 
 import java.io.File;
 import java.io.FileReader;

@@ -17,7 +17,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.CustomBlock;
-import win.codingboulder.advancedmining.DefaultBlocks;
 import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
 import java.util.HashMap;
