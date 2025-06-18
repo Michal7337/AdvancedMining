@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
 import win.codingboulder.advancedmining.mechanics.DefaultBlocks;
+import win.codingboulder.advancedmining.mechanics.DefaultTools;
 
 import java.util.List;
 
@@ -382,8 +383,44 @@ public class AdvancedMiningCommand {
 
                                                 return 1;
 
-                                            })))))
-                        ))
+                                            }))))))
+                    )
+
+                    .then(literal("set-default")
+                        .then(argument("item", ArgumentTypes.itemStack())
+                            .then(argument("mining-speed", FloatArgumentType.floatArg(0))
+                                .then(argument("breaking-power", IntegerArgumentType.integer(0))
+
+                                    .executes(context -> {
+
+                                        DefaultTools.addDefaultTool(
+                                            context.getArgument("item", ItemStack.class).getType(),
+                                            FloatArgumentType.getFloat(context, "mining-speed"),
+                                            IntegerArgumentType.getInteger(context, "breaking-power"),
+                                            ""
+                                        );
+                                        DefaultTools.saveToFile();
+
+                                        return 1;
+
+                                    })
+
+                                    .then(argument("tool-type", StringArgumentType.word())
+                                        .executes(context -> {
+
+                                            DefaultTools.addDefaultTool(
+                                                context.getArgument("item", ItemStack.class).getType(),
+                                                FloatArgumentType.getFloat(context, "mining-speed"),
+                                                IntegerArgumentType.getInteger(context, "breaking-power"),
+                                                StringArgumentType.getString(context, "tool-type")
+                                            );
+                                            DefaultTools.saveToFile();
+
+                                            return 1;
+
+                                        })))))
+
+                    )
 
                 )
 

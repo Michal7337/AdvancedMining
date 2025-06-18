@@ -48,9 +48,11 @@ public class DefaultTools {
     }
 
     public static Tool getDefaultMapping(Material material) {
-
         return defaultTools.get(material);
+    }
 
+    public static void addDefaultTool(Material tool, float miningSpeed, int breakingPower, String toolType) {
+        defaultTools.put(tool, new Tool(miningSpeed, breakingPower, toolType));
     }
 
     public static HashMap<Material, Tool> defaultTools() {
