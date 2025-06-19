@@ -2,7 +2,6 @@ package win.codingboulder.advancedmining;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.key.Key;
@@ -30,7 +29,7 @@ import java.util.function.Consumer;
 public class CustomBlock {
 
     public static final NamespacedKey blockIdKey = new NamespacedKey("advancedmining", "block_id");
-    public static HashMap<String, CustomBlock> loadedBlocks = new HashMap<>();
+    private static HashMap<String, CustomBlock> loadedBlocks = new HashMap<>();
 
     // Main attributes
     private String id;
@@ -190,6 +189,10 @@ public class CustomBlock {
         BlockDataStorage.editContainer(block, pdc ->
             pdc.set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString()));
 
+    }
+
+    public static HashMap<String, CustomBlock> loadedBlocks() {
+        return loadedBlocks;
     }
 
     public String id() {

@@ -63,6 +63,7 @@ public final class AdvancedMining extends JavaPlugin {
         blockDropsFolder.mkdir();
 
         saveDefaultConfig();
+        reloadConfig();
         FileConfiguration config = getConfig();
         showProgressBar = config.getBoolean("show-progress-bar", true);
 

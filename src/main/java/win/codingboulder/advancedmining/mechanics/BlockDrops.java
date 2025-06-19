@@ -12,7 +12,7 @@ public class BlockDrops implements Serializable {
 
     @Serial private static final long serialVersionUID = 4598191079417030808L;
 
-    public static final HashMap<String, BlockDrops> loadedDrops = new HashMap<>();
+    private static final HashMap<String, BlockDrops> loadedDrops = new HashMap<>();
 
     private String id;
     private final ArrayList<Entry> entries = new ArrayList<>();
@@ -101,6 +101,10 @@ public class BlockDrops implements Serializable {
             if (blockDrops != null) loadedDrops.put(blockDrops.id, blockDrops);
         }
 
+    }
+
+    public static HashMap<String, BlockDrops> loadedDrops() {
+        return loadedDrops;
     }
 
     public String id() {

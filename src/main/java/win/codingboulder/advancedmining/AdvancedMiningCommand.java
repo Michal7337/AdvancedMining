@@ -71,7 +71,7 @@ public class AdvancedMiningCommand {
                                                 );
 
                                                 customBlock.saveToFile();
-                                                CustomBlock.loadedBlocks.put(customBlock.id(), customBlock);
+                                                CustomBlock.loadedBlocks().put(customBlock.id(), customBlock);
 
                                                 return 1;
 
@@ -102,7 +102,7 @@ public class AdvancedMiningCommand {
                                                     );
 
                                                     customBlock.saveToFile();
-                                                    CustomBlock.loadedBlocks.put(customBlock.id(), customBlock);
+                                                    CustomBlock.loadedBlocks().put(customBlock.id(), customBlock);
 
                                                     return 1;
 
@@ -136,7 +136,7 @@ public class AdvancedMiningCommand {
                                                                         );
 
                                                                         customBlock.saveToFile();
-                                                                        CustomBlock.loadedBlocks.put(customBlock.id(), customBlock);
+                                                                        CustomBlock.loadedBlocks().put(customBlock.id(), customBlock);
 
                                                                         return 1;
 
@@ -152,7 +152,7 @@ public class AdvancedMiningCommand {
                             .then(literal("drops-file")
                                 .then(argument("file", StringArgumentType.word())
                                     .suggests((context, builder) -> {
-                                        BlockDrops.loadedDrops.keySet().forEach(builder::suggest);
+                                        BlockDrops.loadedDrops().keySet().forEach(builder::suggest);
                                         return builder.buildFuture();
                                     })
                                     .executes(context -> {
@@ -239,19 +239,19 @@ public class AdvancedMiningCommand {
 
                                         BlockDrops blockDrops = new BlockDrops(customBlock.id());
                                         blockDrops.entries().add(new BlockDrops.Entry(item, 1, 1, 1));
-                                        BlockDrops.loadedDrops.put(customBlock.id(), blockDrops);
+                                        BlockDrops.loadedDrops().put(customBlock.id(), blockDrops);
                                         blockDrops.saveToFile();
                                         customBlock.setDropsFile(customBlock.id());
                                         customBlock.saveToFile();
 
                                     } else {
 
-                                        BlockDrops blockDrops = BlockDrops.loadedDrops.get(dropsFile);
+                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(dropsFile);
                                         if (blockDrops == null) {
 
                                             BlockDrops newDrops = new BlockDrops(customBlock.rawDropsFile());
                                             newDrops.entries().add(new BlockDrops.Entry(item, 1, 1, 1));
-                                            BlockDrops.loadedDrops.put(customBlock.id(), newDrops);
+                                            BlockDrops.loadedDrops().put(customBlock.id(), newDrops);
                                             newDrops.saveToFile();
 
                                         } else {
@@ -275,7 +275,7 @@ public class AdvancedMiningCommand {
                     .then(literal("place")
                         .then(argument("block", StringArgumentType.word())
                             .suggests((context, builder) -> {
-                                CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
+                                CustomBlock.loadedBlocks().keySet().forEach(builder::suggest);
                                 return builder.buildFuture();
                             })
                             .then(argument("position", ArgumentTypes.blockPosition())
@@ -300,7 +300,7 @@ public class AdvancedMiningCommand {
                     .then(literal("give")
                         .then(argument("block", StringArgumentType.word())
                             .suggests((context, builder) -> {
-                                CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
+                                CustomBlock.loadedBlocks().keySet().forEach(builder::suggest);
                                 return builder.buildFuture();
                             })
                             .executes(context -> {
@@ -308,7 +308,7 @@ public class AdvancedMiningCommand {
                                 String blockId = StringArgumentType.getString(context, "block");
                                 if (!(context.getSource().getSender() instanceof Player player)) return 1;
 
-                                CustomBlock customBlock = CustomBlock.loadedBlocks.get(blockId);
+                                CustomBlock customBlock = CustomBlock.loadedBlocks().get(blockId);
                                 Material material = customBlock == null ? Material.STONE : customBlock.iconMaterial();
                                 Component name = customBlock == null ? Component.text(blockId) : customBlock.name();
 
@@ -431,7 +431,7 @@ public class AdvancedMiningCommand {
                             .executes(context -> {
 
                                 BlockDrops blockDrops = new BlockDrops(StringArgumentType.getString(context, "name"));
-                                BlockDrops.loadedDrops.put(blockDrops.id(), blockDrops);
+                                BlockDrops.loadedDrops().put(blockDrops.id(), blockDrops);
                                 blockDrops.saveToFile();
 
                                 return 1;
@@ -441,7 +441,7 @@ public class AdvancedMiningCommand {
                     .then(literal("edit")
                         .then(argument("name", StringArgumentType.word())
                             .suggests((context, builder) -> {
-                                BlockDrops.loadedDrops.keySet().forEach(builder::suggest);
+                                BlockDrops.loadedDrops().keySet().forEach(builder::suggest);
                                 return builder.buildFuture();
                             })
 
@@ -452,7 +452,7 @@ public class AdvancedMiningCommand {
                                             .then(argument("max-amount", IntegerArgumentType.integer(1))
                                                 .executes(context -> {
 
-                                                    BlockDrops blockDrops = BlockDrops.loadedDrops.get(StringArgumentType.getString(context, "name"));
+                                                    BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
                                                     if (blockDrops == null) {
                                                         context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
                                                         return 1;
@@ -476,7 +476,7 @@ public class AdvancedMiningCommand {
                                             .then(argument("max-amount", IntegerArgumentType.integer(1))
                                                 .executes(context -> {
 
-                                                    BlockDrops blockDrops = BlockDrops.loadedDrops.get(StringArgumentType.getString(context, "name"));
+                                                    BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
                                                     if (blockDrops == null) {
                                                         context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
                                                         return 1;

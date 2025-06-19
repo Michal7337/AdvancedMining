@@ -104,7 +104,7 @@ public class MiningRunnable extends BukkitRunnable {
         player.sendBlockDamage(block.getLocation(), 0f, randomId);
         player.hideBossBar(progressbar);
 
-        BlockDrops blockDrops = BlockDrops.loadedDrops.get(customBlock.rawDropsFile());
+        BlockDrops blockDrops = BlockDrops.loadedDrops().get(customBlock.rawDropsFile());
 
         CustomBlockBreakEvent blockBreakEvent = new CustomBlockBreakEvent(player, block, customBlock, blockDrops, true, true);
         if (!blockBreakEvent.callEvent()) return;

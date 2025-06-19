@@ -20,7 +20,7 @@ public class CustomBlockArgument implements CustomArgumentType.Converted<CustomB
     @Override
     public @NotNull CustomBlock convert(@NotNull String nativeType) throws CommandSyntaxException {
 
-        CustomBlock block = CustomBlock.loadedBlocks.get(nativeType);
+        CustomBlock block = CustomBlock.loadedBlocks().get(nativeType);
         if (block == null) throw new DynamicCommandExceptionType(name -> new LiteralMessage("The custom block '" + name + "' doesn't exist!")).create(nativeType);
         return block;
 
@@ -29,7 +29,7 @@ public class CustomBlockArgument implements CustomArgumentType.Converted<CustomB
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
 
-        CustomBlock.loadedBlocks.keySet().forEach(builder::suggest);
+        CustomBlock.loadedBlocks().keySet().forEach(builder::suggest);
         return builder.buildFuture();
 
     }

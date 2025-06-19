@@ -27,7 +27,7 @@ public class DefaultBlocks {
     public static @Nullable CustomBlock getDefaultMapping(Material material) {
 
         if (!defaultBlocks.containsKey(material)) return null;
-        return CustomBlock.loadedBlocks.get(defaultBlocks.get(material));
+        return CustomBlock.loadedBlocks().get(defaultBlocks.get(material));
 
     }
 
