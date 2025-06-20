@@ -54,6 +54,7 @@ public final class AdvancedMining extends JavaPlugin {
     }
 
     public static boolean showProgressBar;
+    public static boolean breakVanillaBlocks;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void loadConfig() {
@@ -66,11 +67,14 @@ public final class AdvancedMining extends JavaPlugin {
         reloadConfig();
         FileConfiguration config = getConfig();
         showProgressBar = config.getBoolean("show-progress-bar", true);
+        breakVanillaBlocks = config.getBoolean("break-vanilla-blocks", false);
 
         CustomBlock.loadAll();
         BlockDrops.loadAll();
         DefaultBlocks.loadFromFile();
         DefaultTools.loadFromFile();
+
+        getLogger().info("Config loaded!");
 
     }
 

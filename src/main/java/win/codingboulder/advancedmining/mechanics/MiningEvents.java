@@ -84,6 +84,12 @@ public class MiningEvents implements Listener {
 
         Player player = event.getPlayer();
 
+        if (AdvancedMining.breakVanillaBlocks) {
+            AttributeInstance attrib =  player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
+            assert attrib != null;
+            attrib.setBaseValue(1d);
+        }
+
         MiningRunnable runnable = miningRunnables.get(player);
         if (runnable == null) return;
 

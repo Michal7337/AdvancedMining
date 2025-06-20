@@ -505,6 +505,7 @@ public class AdvancedMiningCommand {
                     .executes(context -> {
 
                         AdvancedMining.getInstance().loadConfig();
+                        context.getSource().getSender().sendRichMessage("<green>Config reloaded!");
                         return 1;
 
                     }))

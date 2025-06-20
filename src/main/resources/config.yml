@@ -1,2 +1,5 @@
 # Sets if the block breaking progress bar should be shown
 show-progress-bar: true
+
+# Sets if normal vanilla blocks can be broken with default vanilla mechanics
+break-vanilla-blocks: false
