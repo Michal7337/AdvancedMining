@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +43,7 @@ public class MiningEvents implements Listener {
 
         event.setCancelled(true); // prevent breaking of the block if something were to go wrong with mining prevention
 
+        // Set the Block Break Speed attribute to 0 to remove the client-side block breaking mechanics
         AttributeInstance attrib =  player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
         assert attrib != null;
         attrib.setBaseValue(0d);
@@ -111,9 +112,13 @@ public class MiningEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerLeave(@NotNull PlayerQuitEvent event) {
 
-        //event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, PotionEffect.INFINITE_DURATION, -1, false, false));
+        Player player = event.getPlayer();
+        MiningRunnable runnable = miningRunnables.get(player);
+
+        if (runnable != null) runnable.isCanceled = true;
+        miningRunnables.remove(player);
 
     }
 

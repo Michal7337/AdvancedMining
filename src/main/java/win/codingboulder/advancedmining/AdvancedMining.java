@@ -56,6 +56,9 @@ public final class AdvancedMining extends JavaPlugin {
     public static boolean showProgressBar;
     public static boolean breakVanillaBlocks;
 
+    /**
+     * Reloads the plugin's configuration. This includes Blocks, Drops and such.
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void loadConfig() {
 

@@ -15,6 +15,10 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
+/**
+ * This class handles default blocks. A default block is a vanilla material mapped to a custom block id.<br>
+ * This is useful if you want every block of a material to be a custom block.
+ */
 public class DefaultBlocks {
 
     public static final File defaultBlocksFile = new File(AdvancedMining.getInstance().getDataFolder(), "default-blocks.json");
@@ -24,6 +28,11 @@ public class DefaultBlocks {
         return defaultBlocks;
     }
 
+    /**
+     * Gets the custom block mapped to the specified material
+     * @param material The material to get the mapping of
+     * @return The custom block mapped to this material or {@code null} if there is no default block mapped to this material
+     */
     public static @Nullable CustomBlock getDefaultMapping(Material material) {
 
         if (!defaultBlocks.containsKey(material)) return null;

@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
+/**
+ * This class handles default tools. A default tool is a vanilla material mapped to a Tool object containing the Mining Speed, Breaking Power and Tool Type.<br>
+ * This is useful if you want every one of an item type to be a tool.
+ */
 public class DefaultTools {
 
     public static final File defaultToolsFile = new File(AdvancedMining.getInstance().getDataFolder(), "default-tools.json");
@@ -47,6 +51,11 @@ public class DefaultTools {
 
     }
 
+    /**
+     * Gets the tool mapped to the specified material
+     * @param material The material to get the mapping of
+     * @return The tool mapped to this material or {@code null} if there is no tool mapped to this material
+     */
     public static Tool getDefaultMapping(Material material) {
         return defaultTools.get(material);
     }

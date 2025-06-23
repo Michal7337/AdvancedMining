@@ -26,6 +26,10 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * Represents a <b>Custom Block</b> which has properties such as strength and hardness and can be broken with the custom mining system. <br>
+ * It is not associated with an actual block placed in a world. Instead, a real block stores the id of a custom block, which is then looked up from the loadedBlocks map.
+ */
 public class CustomBlock {
 
     public static final NamespacedKey blockIdKey = new NamespacedKey("advancedmining", "block_id");
@@ -54,7 +58,20 @@ public class CustomBlock {
     private transient File blockDropsFile;
     private transient BlockDrops blockDrops;
 
-    public CustomBlock(
+    /**
+     * @param id The ID of the block
+     * @param name The name of the block in MiniMessage format
+     * @param material The material of the block that will be placed in the world
+     * @param strength The strength of the block. The player's mining speed is subtracted from this every tick until it reaches 0
+     * @param hardness The hardness of the block. The player's breaking power needs to be equal to or greater than this
+     * @param bestTool The tool type required to mine this block. If empty, all tools can mine the block
+     * @param texture The custom texture that will be applied to the placed block using an Item Display entity
+     * @param breakSound The sound that will be played when breaking the block
+     * @param placeSound The sound that will be played when placing the block
+     * @param iconMaterial The material that will be used to display the block in the inventory and used for breaking particles
+     * @param dropsFile The id of the Block Drops the block will use
+     */
+    public CustomBlock (
         String id,
         String name,
         Material material,
@@ -81,6 +98,67 @@ public class CustomBlock {
         this.dropsFile = dropsFile;
 
         constructAttributes();
+
+    }
+
+
+    /**
+     * @param id The ID of the block
+     * @param name The name of the block in MiniMessage format
+     * @param material The material of the block that will be placed in the world
+     * @param strength The strength of the block. The player's mining speed is subtracted from this every tick until it reaches 0
+     * @param hardness The hardness of the block. The player's breaking power needs to be equal to or greater than this
+     * @param bestTool The tool type required to mine this block. If empty, all tools can mine the block
+     */
+    public CustomBlock(String id, String name, Material material, float strength, int hardness, String bestTool) {
+
+        this.id = id;
+        this.name = name;
+        this.material = material;
+        this.strength = strength;
+        this.hardness = hardness;
+        this.bestTool = bestTool;
+        this.texture = "";
+        this.breakSound = "";
+        this.placeSound = "";
+        this.iconMaterial = material;
+        this.dropsFile = "";
+
+        constructAttributes();
+
+    }
+
+    public CustomBlock(String id, Component name, Material material, float strength, int hardness, String bestTool) {
+
+        this.id = id;
+        this.name = "";
+        this.material = material;
+        this.strength = strength;
+        this.hardness = hardness;
+        this.bestTool = bestTool;
+        this.texture = "";
+        this.breakSound = "";
+        this.placeSound = "";
+        this.iconMaterial = material;
+        this.dropsFile = "";
+
+        constructAttributes();
+        this.nameComponent = name;
+
+    }
+
+    public CustomBlock(String id, Component name, Material material, float strength, int hardness, String bestTool, Key textureKey, Key breakSoundKey, Key placeSoundKey, String blockDrops) {
+
+        this.id = id;
+        this.nameComponent = name;
+        this.material = material;
+        this.strength = strength;
+        this.hardness = hardness;
+        this.bestTool = bestTool;
+        this.textureKey = textureKey;
+        this.breakSoundKey = breakSoundKey;
+        this.placeSoundKey = placeSoundKey;
+        this.dropsFile = blockDrops;
 
     }
 
@@ -132,6 +210,12 @@ public class CustomBlock {
 
     }
 
+    /**
+     * Gets the {@link CustomBlock} that is associated with the given Block. <br>
+     * This checks the {@link BlockDataStorage} for the block id.
+     * @param block The Block to check
+     * @return The {@link CustomBlock} at the given Block or {@code null} if there is none
+     */
     public static @Nullable CustomBlock getCustomBlock(@NotNull Block block) {
 
         if (!BlockDataStorage.hasContainer(block)) return null;
@@ -140,6 +224,11 @@ public class CustomBlock {
 
     }
 
+    /**
+     * Sets the {@link CustomBlock} at the given Block. If the CustomBlock doesn't exist, the ID will still be set, so if it does exist in the future, it will work fine.
+     * @param block The block to set
+     * @param id The ID of the CustomBlock
+     */
     public static void setCustomBlock(Block block, String id) {
 
         BlockDataStorage.editContainer(block, pdc -> pdc.set(blockIdKey, PersistentDataType.STRING, id));
@@ -151,6 +240,11 @@ public class CustomBlock {
 
     }
 
+    /**
+     * This method returns the ItemDisplay entity that displays the CustomBlock's custom texture, if the block has one.
+     * @param block The Block to check
+     * @return The {@link ItemDisplay} placed at the given Block or {@code null} if there is none
+     */
     public static @Nullable ItemDisplay getDisplayEntity(Block block) {
 
         String uuidStr = BlockDataStorage.getDataContainer(block).get(
@@ -168,6 +262,13 @@ public class CustomBlock {
 
     }
 
+    /**
+     * Summons an {@link ItemDisplay} entity with this CustomBlock's texture at the given Block.<br>
+     * The entity's scale is {@code 1.001} to prevent Z-Fighting. <br>
+     * The Material of the Block should be transparent (e.g. Glass) so the entity isn't black and reacts to light properly.<br>
+     * If the Block has a custom texture, the IconMaterial will be used for the breaking effect.
+     * @param block The block to summon the entity at
+     */
     @SuppressWarnings("UnstableApiUsage")
     public void summonDisplayEntity(Block block) {
 

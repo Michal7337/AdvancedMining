@@ -361,13 +361,28 @@ public class AdvancedMiningCommand {
 
                                         return 1;
 
-                                    }))))
+                                    }))
+                                .executes(context -> {
+
+                                    Player player = (Player) context.getSource().getSender();
+
+                                    ItemStack item = player.getInventory().getItemInMainHand();
+                                    item.editPersistentDataContainer(pdc -> {
+                                        pdc.set(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, FloatArgumentType.getFloat(context, "mining-speed"));
+                                        pdc.set(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, IntegerArgumentType.getInteger(context, "breaking-power"));
+                                    });
+
+                                    player.sendRichMessage("<green>Tool set!");
+
+                                    return 1;
+
+                                })))
                     )
                     .then(literal("give")
                         .then(argument("player", ArgumentTypes.players())
                             .then(argument("item", ArgumentTypes.itemStack())
                                 .then(argument("mining-speed", FloatArgumentType.floatArg(0))
-                                    .then(argument("mining-power", IntegerArgumentType.integer(0))
+                                    .then(argument("breaking-power", IntegerArgumentType.integer(0))
                                         .then(argument("tool-type", StringArgumentType.word())
                                             .executes(context -> {
 
@@ -377,14 +392,29 @@ public class AdvancedMiningCommand {
                                                 item.editPersistentDataContainer(pdc -> {
                                                     pdc.set(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, FloatArgumentType.getFloat(context, "mining-speed"));
                                                     pdc.set(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, IntegerArgumentType.getInteger(context, "breaking-power"));
-                                                    pdc.set(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, StringArgumentType.getString(context, "tool-wype"));
+                                                    pdc.set(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, StringArgumentType.getString(context, "tool-type"));
                                                 });
 
                                                 players.forEach(player -> player.give(item));
 
                                                 return 1;
 
-                                            }))))))
+                                            }))
+                                        .executes(context -> {
+
+                                            List<Player> players = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
+
+                                            ItemStack item = context.getArgument("item", ItemStack.class);
+                                            item.editPersistentDataContainer(pdc -> {
+                                                pdc.set(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, FloatArgumentType.getFloat(context, "mining-speed"));
+                                                pdc.set(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, IntegerArgumentType.getInteger(context, "breaking-power"));
+                                            });
+
+                                            players.forEach(player -> player.give(item));
+
+                                            return 1;
+
+                                        })))))
                     )
 
                     .then(literal("set-default")

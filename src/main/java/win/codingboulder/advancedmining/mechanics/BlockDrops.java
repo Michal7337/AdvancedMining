@@ -8,6 +8,9 @@ import win.codingboulder.advancedmining.AdvancedMining;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Represents a list of items that can be dropped from a block.
+ */
 public class BlockDrops implements Serializable {
 
     @Serial private static final long serialVersionUID = 4598191079417030808L;
@@ -27,6 +30,10 @@ public class BlockDrops implements Serializable {
         return blockDrops;
     }
 
+    /**
+     * Iterates through all the entries and randomly rolls if they should be dropped and how many items should be dropped
+     * @return The randomly rolled items
+     */
     public ItemStack[] rollDrops() {
 
         ArrayList<ItemStack> droppedItems = new ArrayList<>();
@@ -39,6 +46,13 @@ public class BlockDrops implements Serializable {
 
     }
 
+    /**
+     * Makes an array of ItemStacks in which the amount of items equals the specified amount.<br>
+     * E.g. If the ItemStack is a Gold Ingot and the amount is 130, the array will contain two stacks of 64 Ingots and one stack of 2 Ingots.
+     * @param item The item to make stacks of
+     * @param amount The amount of items
+     * @return An array of ItemStacks with the total amount of items equal to the item argument
+     */
     public static ItemStack @NotNull [] getCostItemsArray(ItemStack item, int amount) {
 
         if (amount == 0) return new ItemStack[0];
@@ -119,6 +133,9 @@ public class BlockDrops implements Serializable {
         return entries;
     }
 
+    /**
+     * Represents an entry that can be rolled to drop from a block
+     */
     public static class Entry implements Serializable {
 
         private transient ItemStack itemStack;
@@ -127,6 +144,12 @@ public class BlockDrops implements Serializable {
         private float chance;
         private byte[] item;
 
+        /**
+         * @param itemStack The item to be dropped
+         * @param minAmount The minimum amount of the item to be dropped
+         * @param maxAmount The maximum amount of the item to be dropped
+         * @param chance The chance of the item dropping from the block
+         */
         public Entry(@NotNull ItemStack itemStack, int minAmount, int maxAmount, float chance) {
             this.itemStack = itemStack;
             this.minAmount = minAmount;

@@ -14,13 +14,14 @@ import java.util.function.Consumer;
  */
 public class BlockDataStorage {
 
-    public static String DEFAULT_NAMESPACE = "blockdatastorage";
+    public static final String DEFAULT_NAMESPACE = "blockdatastorage";
 
     private BlockDataStorage() {}
 
     /**
      * Gets the {@link PersistentDataContainer} associated with this block in the default namespace.
-     * If the block doesn't have a PDC a new one is created
+     * If the block doesn't have a PDC a new one is created.<br>
+     * Changes to this container WILL NOT be reflected in the saved container. To save them you have to use {@code setContainer()} or use the {@code editContainer()} utility method.
      * @param block The block
      * @return The {@link PersistentDataContainer} associated with the block
      */
@@ -40,7 +41,8 @@ public class BlockDataStorage {
 
     /**
      * Gets the {@link PersistentDataContainer} associated with this block in the specified namespace.
-     * If the block doesn't have a PDC a new one is created
+     * If the block doesn't have a PDC a new one is created. <br>
+     * Changes to this container WILL NOT be reflected in the saved container. To save them you have to use {@code setContainer()} or use the {@code editContainer()} utility method.
      * @param block The block
      * @param namespace The namespace
      * @return The {@link PersistentDataContainer} associated with the block
@@ -60,7 +62,7 @@ public class BlockDataStorage {
     }
 
     /**
-     * Gets if the block has an associated PDC in the default namespace
+     * Gets if the block has an associated PDC in the default namespace.
      * @param block The block
      * @return Weather the block has a PDC associated with it
      */
@@ -69,7 +71,7 @@ public class BlockDataStorage {
     }
 
     /**
-     * Gets if the block has an associated PDC in the specified namespace
+     * Gets if the block has an associated PDC in the specified namespace.
      * @param block The block
      * @param namespace The namespace
      * @return Weather the block has a PDC associated with it
@@ -80,7 +82,7 @@ public class BlockDataStorage {
 
 
     /**
-     * Sets the {@link PersistentDataContainer} associated with this block in the default namespace
+     * Sets the {@link PersistentDataContainer} associated with this block in the default namespace.
      * @param block The block
      * @param container The container to associate
      */
@@ -89,7 +91,7 @@ public class BlockDataStorage {
     }
 
     /**
-     * Sets the {@link PersistentDataContainer} associated with this block in the specified namespace
+     * Sets the {@link PersistentDataContainer} associated with this block in the specified namespace.
      * @param block The block
      * @param container The container to associate
      * @param namespace The namespace
@@ -98,6 +100,12 @@ public class BlockDataStorage {
         block.getChunk().getPersistentDataContainer().set(getBockKey(block, namespace), PersistentDataType.TAG_CONTAINER, container);
     }
 
+    /**
+     * This is a utility method for editing and saving the Block's PDC with a lambda. <br>
+     * It works just like {@code ItemStack.editPersistentDataContainer()}
+     * @param block The block to edit container of
+     * @param pdc A consumer that edits the PDC
+     */
     public static void editContainer(Block block, @NotNull Consumer<PersistentDataContainer> pdc) {
 
         PersistentDataContainer container = getDataContainer(block);
@@ -107,8 +115,23 @@ public class BlockDataStorage {
     }
 
     /**
+     * This is a utility method for editing and saving the Block's PDC with a lambda. <br>
+     * It works just like {@code ItemStack.editPersistentDataContainer()}
+     * @param block The block to edit container of
+     * @param namespace The namespace of the edited container
+     * @param pdc A consumer that edits the PDC
+     */
+    public static void editContainer(Block block, String namespace,  @NotNull Consumer<PersistentDataContainer> pdc) {
+
+        PersistentDataContainer container = getDataContainer(block, namespace);
+        pdc.accept(container);
+        setContainer(block, container, namespace);
+
+    }
+
+    /**
      * Gets the {@link NamespacedKey} for the block in the default namespace. <br>
-     * Format: {@code BlockDataStorage:x,y,z}
+     * Format: {@code blockdatastorage:x_y_z}
      * @param block The block to get key of
      * @return The key
      */
@@ -118,7 +141,7 @@ public class BlockDataStorage {
 
     /**
      * Gets the {@link NamespacedKey} for the block in the specified namespace. <br>
-     * Format: {@code namespace:x,y,z}
+     * Format: {@code namespace:x_y_z}
      * @param block The block to get key of
      * @param namespace The namespace
      * @return The key

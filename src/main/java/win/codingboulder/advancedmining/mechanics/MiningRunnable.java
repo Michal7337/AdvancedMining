@@ -23,6 +23,9 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Random;
 
+/**
+ * This runnable is responsible for the block mining process. Instantiating it does not start the mining process, to do that you need to schedule it.
+ */
 public class MiningRunnable extends BukkitRunnable {
 
     private final Block block;
@@ -35,13 +38,13 @@ public class MiningRunnable extends BukkitRunnable {
     private final DecimalFormat decimalFormat;
     private float miningProgress;
     public BossBar progressbar;
-    Component barName;
+    private final Component barName;
     public int tick;
 
     public boolean isCanceled;
     public boolean instaMine;
 
-    public MiningRunnable(Block block, @NotNull CustomBlock customBlock, @NotNull Player player, float miningSpeed, int breakingPower) {
+    public MiningRunnable(Block block, @NotNull CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
 
         this.block = block;
         this.customBlock = customBlock;
@@ -57,7 +60,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
         progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
-        if (!instaMine && AdvancedMining.showProgressBar) player.showBossBar(progressbar);
+        if (!instaMine && AdvancedMining.showProgressBar && player != null) player.showBossBar(progressbar);
 
     }
 
@@ -86,7 +89,7 @@ public class MiningRunnable extends BukkitRunnable {
         breakStage = event.breakStage();
 
         if (breakStage != lastState) {
-            player.sendBlockDamage(block.getLocation(), breakStage, randomId);
+            if (player != null) player.sendBlockDamage(block.getLocation(), breakStage, randomId);
             lastState = breakStage;
         }
 
@@ -101,8 +104,10 @@ public class MiningRunnable extends BukkitRunnable {
 
     public void breakBlock() {
 
-        player.sendBlockDamage(block.getLocation(), 0f, randomId);
-        player.hideBossBar(progressbar);
+        if (player != null) {
+            player.sendBlockDamage(block.getLocation(), 0f, randomId);
+            player.hideBossBar(progressbar);
+        }
 
         BlockDrops blockDrops = BlockDrops.loadedDrops().get(customBlock.rawDropsFile());
 
