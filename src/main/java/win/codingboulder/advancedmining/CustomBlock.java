@@ -218,7 +218,7 @@ public class CustomBlock {
      */
     public static @Nullable CustomBlock getCustomBlock(@NotNull Block block) {
 
-        if (!BlockDataStorage.hasContainer(block)) return null;
+        if (!BlockDataStorage.hasDataContainer(block)) return null;
         String blockId = BlockDataStorage.getDataContainer(block).getOrDefault(blockIdKey, PersistentDataType.STRING, "");
         return loadedBlocks.get(blockId);
 
@@ -231,7 +231,7 @@ public class CustomBlock {
      */
     public static void setCustomBlock(Block block, String id) {
 
-        BlockDataStorage.editContainer(block, pdc -> pdc.set(blockIdKey, PersistentDataType.STRING, id));
+        BlockDataStorage.editDataContainer(block, pdc -> pdc.set(blockIdKey, PersistentDataType.STRING, id));
 
         CustomBlock customBlock = loadedBlocks.get(id);
         if (customBlock == null) return;
@@ -257,7 +257,7 @@ public class CustomBlock {
 
     public static void setDisplayEntity(Block block, @NotNull ItemDisplay itemDisplay) {
 
-        BlockDataStorage.editContainer(block, pdc ->
+        BlockDataStorage.editDataContainer(block, pdc ->
             pdc.set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString()));
 
     }
@@ -284,10 +284,11 @@ public class CustomBlock {
         itemDisplay.setShadowStrength(0);
         itemDisplay.addScoreboardTag("advmining_block");
         itemDisplay.addScoreboardTag("advmining_block_" + id);
+        itemDisplay.addScoreboardTag("advmining_block_loc_" + block.getX() + "_" + block.getY() + "_" + block.getZ());
 
         itemDisplay.spawnAt(block.getLocation().add(0.5, 0.5, 0.5));
 
-        BlockDataStorage.editContainer(block, pdc ->
+        BlockDataStorage.editDataContainer(block, pdc ->
             pdc.set(new NamespacedKey("advancedmining", "display_entity"), PersistentDataType.STRING, itemDisplay.getUniqueId().toString()));
 
     }

@@ -125,7 +125,7 @@ public class MiningRunnable extends BukkitRunnable {
         if (blockDrops != null)
             for (ItemStack item : blockDrops.rollDrops()) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 
-        if (blockBreakEvent.removeBlockData()) BlockDataStorage.editContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
+        if (blockBreakEvent.removeBlockData()) BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
     }
 

@@ -66,7 +66,7 @@ public class BlockDataStorage {
      * @param block The block
      * @return Weather the block has a PDC associated with it
      */
-    public static boolean hasContainer(@NotNull Block block) {
+    public static boolean hasDataContainer(@NotNull Block block) {
         return block.getChunk().getPersistentDataContainer().has(getBockKey(block), PersistentDataType.TAG_CONTAINER);
     }
 
@@ -76,7 +76,7 @@ public class BlockDataStorage {
      * @param namespace The namespace
      * @return Weather the block has a PDC associated with it
      */
-    public static boolean hasContainer(@NotNull Block block, String namespace) {
+    public static boolean hasDataContainer(@NotNull Block block, String namespace) {
         return block.getChunk().getPersistentDataContainer().has(getBockKey(block, namespace), PersistentDataType.TAG_CONTAINER);
     }
 
@@ -86,7 +86,7 @@ public class BlockDataStorage {
      * @param block The block
      * @param container The container to associate
      */
-    public static void setContainer(@NotNull Block block, PersistentDataContainer container) {
+    public static void setDataContainer(@NotNull Block block, PersistentDataContainer container) {
         block.getChunk().getPersistentDataContainer().set(getBockKey(block), PersistentDataType.TAG_CONTAINER, container);
     }
 
@@ -96,7 +96,7 @@ public class BlockDataStorage {
      * @param container The container to associate
      * @param namespace The namespace
      */
-    public static void setContainer(@NotNull Block block, PersistentDataContainer container, String namespace) {
+    public static void setDataContainer(@NotNull Block block, PersistentDataContainer container, String namespace) {
         block.getChunk().getPersistentDataContainer().set(getBockKey(block, namespace), PersistentDataType.TAG_CONTAINER, container);
     }
 
@@ -106,11 +106,11 @@ public class BlockDataStorage {
      * @param block The block to edit container of
      * @param pdc A consumer that edits the PDC
      */
-    public static void editContainer(Block block, @NotNull Consumer<PersistentDataContainer> pdc) {
+    public static void editDataContainer(Block block, @NotNull Consumer<PersistentDataContainer> pdc) {
 
         PersistentDataContainer container = getDataContainer(block);
         pdc.accept(container);
-        setContainer(block, container);
+        setDataContainer(block, container);
 
     }
 
@@ -121,11 +121,11 @@ public class BlockDataStorage {
      * @param namespace The namespace of the edited container
      * @param pdc A consumer that edits the PDC
      */
-    public static void editContainer(Block block, String namespace,  @NotNull Consumer<PersistentDataContainer> pdc) {
+    public static void editDataContainer(Block block, String namespace, @NotNull Consumer<PersistentDataContainer> pdc) {
 
         PersistentDataContainer container = getDataContainer(block, namespace);
         pdc.accept(container);
-        setContainer(block, container, namespace);
+        setDataContainer(block, container, namespace);
 
     }
 

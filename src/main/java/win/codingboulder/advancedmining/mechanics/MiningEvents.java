@@ -62,6 +62,7 @@ public class MiningEvents implements Listener {
         if (!breakStartEvent.callEvent()) return;
 
         customBlock = breakStartEvent.getCustomBlock();
+        if (customBlock == null) return;
         miningSpeed = breakStartEvent.getMiningSpeed();
         breakingPower = breakStartEvent.getBreakingPower();
         toolType = breakStartEvent.getToolType();

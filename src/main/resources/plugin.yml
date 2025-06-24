@@ -1,7 +1,7 @@
 name: AdvancedMining
-version: '1.0-SNAPSHOT'
+version: '1.0'
 main: win.codingboulder.advancedmining.AdvancedMining
 api-version: '1.21'
-authors: [ Michal737 ]
+authors: [ CodingBoulder ]
 description: A plugin that adds a custom mining system
-website: https://github.com/michal7337
+website: https://hangar.papermc.io/CodingBoulder/AdvancedMining
