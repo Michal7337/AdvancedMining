@@ -323,6 +323,25 @@ public class AdvancedMiningCommand {
                             }))
                     )
 
+                    .then(literal("set-hand")
+                        .then(argument("block", StringArgumentType.word())
+                            .suggests((context, builder) -> {
+                                CustomBlock.loadedBlocks().keySet().forEach(builder::suggest);
+                                return builder.buildFuture();
+                            })
+                            .executes(context -> {
+
+                                String blockId = StringArgumentType.getString(context, "block");
+                                if (!(context.getSource().getSender() instanceof Player player)) return 1;
+
+                                ItemStack item = player.getInventory().getItemInMainHand();
+                                item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, blockId));
+
+                                return 1;
+
+                            })
+                        ))
+
                     .then(literal("set-default")
                         .then(argument("material", ArgumentTypes.blockState())
                             .then(argument("block", CustomBlockArgument.blockArgument())
