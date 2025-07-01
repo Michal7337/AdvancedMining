@@ -5,6 +5,7 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -85,6 +86,7 @@ public class MiningEvents implements Listener {
     public void onBlockBreakAbort(@NotNull BlockDamageAbortEvent event) {
 
         Player player = event.getPlayer();
+        Block block = event.getBlock();
 
         if (AdvancedMining.breakVanillaBlocks) {
             AttributeInstance attrib =  player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
@@ -96,7 +98,11 @@ public class MiningEvents implements Listener {
         if (runnable == null) return;
 
         runnable.isCanceled = true;
-        player.sendBlockDamage(event.getBlock().getLocation(), 0f, runnable.randomId);
+
+        player.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
+        int range = AdvancedMining.crackingAnimationRange;
+        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
+
         player.hideBossBar(runnable.progressbar);
         miningRunnables.remove(player); // note: do not remove the runnable from the list anywhere other than here or breaking blocks
 

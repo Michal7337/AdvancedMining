@@ -3,3 +3,6 @@ show-progress-bar: true
 
 # Sets if normal vanilla blocks can be broken with default vanilla mechanics
 break-vanilla-blocks: false
+
+# Sets the range at which the block cracking animation will be shown to other players
+cracking-animation-range: 50

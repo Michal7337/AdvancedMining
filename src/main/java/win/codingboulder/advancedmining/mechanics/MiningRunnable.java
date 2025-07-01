@@ -7,6 +7,7 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -89,7 +90,11 @@ public class MiningRunnable extends BukkitRunnable {
         breakStage = event.breakStage();
 
         if (breakStage != lastState) {
-            if (player != null) player.sendBlockDamage(block.getLocation(), breakStage, randomId);
+            int range = AdvancedMining.crackingAnimationRange;
+            if (player != null) {
+                player.sendBlockDamage(block.getLocation(), breakStage, randomId);
+                for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), breakStage, randomId);
+            }
             lastState = breakStage;
         }
 
@@ -106,6 +111,8 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (player != null) {
             player.sendBlockDamage(block.getLocation(), 0f, randomId);
+            int range = AdvancedMining.crackingAnimationRange;
+            for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0, randomId);
             player.hideBossBar(progressbar);
         }
 

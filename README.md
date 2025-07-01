@@ -1,6 +1,6 @@
 # AdvancedMining  
 AdvancedMining is a plugin that adds a custom mining system. It functions like the one seen on Hypixel Skyblock.<br><br>
-This plugin is still new so if you find any issues or have a suggestion, please create an issue [on the GitHub](https://github.com/Michal7337/AdvancedMining/issues).
+This plugin is still new so if you find any issues or have a suggestion, please create an Issue.
 ## How it works
 The plugin adds Custom Blocks, which specify properties of the block. 
 The required properties are:
@@ -42,6 +42,7 @@ When mining a Custom Block the plugin sets the player's `block_break_speed` attr
 In the plugin's folder is a file named `config.yml` (as is in pretty much all plugins). In the config you can set:
 * `show-progress-bar` - If set to true, a progress bar will be displayed when mining blocks.
 * `break-vanilla-blocks` - If set to true, players will be able to break vanilla blocks as they normally would. If set to false, the players will only be able to break Custom Blocks. 
+* `cracking-animation-range` - Sets the range in which block cracking animations will be shown to other players when mining a block.
 
 ## More Advanced Stuff
 
@@ -88,7 +89,7 @@ Currently I am considering adding the following features:
 * Optional allowing the player to mine multiple blocks at once when the above feature is enabled
 * Configurable progress bar color
 
-I am of course open to any suggestions, so if you have any, create an Issue (with the Enhancement tag) [on the GitHub](https://github.com/Michal7337/AdvancedMining/issues).
+I am of course open to suggestions, so if you have any, create an Issue (with the Enhancement tag).
 
 ## API For Developers
 
