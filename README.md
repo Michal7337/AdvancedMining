@@ -36,7 +36,7 @@ To mine a block the player needs to have **Breaking Power** equal to or higher t
 
 The block can optionally specify the **Tool Type** required to mine it. The tool type is just a string that can be anything. If the block doesn't specify anything, it can be broken by any tool. If it does, only the specified tool type can mine the block. If the player isn't holding any items, their tool type is set to `hand`.<br>
 
-When mining a Custom Block the plugin sets the player's `block_break_speed` attribute to 0 in order to get rid of the client side cracking animation and destroying the block. It then sends the cracking animation to the player when it needs to. With this system block breaking is completly server-side, so players can't use cheats like FastBreak. Currently the system allows a player to break one block at a time. If the player somehow starts mining a block when they are still mining another, it will be ignored.
+When mining a Custom Block the plugin sets the player's `block_break_speed` attribute to 0 in order to get rid of the client side cracking animation and destroying the block. It then sends the cracking animation to the player when it needs to. With this system block breaking is completely server-side, so players can't use cheats like FastBreak. Currently, the system allows a player to break one block at a time. If the player somehow starts mining a block when they are still mining another, it will be ignored.
 
 ### Configuration
 In the plugin's folder is a file named `config.yml` (as is in pretty much all plugins). In the config you can set:
@@ -64,21 +64,21 @@ Example of a working custom texture:<br>
 [![FTMvK22.md.png](https://iili.io/FTMvK22.md.png)](https://freeimage.host/i/FTMvK22)<br>
 
 ### Block Drops
-The optional `DropsFile` property is the id of a **Block Drops** file inside the `plugins/AdvancedMining/BlockDrops` directory (it's not the name of the file, but the name you specify when making the drops). The files are in a binary format, so you can't really edit them outside of the in-game command or in code.<br>
-The drops is basically a list of items, each having a **Chance** to drop (a value between 0.0 and 1.0), a **Minimum Amount** and a **Maximum Amount**. When a block is broken, if it has a valid drops id specified, it will roll each of these Items with the specified chance and a random amount between the specified min and max values. It will then drop all of the rolled items. <br>
+The optional `DropsFile` property is the id of a **Block Drops** file inside the `plugins/AdvancedMining/BlockDrops` directory (it's not the name of the file, but the name you specify when making the drops). The files are in a binary format, so you can't really edit them outside the in-game command or in code.<br>
+The drops is basically a list of items, each having a **Chance** to drop (a value between 0.0 and 1.0), a **Minimum Amount** and a **Maximum Amount**. When a block is broken, if it has a valid drops id specified, it will roll each of these Items with the specified chance and a random amount between the specified min and max values. It will then drop all the rolled items. <br>
 With the system using IDs for referencing these drops, you can set the same drops to multiple blocks.<br>
-To create a Drops File use the `/advmining drops create` comand. To add an item to said drop, use `/advmining drops edit {dropId}`.<br>
-There is a convienience command `/advmining block edit {BlockId} add-drop-itself` command that adds a guaranteed placeable Custom Block of the edited block to the drops file or creates a new one if it doesn't exist.<br>
+To create a Drops File use the `/advmining drops create` command. To add an item to said drop, use `/advmining drops edit {dropId}`.<br>
+There is a convenience command `/advmining block edit {BlockId} add-drop-itself` command that adds a guaranteed placeable Custom Block of the edited block to the drops file or creates a new one if it doesn't exist.<br>
 
 ## Miscellaneous 
 
 ### Default Blocks and Tools
 The plugin has a system for setting a normal block type to be a custom block. To set a default block use `/advmining block set-default`. E.g. `/advmining block set-default minecraft:stone stone_block` will make all stone be the `stone_block` Custom Block.<br>
 The same can be done with Items and Tools. The command `/advmining tool set-default` sets an Item to always have the specified stats. E.g. `/advmining tool set-default minecraft:breeze_rod 2137 6 pickaxe` will make every breeze rod have 2137 mining speed, 6 breaking power and be the pickaxe tool type. The tool type is optional.<br>
-All default blocks and tools can be overriden by placing a custom block or setting the tool with the command.
+All default blocks and tools can be overridden by placing a custom block or setting the tool with the command.
 
 ### Other commands
-There are also other commands not mentioned above:<br>
+There are other commands not mentioned above:<br>
 `/advmining block give` gives you a placeable Custom Block<br>
 `/advmining block set-hand` sets the id of the block you're holding<br>
 `/advmining block place` places a Custom Block at the given location<br>
@@ -86,7 +86,7 @@ There are also other commands not mentioned above:<br>
 `/advmining reload` reloads the plugin's config, all the Blocks, Block Drops and default Tools and Blocks
 
 ### Planned / Considered Features
-Currently I am considering adding the following features:
+Currently, I am considering adding the following features:
 * Optional keeping of the mining progress when the player stops mining a block and starts mining it again (with the same tool)
 * Optional allowing the player to mine multiple blocks at once when the above feature is enabled
 * Configurable progress bar color
@@ -95,11 +95,11 @@ I am of course open to suggestions, so if you have any, create an Issue (with th
 
 ## API For Developers
 
-The plugin has an api that allows developers to customize the plugin's behavior. To use it for now you have to add the plugin jar as a dependency (maybie I'll make a repository at some point). I tried to document the plugin somewhat to make it understandable.
+The plugin has an api that allows developers to customize the plugin's behavior. To use it for now you have to add the plugin jar as a dependency (maybe I'll make a repository at some point). I tried to document the plugin somewhat to make it understandable.
 ### The Main Things
 The main things you will be interacting with are the **CustomBlock** class and the **BlockDrops** class.<br>
-The CustomBlock class represents a Custom Block and all of it's properties. It has methods to place and retrieve placed blocks and do some other things. To have a block work you need to either put it in the `CustomBlock.loadedBlocks()` map or use an Event.<br>
-The BlockDrops class represents a Block Drops object and all of it's properties. Among other things it has a method to roll the drops it contains. To have a block drop work you need to either put it in the `BlockDrops.loadedDrops()` map or use an Event.<br>
+The CustomBlock class represents a Custom Block and all of its properties. It has methods to place and retrieve placed blocks and do some other things. To have a block work you need to either put it in the `CustomBlock.loadedBlocks()` map or use an Event.<br>
+The BlockDrops class represents a Block Drops object and all of its properties. Among other things it has a method to roll the drops it contains. To have a block drop work you need to either put it in the `BlockDrops.loadedDrops()` map or use an Event.<br>
 
 There also is the `BlockDataStorage` class which is used to store data about blocks in the Chunk's `PersistentDataContainer`. You can use the `getDataContainer(Block)` method to get a `PersistentDataContainer` linked to the block. Note that changes to that container aren't saved, you must use `setDataContainer()` to save the changes. There is a utility method to edit the container: `editDataContainer()` which takes a lambda. This class is useful and unrelated to this specific plugin, so you may copy and use it in your own projects, which need to store data in Blocks.
 
