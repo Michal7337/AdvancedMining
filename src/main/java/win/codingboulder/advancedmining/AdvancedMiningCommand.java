@@ -14,6 +14,7 @@ import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -295,6 +296,55 @@ public class AdvancedMiningCommand {
                                     return 1;
 
                                 })))
+                    )
+
+                    .then(literal("fill")
+                        .then(argument("block", CustomBlockArgument.blockArgument())
+                            .then(argument("pos1", ArgumentTypes.blockPosition())
+                                .then(argument("pos2", ArgumentTypes.blockPosition())
+                                    .executes(context -> {
+
+                                        CustomBlock customBlock = context.getArgument("block", CustomBlock.class);
+                                        BlockPosition pos1 = context.getArgument("pos1", BlockPositionResolver.class).resolve(context.getSource());
+                                        BlockPosition pos2 = context.getArgument("pos2", BlockPositionResolver.class).resolve(context.getSource());
+                                        World world = context.getSource().getLocation().getWorld();
+
+                                        for (int x = Math.min(pos1.blockX(), pos2.blockX()); x <= Math.max(pos1.blockX(), pos2.blockX()); x++) {
+                                            for (int y = Math.min(pos1.blockY(), pos2.blockY()); y <= Math.max(pos1.blockY(), pos2.blockY()); y++) {
+                                                for (int z = Math.min(pos1.blockZ(), pos2.blockZ()); z <= Math.max(pos1.blockZ(), pos2.blockZ()); z++) {
+
+                                                    CustomBlock.setCustomBlock(world.getBlockAt(x, y, z), customBlock.id());
+
+                                                }
+                                            }
+                                        }
+
+                                        return 1;
+
+                                    })
+                                    .then(argument("replace", ArgumentTypes.blockState())
+                                        .executes(context -> {
+
+                                            CustomBlock customBlock = context.getArgument("block", CustomBlock.class);
+                                            BlockPosition pos1 = context.getArgument("pos1", BlockPositionResolver.class).resolve(context.getSource());
+                                            BlockPosition pos2 = context.getArgument("pos2", BlockPositionResolver.class).resolve(context.getSource());
+                                            World world = context.getSource().getLocation().getWorld();
+                                            Material material = context.getArgument("replace", BlockState.class).getType();
+
+                                            for (int x = Math.min(pos1.blockX(), pos2.blockX()); x <= Math.max(pos1.blockX(), pos2.blockX()); x++) {
+                                                for (int y = Math.min(pos1.blockY(), pos2.blockY()); y <= Math.max(pos1.blockY(), pos2.blockY()); y++) {
+                                                    for (int z = Math.min(pos1.blockZ(), pos2.blockZ()); z <= Math.max(pos1.blockZ(), pos2.blockZ()); z++) {
+
+                                                        Block block = world.getBlockAt(x, y, z);
+                                                        if (block.getType().equals(material)) CustomBlock.setCustomBlock(block, customBlock.id());
+
+                                                    }
+                                                }
+                                            }
+
+                                            return 1;
+
+                                        })))))
                     )
 
                     .then(literal("give")

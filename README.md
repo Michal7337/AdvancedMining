@@ -80,7 +80,9 @@ All default blocks and tools can be overriden by placing a custom block or setti
 ### Other commands
 There are also other commands not mentioned above:<br>
 `/advmining block give` gives you a placeable Custom Block<br>
+`/advmining block set-hand` sets the id of the block you're holding<br>
 `/advmining block place` places a Custom Block at the given location<br>
+`/advmining block fill` fills a given area with the specified custom block. You can optionally specify a block to replace<br>
 `/advmining reload` reloads the plugin's config, all the Blocks, Block Drops and default Tools and Blocks
 
 ### Planned / Considered Features
