@@ -43,6 +43,9 @@ In the plugin's folder is a file named `config.yml` (as is in pretty much all pl
 * `show-progress-bar` - If set to true, a progress bar will be displayed when mining blocks.
 * `break-vanilla-blocks` - If set to true, players will be able to break vanilla blocks as they normally would. If set to false, the players will only be able to break Custom Blocks. 
 * `cracking-animation-range` - Sets the range in which block cracking animations will be shown to other players when mining a block.
+* `allow-breaking-multiple-blocks` - If set to true, players will be able to pause mining a block and start mining another one without loosing progress. Note: when block mining is paused, the mining task is still ticking, just not calculating the mining, so setting a high block limit *may* cause performance issues at a large scale.
+* `simultaneous-broken-blocks-limit` - Sets the amount of blocks a player can have mining progress on at the same time. Set to one if you simply want to be able to stop mining a block and resume later. 
+* `mining-progress-reset-timer` - Sets the amount of ticks after which progress on perviously mined blocks is reset.
 
 ## More Advanced Stuff
 
@@ -87,8 +90,8 @@ There are other commands not mentioned above:<br>
 
 ### Planned / Considered Features
 Currently, I am considering adding the following features:
-* Optional keeping of the mining progress when the player stops mining a block and starts mining it again (with the same tool)
-* Optional allowing the player to mine multiple blocks at once when the above feature is enabled
+* Optional keeping of the mining progress when the player stops mining a block and starts mining it again (with the same tool) [Added in v1.1]
+* Optional allowing the player to mine multiple blocks at once when the above feature is enabled [Added in v1.1]
 * Configurable progress bar color
 
 I am of course open to suggestions, so if you have any, create an Issue (with the Enhancement tag).
@@ -105,9 +108,9 @@ There also is the `BlockDataStorage` class which is used to store data about blo
 
 ### Events
 There are three events the API has:
-* `CustomBlockBreakEvent` is fired when a Custom Block is broken. It has the Player, Block and Custom Block. In this event you can set the BlockDrops object used for block drops (set it to null if you don't want drops). You can also set if the block break effect should be played and if the custom block id should be removed from the physical block. If the event is cancelled the block doesn't break and the breaking progress is reset.
-* `CustomBlockBreakStartEvent` is fired when a Player starts mining a Custom Block. It has the Player who is breaking the block, and the physical Block which is being broken. In this event you can set the CustomBlock object of the broken block and the mining stats (Mining Speed, Breaking Power and Tool Type). If this event is cancelled the block mining process doesn't start.
-* `CustomBlockBreakProgressEvent` is fired every tick when a Custom Block is being mined. It has the Player, Block, Custom Block and the current Tick of the mining process. In this event you can set the overall progress of the block mining (from the block's strength to 0), the progress that will be done this tick and the block's destroy stage (the cracking animation, value from 0.0 to 1.0). If this event is cancelled, the mining won't progress this tick.<br>
+* `CustomBlockBreakEvent` is fired when a Custom Block is broken. It has the Player, Block and Custom Block. In this event you can set the BlockDrops object used for block drops (set it to null if you don't want drops). You can also set if the block break effect should be played and if the custom block id should be removed from the physical block. If the event is canceled the block doesn't break and the breaking progress is reset.
+* `CustomBlockBreakStartEvent` is fired when a Player starts mining a Custom Block. It has the Player who is breaking the block, and the physical Block which is being broken. In this event you can set the CustomBlock object of the broken block and the mining stats (Mining Speed, Breaking Power and Tool Type). If this event is canceled the block mining process doesn't start.
+* `CustomBlockBreakProgressEvent` is fired every tick when a Custom Block is being mined. It has the Player, Block, Custom Block and the current Tick of the mining process. In this event you can set the overall progress of the block mining (from the block's strength to 0), the progress that will be done this tick and the block's destroy stage (the cracking animation, value from 0.0 to 1.0). If this event is canceled, the mining won't progress this tick.<br>
 
 This example code makes the mining animation appear backwards:
 ```
