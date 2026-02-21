@@ -1,6 +1,10 @@
 # Sets if the block breaking progress bar should be shown
 show-progress-bar: true
 
+# Sets the color of the mining progress bar
+# Possible colors: blue, red, pink, green, yellow, purple, white
+progress-bar-color: blue
+
 # Sets if normal vanilla blocks can be broken with default vanilla mechanics
 break-vanilla-blocks: true
 

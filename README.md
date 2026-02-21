@@ -41,6 +41,7 @@ When mining a Custom Block the plugin sets the player's `block_break_speed` attr
 ### Configuration
 In the plugin's folder is a file named `config.yml` (as is in pretty much all plugins). In the config you can set:
 * `show-progress-bar` - If set to true, a progress bar will be displayed when mining blocks.
+* `progress-bar-color` - Sets the color of the mining progress bar. Possible colors: blue, red, pink, green, yellow, purple, white
 * `break-vanilla-blocks` - If set to true, players will be able to break vanilla blocks as they normally would. If set to false, the players will only be able to break Custom Blocks. 
 * `cracking-animation-range` - Sets the range in which block cracking animations will be shown to other players when mining a block.
 * `allow-breaking-multiple-blocks` - If set to true, players will be able to pause mining a block and start mining another one without loosing progress. Note: when block mining is paused, the mining task is still ticking, just not calculating the mining, so setting a high block limit *may* cause performance issues at a large scale.
@@ -92,9 +93,14 @@ There are other commands not mentioned above:<br>
 Currently, I am considering adding the following features:
 * Optional keeping of the mining progress when the player stops mining a block and starts mining it again (with the same tool) [Added in v1.1]
 * Optional allowing the player to mine multiple blocks at once when the above feature is enabled [Added in v1.1]
-* Configurable progress bar color
+* Configurable progress bar color [Added in v1.1]
 
 I am of course open to suggestions, so if you have any, create an Issue (with the Enhancement tag).
+
+### Notes
+
+Blocks that break instantly, such as TNT or slime may behave weirdly when the `break-vanilla-blocks` option is set to true.
+
 
 ## API For Developers
 

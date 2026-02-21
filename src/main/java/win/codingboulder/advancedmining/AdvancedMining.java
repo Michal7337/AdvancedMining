@@ -1,5 +1,6 @@
 package win.codingboulder.advancedmining;
 
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.permissions.Permission;
@@ -54,6 +55,7 @@ public final class AdvancedMining extends JavaPlugin {
     }
 
     public static boolean showProgressBar;
+    public static BossBar.Color progressBarColor;
     public static boolean breakVanillaBlocks;
     public static int crackingAnimationRange;
     public static boolean allowBreakingMultipleBlocks;
@@ -79,6 +81,7 @@ public final class AdvancedMining extends JavaPlugin {
         allowBreakingMultipleBlocks = config.getBoolean("allow-breaking-multiple-blocks", false);
         miningProgressResetTime = config.getInt("mining-progress-reset-timer", 1200);
         simultaneousBrokenBlocksLimit = config.getInt("simultaneous-broken-blocks-limit", 8);
+        progressBarColor = BossBar.Color.NAMES.valueOr(config.getString("progress-bar-color", "blue"), BossBar.Color.BLUE);
 
         CustomBlock.loadAll();
         BlockDrops.loadAll();

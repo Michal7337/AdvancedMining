@@ -58,7 +58,7 @@ public class MiningRunnable extends BukkitRunnable {
         instaMine = miningSpeed >= customBlock.strength();
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
-        progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_10);
+        progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, AdvancedMining.progressBarColor, BossBar.Overlay.NOTCHED_10);
         if (!instaMine && AdvancedMining.showProgressBar && player != null) player.showBossBar(progressbar);
 
     }
