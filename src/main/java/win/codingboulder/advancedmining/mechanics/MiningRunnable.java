@@ -21,7 +21,6 @@ import win.codingboulder.advancedmining.api.CustomBlockBreakProgressEvent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.Random;
 
 /**
@@ -36,7 +35,6 @@ public class MiningRunnable extends BukkitRunnable {
     private final int breakingPower;
 
     public int randomId;
-    private final DecimalFormat decimalFormat;
     private float miningProgress;
     public BossBar progressbar;
     private final Component barName;
@@ -55,8 +53,6 @@ public class MiningRunnable extends BukkitRunnable {
 
         randomId = new Random().nextInt();
         miningProgress = customBlock.strength();
-        decimalFormat = new DecimalFormat("#.#");
-        decimalFormat.setRoundingMode(RoundingMode.CEILING);
         instaMine = miningSpeed >= customBlock.strength();
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
@@ -81,7 +77,7 @@ public class MiningRunnable extends BukkitRunnable {
         }
 
         float breakFraction = 1 - miningProgress / customBlock.strength();
-        float breakStage = Float.parseFloat(decimalFormat.format(breakFraction));
+        float breakStage = (float) (Math.ceil(breakFraction * 10) / 10);
 
         CustomBlockBreakProgressEvent event = new CustomBlockBreakProgressEvent(player, block, customBlock, miningProgress, miningSpeed, breakStage, tick);
         if (!event.callEvent()) {tick++; return;}
