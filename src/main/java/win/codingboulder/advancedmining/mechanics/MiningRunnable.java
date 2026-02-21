@@ -39,9 +39,11 @@ public class MiningRunnable extends BukkitRunnable {
     public BossBar progressbar;
     private final Component barName;
     public int tick;
+    public int pauseTicks;
 
     public boolean isCanceled;
     public boolean instaMine;
+    public boolean isPaused;
 
     public MiningRunnable(Block block, @NotNull CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
 
@@ -67,12 +69,17 @@ public class MiningRunnable extends BukkitRunnable {
     public void run() {
 
         if (isCanceled) {this.cancel(); return;}
-        if (instaMine) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.remove(player); return;}
+        if (isPaused) {
+            if (pauseTicks >= AdvancedMining.miningProgressResetTime) {stopMining(); MiningEvents.miningRunnables.get(player).remove(block);}
+            pauseTicks++;
+            return;
+        }
+        if (instaMine) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.get(player).remove(block); return;}
 
         if (miningProgress <= 0) {
             breakBlock();
             this.cancel();
-            MiningEvents.miningRunnables.remove(player);
+            MiningEvents.miningRunnables.get(player).remove(block);
             return;
         }
 
@@ -130,6 +137,25 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (blockBreakEvent.removeBlockData()) BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
+    }
+
+    public void stopMining() {
+        this.isCanceled = true;
+        player.hideBossBar(progressbar);
+        player.sendBlockDamage(block.getLocation(), 0f, randomId);
+        int range = AdvancedMining.crackingAnimationRange;
+        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, randomId);
+    }
+
+    public void pauseMining() {
+        this.isPaused = true;
+        player.hideBossBar(progressbar);
+    }
+
+    public void unpauseMining() {
+        this.isPaused = false;
+        pauseTicks = 0;
+        player.showBossBar(progressbar);
     }
 
     public Block block() {

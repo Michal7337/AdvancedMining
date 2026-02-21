@@ -56,6 +56,9 @@ public final class AdvancedMining extends JavaPlugin {
     public static boolean showProgressBar;
     public static boolean breakVanillaBlocks;
     public static int crackingAnimationRange;
+    public static boolean allowBreakingMultipleBlocks;
+    public static int miningProgressResetTime;
+    public static int simultaneousBrokenBlocksLimit;
 
     /**
      * Reloads the plugin's configuration. This includes Blocks, Drops and such.
@@ -73,6 +76,9 @@ public final class AdvancedMining extends JavaPlugin {
         showProgressBar = config.getBoolean("show-progress-bar", true);
         breakVanillaBlocks = config.getBoolean("break-vanilla-blocks", false);
         crackingAnimationRange = config.getInt("cracking-animation-range", 50);
+        allowBreakingMultipleBlocks = config.getBoolean("allow-breaking-multiple-blocks", false);
+        miningProgressResetTime = config.getInt("mining-progress-reset-timer", 1200);
+        simultaneousBrokenBlocksLimit = config.getInt("simultaneous-broken-blocks-limit", 8);
 
         CustomBlock.loadAll();
         BlockDrops.loadAll();

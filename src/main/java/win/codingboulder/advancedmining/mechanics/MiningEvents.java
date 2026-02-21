@@ -5,7 +5,6 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,10 +20,11 @@ import win.codingboulder.advancedmining.CustomBlock;
 import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class MiningEvents implements Listener {
 
-    public static HashMap<Player, MiningRunnable> miningRunnables = new HashMap<>();
+    public static HashMap<Player, LinkedHashMap<Block, MiningRunnable>> miningRunnables = new HashMap<>();
 
     @EventHandler
     public void onBlockBreakStart(@NotNull BlockDamageEvent event) {
@@ -33,7 +33,6 @@ public class MiningEvents implements Listener {
         Block block = event.getBlock();
 
         if (!player.getGameMode().equals(GameMode.SURVIVAL)) return; // Return if the player is not in survival to not break stuff
-        if (miningRunnables.containsKey(player)) return; // Return if the player is already mining a block
 
         // Check if there is a default mapping for this material
         // If there is no default mapping or if a block is placed there normally set it normally
@@ -58,7 +57,7 @@ public class MiningEvents implements Listener {
         int breakingPower = pdc.getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, defaultTool == null ? 0 : defaultTool.breakingPower());
         String toolType = item.isEmpty() ? "hand" : pdc.getOrDefault(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, defaultTool == null ? "" : defaultTool.toolType());
 
-        // Create the event and return if it was cancelled
+        // Create the event and return if it was canceled
         CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, miningSpeed, breakingPower, toolType);
         if (!breakStartEvent.callEvent()) return;
 
@@ -76,9 +75,35 @@ public class MiningEvents implements Listener {
             return;
         }
 
-        MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
-        runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
-        miningRunnables.put(player, runnable);
+        if (miningRunnables.containsKey(player)) { // If the player was mining something
+
+            LinkedHashMap<Block, MiningRunnable> playerRunnables = miningRunnables.get(player); //Get the blocks the player is mining
+
+            if (playerRunnables.containsKey(block)) playerRunnables.get(block).unpauseMining(); //If the block was being mined, unpause it
+            else { //Else create a new runnable
+
+                MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+                runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+                playerRunnables.putLast(block, runnable);
+
+                //If the amount of broken blocks is above the limit, remove the oldest one
+                if (playerRunnables.size() > AdvancedMining.simultaneousBrokenBlocksLimit) {
+                    MiningRunnable miningRunnable = playerRunnables.firstEntry().getValue();
+                    miningRunnable.stopMining();
+                    playerRunnables.remove(playerRunnables.firstEntry().getKey());
+                }
+
+            }
+
+        } else { // If the player wasn't mining anything, create a new list and a new runnable
+
+            miningRunnables.put(player, new LinkedHashMap<>());
+
+            MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+            runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+            miningRunnables.get(player).putLast(block, runnable);
+
+        }
 
     }
 
@@ -94,17 +119,17 @@ public class MiningEvents implements Listener {
             attrib.setBaseValue(1d);
         }
 
-        MiningRunnable runnable = miningRunnables.get(player);
+        LinkedHashMap<Block, MiningRunnable> playerRunnables = miningRunnables.get(player);
+        if (playerRunnables == null) return;
+        MiningRunnable runnable = playerRunnables.get(block);
         if (runnable == null) return;
 
-        runnable.isCanceled = true;
-
-        player.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
-        int range = AdvancedMining.crackingAnimationRange;
-        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
-
-        player.hideBossBar(runnable.progressbar);
-        miningRunnables.remove(player); // note: do not remove the runnable from the list anywhere other than here or breaking blocks
+        if (AdvancedMining.allowBreakingMultipleBlocks) {
+            runnable.pauseMining();
+        } else {
+            runnable.stopMining();
+            playerRunnables.remove(block);
+        }
 
     }
 
@@ -122,9 +147,8 @@ public class MiningEvents implements Listener {
     public void onPlayerLeave(@NotNull PlayerQuitEvent event) {
 
         Player player = event.getPlayer();
-        MiningRunnable runnable = miningRunnables.get(player);
 
-        if (runnable != null) runnable.isCanceled = true;
+        if (miningRunnables.containsKey(player)) miningRunnables.get(player).forEach((block, miningRunnable) -> miningRunnable.stopMining());
         miningRunnables.remove(player);
 
     }
