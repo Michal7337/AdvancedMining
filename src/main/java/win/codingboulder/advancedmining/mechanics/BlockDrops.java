@@ -40,7 +40,7 @@ public class BlockDrops implements Serializable {
 
         for (Entry entry : entries)
             if (new Random().nextDouble() <= entry.chance)
-                droppedItems.addAll(List.of(getCostItemsArray(entry.itemStack, new Random().nextInt(entry.minAmount, entry.maxAmount + 1))));
+                droppedItems.addAll(List.of(getItemAmountArray(entry.itemStack, new Random().nextInt(entry.minAmount, entry.maxAmount + 1))));
 
         return droppedItems.toArray(new ItemStack[]{});
 
@@ -53,7 +53,7 @@ public class BlockDrops implements Serializable {
      * @param amount The amount of items
      * @return An array of ItemStacks with the total amount of items equal to the item argument
      */
-    public static ItemStack @NotNull [] getCostItemsArray(ItemStack item, int amount) {
+    public static ItemStack @NotNull [] getItemAmountArray(ItemStack item, int amount) {
 
         if (amount == 0) return new ItemStack[0];
         int stackSize = item.getMaxStackSize();
@@ -138,11 +138,16 @@ public class BlockDrops implements Serializable {
      */
     public static class Entry implements Serializable {
 
+        @Serial private static final long serialVersionUID = 4427812365522579698L;
+
         private transient ItemStack itemStack;
         private int minAmount;
         private int maxAmount;
         private float chance;
         private byte[] item;
+        private boolean affectedByFortune;
+        private boolean silkTouchOnly;
+        private String alternateDrop;
 
         /**
          * @param itemStack The item to be dropped
@@ -156,6 +161,25 @@ public class BlockDrops implements Serializable {
             this.maxAmount = maxAmount;
             this.chance = chance;
             this.item = itemStack.serializeAsBytes();
+        }
+
+        /**
+         * @param itemStack The item to be dropped
+         * @param minAmount The minimum amount of the item to be dropped
+         * @param maxAmount The maximum amount of the item to be dropped
+         * @param chance The chance of the item dropping from the block
+         * @param affectedByFortune Should this drop be affected by fortune if enabled in the config
+         * @param silkTouchOnly Should this drop be rolled only when the tool has silk touch
+         * @param alternateDrop Id of a drop that should be dropped when this one doesn't
+         */
+        public Entry(ItemStack itemStack, int minAmount, int maxAmount, float chance, boolean affectedByFortune, boolean silkTouchOnly, String alternateDrop) {
+            this.itemStack = itemStack;
+            this.minAmount = minAmount;
+            this.maxAmount = maxAmount;
+            this.chance = chance;
+            this.affectedByFortune = affectedByFortune;
+            this.silkTouchOnly = silkTouchOnly;
+            this.alternateDrop = alternateDrop;
         }
 
         @Serial
@@ -204,6 +228,29 @@ public class BlockDrops implements Serializable {
             this.item = item;
         }
 
+        public boolean affectedByFortune() {
+            return affectedByFortune;
+        }
+
+        public void setAffectedByFortune(boolean affectedByFortune) {
+            this.affectedByFortune = affectedByFortune;
+        }
+
+        public boolean silkTouchOnly() {
+            return silkTouchOnly;
+        }
+
+        public void setSilkTouchOnly(boolean silkTouchOnly) {
+            this.silkTouchOnly = silkTouchOnly;
+        }
+
+        public String alternateDrop() {
+            return alternateDrop;
+        }
+
+        public void setAlternateDrop(String alternateDrop) {
+            this.alternateDrop = alternateDrop;
+        }
     }
 
 }

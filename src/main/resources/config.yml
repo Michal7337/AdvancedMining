@@ -20,3 +20,42 @@ simultaneous-broken-blocks-limit: 1
 
 # Sets the amount of ticks after which progress on a previously mined block is reset
 mining-progress-reset-timer: 1200
+
+# Configures the behavior of enchantments on tools
+enchantments:
+
+  # Configures the efficiency enchantment
+  efficiency:
+
+    # Sets if the enchantment should have any effect
+    enable: false
+
+    # Sets what kind of effect this enchantment should have. Possible options are:
+    # constant - Adds the specified amount of mining speed to the tool per level of efficiency. E.g. efficiency 1 - +100 MS | 2 - +200 MS
+    # percent - Increases the tool's mining speed by the specified percentage per level of efficiency. E.g. efficiency 1 - +10% MS | 2 - +20% MS
+    effect-type: constant
+
+    # Sets the amount of given mining speed. For constant, just set the amount added per level. For percent, set it to E.g. 0.1 for 10%, 0.35 for 35% or 1.5 for 150%
+    amount: 100.0
+
+  fortune:
+
+    # Sets if the enchantment should have any effect
+    enable: false
+
+    # Sets what kind of effect this enchantment should have. Possible options are:
+    # vanilla - attempts to mimic vanilla fortune behavior, which you can read more about on the Minecraft Wiki
+    # custom - applies the options below to block drops. Each option applies to all individual drops a block has. You can set a drop to ignore fortune using the command
+    effect-type: vanilla
+
+    # Increases the minimum item drop amount by the specified amount per level of fortune
+    increase-min-amount: 1
+
+    # Increases the maximum item drop amount by the specified amount per level of fortune
+    increase-max-amount: 1
+
+    # Increases the item drop chance by the specified amount per level of fortune
+    increase-drop-chance: 0.1
+
+    # Increases the amount of times drops are rolled on a block by the specified amount per level of fortune
+    increase-drop-rolls: 0

@@ -74,7 +74,7 @@ public class AdvancedMiningCommand {
                                                 customBlock.saveToFile();
                                                 CustomBlock.loadedBlocks().put(customBlock.id(), customBlock);
 
-                                                context.getSource().getSender().sendMessage("<green>Block created!");
+                                                context.getSource().getSender().sendRichMessage("<green>Block created!");
 
                                                 return 1;
 
@@ -141,7 +141,7 @@ public class AdvancedMiningCommand {
                                                                         customBlock.saveToFile();
                                                                         CustomBlock.loadedBlocks().put(customBlock.id(), customBlock);
 
-                                                                        context.getSource().getSender().sendMessage("<green>Block created!");
+                                                                        context.getSource().getSender().sendRichMessage("<green>Block created!");
 
                                                                         return 1;
 
@@ -164,7 +164,7 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setDropsFile(context.getArgument("file", String.class)));
-                                        context.getSource().getSender().sendMessage("<green>Block edited!");
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
                                         return 1;
 
@@ -177,7 +177,7 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setBestTool(context.getArgument("tool", String.class)));
-                                        context.getSource().getSender().sendMessage("<green>Block edited!");
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
                                         return 1;
 
@@ -190,7 +190,7 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setTexture(context.getArgument("texture", Key.class)));
-                                        context.getSource().getSender().sendMessage("<green>Block edited!");
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
                                         return 1;
 
@@ -203,7 +203,7 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setIconMaterial(context.getArgument("material", BlockState.class).getType()));
-                                        context.getSource().getSender().sendMessage("<green>Block edited!");
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
                                         return 1;
 
@@ -216,7 +216,7 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setBreakSound(context.getArgument("sound", TypedKey.class)));
-                                        context.getSource().getSender().sendMessage("<green>Block edited!");
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
                                         return 1;
 
@@ -229,7 +229,7 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setPlaceSound(context.getArgument("sound", TypedKey.class)));
-                                        context.getSource().getSender().sendMessage("<green>Block edited!");
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
                                         return 1;
 
@@ -397,7 +397,7 @@ public class AdvancedMiningCommand {
                                 ItemStack item = player.getInventory().getItemInMainHand();
                                 item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, blockId));
 
-                                context.getSource().getSender().sendMessage("<green>The block you're holding is now " + blockId);
+                                context.getSource().getSender().sendRichMessage("<green>The block you're holding is now " + blockId);
 
                                 return 1;
 
@@ -415,7 +415,7 @@ public class AdvancedMiningCommand {
                                     );
                                     DefaultBlocks.saveToFile();
 
-                                    context.getSource().getSender().sendMessage("<green>Set default block!");
+                                    context.getSource().getSender().sendRichMessage("<green>Set default block!");
 
                                     return 1;
 
@@ -515,7 +515,7 @@ public class AdvancedMiningCommand {
                                         );
                                         DefaultTools.saveToFile();
 
-                                        context.getSource().getSender().sendMessage("<green>Default tool added!");
+                                        context.getSource().getSender().sendRichMessage("<green>Default tool added!");
 
                                         return 1;
 
@@ -532,7 +532,7 @@ public class AdvancedMiningCommand {
                                             );
                                             DefaultTools.saveToFile();
 
-                                            context.getSource().getSender().sendMessage("<green>Default tool added!");
+                                            context.getSource().getSender().sendRichMessage("<green>Default tool added!");
 
                                             return 1;
 
@@ -551,7 +551,7 @@ public class AdvancedMiningCommand {
                                 BlockDrops.loadedDrops().put(blockDrops.id(), blockDrops);
                                 blockDrops.saveToFile();
 
-                                context.getSource().getSender().sendMessage("<green>Block drop created!");
+                                context.getSource().getSender().sendRichMessage("<green>Block drop created!");
 
                                 return 1;
 
@@ -586,7 +586,7 @@ public class AdvancedMiningCommand {
 
                                                     blockDrops.saveToFile();
 
-                                                    context.getSource().getSender().sendMessage("<green>Entry added to Block Drop!");
+                                                    context.getSource().getSender().sendRichMessage("<green>Entry added to Block Drop!");
 
                                                     return 1;
 
@@ -616,7 +616,7 @@ public class AdvancedMiningCommand {
 
                                                     blockDrops.saveToFile();
 
-                                                    context.getSource().getSender().sendMessage("<green>Entry added to Block Drop!");
+                                                    context.getSource().getSender().sendRichMessage("<green>Entry added to Block Drop!");
 
                                                     return 1;
 
