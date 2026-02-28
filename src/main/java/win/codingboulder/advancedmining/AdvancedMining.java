@@ -54,41 +54,73 @@ public final class AdvancedMining extends JavaPlugin {
         return instance;
     }
 
-    public static boolean showProgressBar;
-    public static BossBar.Color progressBarColor;
-    public static boolean breakVanillaBlocks;
-    public static int crackingAnimationRange;
-    public static boolean allowBreakingMultipleBlocks;
-    public static int miningProgressResetTime;
-    public static int simultaneousBrokenBlocksLimit;
-
     /**
      * Reloads the plugin's configuration. This includes Blocks, Drops and such.
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void loadConfig() {
 
-        getDataFolder().mkdir();
-        blocksFolder.mkdir();
-        blockDropsFolder.mkdir();
+        Config.loadConfig();
 
-        saveDefaultConfig();
-        reloadConfig();
-        FileConfiguration config = getConfig();
-        showProgressBar = config.getBoolean("show-progress-bar", true);
-        breakVanillaBlocks = config.getBoolean("break-vanilla-blocks", false);
-        crackingAnimationRange = config.getInt("cracking-animation-range", 50);
-        allowBreakingMultipleBlocks = config.getBoolean("allow-breaking-multiple-blocks", false);
-        miningProgressResetTime = config.getInt("mining-progress-reset-timer", 1200);
-        simultaneousBrokenBlocksLimit = config.getInt("simultaneous-broken-blocks-limit", 8);
-        progressBarColor = BossBar.Color.NAMES.valueOr(config.getString("progress-bar-color", "blue"), BossBar.Color.BLUE);
+    }
 
-        CustomBlock.loadAll();
-        BlockDrops.loadAll();
-        DefaultBlocks.loadFromFile();
-        DefaultTools.loadFromFile();
+    public static class Config {
 
-        getLogger().info("Config loaded!");
+        public static boolean showProgressBar;
+        public static BossBar.Color progressBarColor;
+        public static boolean breakVanillaBlocks;
+        public static int crackingAnimationRange;
+        public static boolean allowBreakingMultipleBlocks;
+        public static int miningProgressResetTime;
+        public static int simultaneousBrokenBlocksLimit;
+
+        public static boolean efficiencyEnable;
+        public static String efficiencyEffectType;
+        public static float efficiencyAmount;
+
+        public static boolean fortuneEnable;
+        public static String fortuneEffectType;
+        public static int fortuneMinAmount;
+        public static int fortuneMaxAmount;
+        public static float fortuneDropChance;
+        public static int fortuneDropRolls;
+
+        @SuppressWarnings("ResultOfMethodCallIgnored")
+        public static void loadConfig() {
+
+            getInstance().getDataFolder().mkdir();
+            blocksFolder.mkdir();
+            blockDropsFolder.mkdir();
+
+            getInstance().saveDefaultConfig();
+            getInstance().reloadConfig();
+            FileConfiguration config = getInstance().getConfig();
+            showProgressBar = config.getBoolean("show-progress-bar", true);
+            breakVanillaBlocks = config.getBoolean("break-vanilla-blocks", false);
+            crackingAnimationRange = config.getInt("cracking-animation-range", 50);
+            allowBreakingMultipleBlocks = config.getBoolean("allow-breaking-multiple-blocks", false);
+            miningProgressResetTime = config.getInt("mining-progress-reset-timer", 1200);
+            simultaneousBrokenBlocksLimit = config.getInt("simultaneous-broken-blocks-limit", 8);
+            progressBarColor = BossBar.Color.NAMES.valueOr(config.getString("progress-bar-color", "blue"), BossBar.Color.BLUE);
+
+            efficiencyEnable = config.getBoolean("enchantments.efficiency.enable", false);
+            efficiencyEffectType = config.getString("enchantments.efficiency.effect-type", "constant");
+            efficiencyAmount = (float) config.getDouble("enchantments.efficiency.amount", 100.0d);
+
+            fortuneEnable = config.getBoolean("enchantments.fortune.enable", false);
+            fortuneEffectType = config.getString("enchantments.fortune.effect-type", "vanilla");
+            fortuneMinAmount = config.getInt("enchantments.fortune.increase-min-amount", 1);
+            fortuneMaxAmount = config.getInt("enchantments.fortune.increase-max-amount", 1);
+            fortuneDropChance = (float) config.getDouble("enchantments.fortune.increase-drop-chance", 0.1d);
+            fortuneDropRolls = config.getInt("enchantments.fortune.increase-drop-rolls", 0);
+
+            CustomBlock.loadAll();
+            BlockDrops.loadAll();
+            DefaultBlocks.loadFromFile();
+            DefaultTools.loadFromFile();
+
+            getInstance().getLogger().info("Config loaded!");
+
+        }
 
     }
 

@@ -87,7 +87,7 @@ public class MiningEvents implements Listener {
                 playerRunnables.putLast(block, runnable);
 
                 //If the amount of broken blocks is above the limit, remove the oldest one
-                if (playerRunnables.size() > AdvancedMining.simultaneousBrokenBlocksLimit) {
+                if (playerRunnables.size() > AdvancedMining.Config.simultaneousBrokenBlocksLimit) {
                     MiningRunnable miningRunnable = playerRunnables.firstEntry().getValue();
                     miningRunnable.stopMining();
                     playerRunnables.remove(playerRunnables.firstEntry().getKey());
@@ -113,7 +113,7 @@ public class MiningEvents implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
-        if (AdvancedMining.breakVanillaBlocks) {
+        if (AdvancedMining.Config.breakVanillaBlocks) {
             AttributeInstance attrib =  player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
             assert attrib != null;
             attrib.setBaseValue(1d);
@@ -124,7 +124,7 @@ public class MiningEvents implements Listener {
         MiningRunnable runnable = playerRunnables.get(block);
         if (runnable == null) return;
 
-        if (AdvancedMining.allowBreakingMultipleBlocks) {
+        if (AdvancedMining.Config.allowBreakingMultipleBlocks) {
             runnable.pauseMining();
         } else {
             runnable.stopMining();

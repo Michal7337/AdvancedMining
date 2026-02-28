@@ -58,8 +58,8 @@ public class MiningRunnable extends BukkitRunnable {
         instaMine = miningSpeed >= customBlock.strength();
 
         barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
-        progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, AdvancedMining.progressBarColor, BossBar.Overlay.NOTCHED_10);
-        if (!instaMine && AdvancedMining.showProgressBar && player != null) player.showBossBar(progressbar);
+        progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, AdvancedMining.Config.progressBarColor, BossBar.Overlay.NOTCHED_10);
+        if (!instaMine && AdvancedMining.Config.showProgressBar && player != null) player.showBossBar(progressbar);
 
     }
 
@@ -70,7 +70,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (isCanceled) {this.cancel(); return;}
         if (isPaused) {
-            if (pauseTicks >= AdvancedMining.miningProgressResetTime) {stopMining(); MiningEvents.miningRunnables.get(player).remove(block);}
+            if (pauseTicks >= AdvancedMining.Config.miningProgressResetTime) {stopMining(); MiningEvents.miningRunnables.get(player).remove(block);}
             pauseTicks++;
             return;
         }
@@ -93,7 +93,7 @@ public class MiningRunnable extends BukkitRunnable {
         breakStage = event.breakStage();
 
         if (breakStage != lastState) {
-            int range = AdvancedMining.crackingAnimationRange;
+            int range = AdvancedMining.Config.crackingAnimationRange;
             if (player != null) {
                 player.sendBlockDamage(block.getLocation(), breakStage, randomId);
                 for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), breakStage, randomId);
@@ -114,7 +114,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (player != null) {
             player.sendBlockDamage(block.getLocation(), 0f, randomId);
-            int range = AdvancedMining.crackingAnimationRange;
+            int range = AdvancedMining.Config.crackingAnimationRange;
             for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0, randomId);
             player.hideBossBar(progressbar);
         }
@@ -143,7 +143,7 @@ public class MiningRunnable extends BukkitRunnable {
         this.isCanceled = true;
         player.hideBossBar(progressbar);
         player.sendBlockDamage(block.getLocation(), 0f, randomId);
-        int range = AdvancedMining.crackingAnimationRange;
+        int range = AdvancedMining.Config.crackingAnimationRange;
         for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, randomId);
     }
 

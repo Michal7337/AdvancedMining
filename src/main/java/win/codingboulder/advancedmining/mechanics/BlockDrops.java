@@ -30,6 +30,12 @@ public class BlockDrops implements Serializable {
         return blockDrops;
     }
 
+    public static @NotNull BlockDrops singleDrop(String id, ItemStack item, int minAmount, int maxAmount, float chance, boolean affectedByFortune, boolean silkTouchOnly, String alternateDrop) {
+        BlockDrops blockDrops = new BlockDrops(id);
+        blockDrops.entries.add(new Entry(item, minAmount, maxAmount, chance, affectedByFortune, silkTouchOnly, alternateDrop));
+        return blockDrops;
+    }
+
     /**
      * Iterates through all the entries and randomly rolls if they should be dropped and how many items should be dropped
      * @return The randomly rolled items
