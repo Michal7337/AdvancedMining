@@ -3,6 +3,7 @@ package win.codingboulder.advancedmining.mechanics;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -201,15 +202,31 @@ public class BlockDrops implements Serializable {
 
     @Serial
     private void readObject(@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException {
+
         in.defaultReadObject();
+
         if (entryMap == null) entryMap = new HashMap<>();
         entries.forEach(entry -> entryMap.put(entry.id, entry));
+
+        // Automatic naming of entries from old versions
+        boolean wasFromOldVersion = false;
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry = entries.get(i);
+            if (entry.id() == null) {
+                String newId = "auto-migrated-" + i + "-" + PlainTextComponentSerializer.plainText().serialize(entry.item().effectiveName()).replace(" ", "_");
+                entry.setId(newId);
+                    AdvancedMining.getInstance().getLogger().info("Automatically renamed legacy Entry " + i + " from Block Drop '" + id + "' to '" + newId + "'");
+                wasFromOldVersion = true;
+            }
+        }
+        if (wasFromOldVersion) saveToFile();
+
     }
 
     public void modifyWithCommandContext(CommandContext<CommandSourceStack> context, String argName, Consumer<Entry> entry) {
 
-        BlockDrops.Entry dropEntry = entryMap().get(StringArgumentType.getString(context, argName));
-        if (entry == null) {
+        Entry dropEntry = entryMap().get(StringArgumentType.getString(context, argName));
+        if (dropEntry == null) {
             context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
             return;
         }

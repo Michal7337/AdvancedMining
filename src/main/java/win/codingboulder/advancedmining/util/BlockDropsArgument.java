@@ -9,7 +9,6 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
-import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
 
