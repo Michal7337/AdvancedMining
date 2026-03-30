@@ -21,6 +21,9 @@ simultaneous-broken-blocks-limit: 1
 # Sets the amount of ticks after which progress on a previously mined block is reset
 mining-progress-reset-timer: 1200
 
+# Sets if the player should be able to resume mining a block with a different tool to what they originally used to mine it
+allow-tool-swapping: false
+
 # Configures the behavior of enchantments on tools
 enchantments:
 
@@ -40,12 +43,12 @@ enchantments:
 
   fortune:
 
-    # Sets if the enchantment should have any effect
+    # Sets if the enchantment should have any effect. You can set a block drop to ignore fortune using the command
     enable: false
 
     # Sets what kind of effect this enchantment should have. Possible options are:
     # vanilla - attempts to mimic vanilla fortune behavior, which you can read more about on the Minecraft Wiki
-    # custom - applies the options below to block drops. Each option applies to all individual drops a block has. You can set a drop to ignore fortune using the command
+    # custom - applies the options below to block drops. Each option applies to all individual drops a block has
     effect-type: vanilla
 
     # Increases the minimum item drop amount by the specified amount per level of fortune
@@ -54,7 +57,7 @@ enchantments:
     # Increases the maximum item drop amount by the specified amount per level of fortune
     increase-max-amount: 1
 
-    # Increases the item drop chance by the specified amount per level of fortune
+    # Increases the item drop chance by the specified amount per level of fortune. Note: over 100% chance doesn't do anything
     increase-drop-chance: 0.1
 
     # Increases the amount of times drops are rolled on a block by the specified amount per level of fortune

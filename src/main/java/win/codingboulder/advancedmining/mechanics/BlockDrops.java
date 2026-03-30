@@ -1,8 +1,10 @@
 package win.codingboulder.advancedmining.mechanics;
 
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 
 import java.io.*;
@@ -19,6 +21,7 @@ public class BlockDrops implements Serializable {
 
     private String id;
     private final ArrayList<Entry> entries = new ArrayList<>();
+    private transient HashMap<String, Entry> entryMap = new HashMap<>();
 
     public BlockDrops(String id) {
         this.id = id;
@@ -26,14 +29,30 @@ public class BlockDrops implements Serializable {
 
     public static @NotNull BlockDrops singleDrop(String id, ItemStack item, int minAmount, int maxAmount, float chance) {
         BlockDrops blockDrops = new BlockDrops(id);
-        blockDrops.entries.add(new Entry(item, minAmount, maxAmount, chance));
+        blockDrops.entries.add(new Entry("main", item, minAmount, maxAmount, chance));
         return blockDrops;
     }
 
-    public static @NotNull BlockDrops singleDrop(String id, ItemStack item, int minAmount, int maxAmount, float chance, boolean affectedByFortune, boolean silkTouchOnly, String alternateDrop) {
+    public static @NotNull BlockDrops singleDrop(String id, ItemStack itemStack, int minAmount, int maxAmount, float chance, boolean affectedByFortune, boolean silkTouchOnly, boolean noRollByDefault, ArrayList<String> extraDrops) {
         BlockDrops blockDrops = new BlockDrops(id);
-        blockDrops.entries.add(new Entry(item, minAmount, maxAmount, chance, affectedByFortune, silkTouchOnly, alternateDrop));
+        blockDrops.entries.add(new Entry("main", itemStack, minAmount, maxAmount, chance, affectedByFortune, silkTouchOnly, noRollByDefault, extraDrops));
         return blockDrops;
+    }
+
+
+    /**
+     * A utility method for changing an entry's Id. It automatically updates the entryMap
+     * @param targetId Id of the entry to change
+     * @param newId New Id of the entry
+     */
+    public void changeEntryId(String targetId, String newId) {
+
+        Entry entry = entryMap.get(targetId);
+        if (entry == null) return;
+        entry.setId(newId);
+        entryMap.remove(targetId);
+        entryMap.put(newId, entry);
+
     }
 
     /**
@@ -44,11 +63,59 @@ public class BlockDrops implements Serializable {
 
         ArrayList<ItemStack> droppedItems = new ArrayList<>();
 
-        for (Entry entry : entries)
-            if (new Random().nextDouble() <= entry.chance)
-                droppedItems.addAll(List.of(getItemAmountArray(entry.itemStack, new Random().nextInt(entry.minAmount, entry.maxAmount + 1))));
+        for (Entry entry : entries) { // for each entry
 
-        return droppedItems.toArray(new ItemStack[]{});
+            if (!entry.noRollByDefault) { // if it can be rolled
+
+                boolean extraDropSuccess = false;
+                for (String extraDropId : entry.extraDrops) { // for each extra drop
+
+                    Entry extraDrop = entryMap.get(extraDropId);
+                    if (extraDrop == null) continue;
+                    ArrayList<ItemStack> rolledDrops = extraDrop.roll(); // if it exists roll it
+                    droppedItems.addAll(rolledDrops);
+                    if (!rolledDrops.isEmpty()) {extraDropSuccess = true; break;} // if it succeeds end the loop
+
+                }
+
+                if (!extraDropSuccess) droppedItems.addAll(entry.roll()); // if the extra drops don't roll, roll the base drop
+
+            }
+
+        }
+
+        return droppedItems.toArray(new ItemStack[0]);
+
+    }
+
+    public ItemStack[] rollDrops(ItemStack tool) {
+
+        if (tool == null) return rollDrops();
+
+        ArrayList<ItemStack> droppedItems = new ArrayList<>();
+
+        for (Entry entry : entries) { // for each entry
+
+            if (!entry.noRollByDefault) { // if it can be rolled
+
+                boolean extraDropSuccess = false;
+                for (String extraDropId : entry.extraDrops) { // for each extra drop
+
+                    Entry extraDrop = entryMap.get(extraDropId);
+                    if (extraDrop == null) continue;
+                    ArrayList<ItemStack> rolledDrops = extraDrop.roll(tool); // if it exists roll it
+                    droppedItems.addAll(rolledDrops);
+                    if (!rolledDrops.isEmpty()) {extraDropSuccess = true; break;} // if it succeeds end the loop
+
+                }
+
+                if (!extraDropSuccess) droppedItems.addAll(entry.roll(tool)); // if the extra drops don't roll, roll the base drop
+
+            }
+
+        }
+
+        return droppedItems.toArray(new ItemStack[0]);
 
     }
 
@@ -57,7 +124,7 @@ public class BlockDrops implements Serializable {
      * E.g. If the ItemStack is a Gold Ingot and the amount is 130, the array will contain two stacks of 64 Ingots and one stack of 2 Ingots.
      * @param item The item to make stacks of
      * @param amount The amount of items
-     * @return An array of ItemStacks with the total amount of items equal to the item argument
+     * @return An array of ItemStacks with the total amount of items equal to the amount argument
      */
     public static ItemStack @NotNull [] getItemAmountArray(ItemStack item, int amount) {
 
@@ -123,6 +190,18 @@ public class BlockDrops implements Serializable {
 
     }
 
+    public void loadDropsMap() {
+        entryMap = new HashMap<>();
+        entries.forEach(entry -> entryMap.put(entry.id, entry));
+    }
+
+    @Serial
+    private void readObject(@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (entryMap == null) entryMap = new HashMap<>();
+        entries.forEach(entry -> entryMap.put(entry.id, entry));
+    }
+
     public static HashMap<String, BlockDrops> loadedDrops() {
         return loadedDrops;
     }
@@ -139,6 +218,10 @@ public class BlockDrops implements Serializable {
         return entries;
     }
 
+    public HashMap<String, Entry> entryMap() {
+        return entryMap;
+    }
+
     /**
      * Represents an entry that can be rolled to drop from a block
      */
@@ -151,9 +234,11 @@ public class BlockDrops implements Serializable {
         private int maxAmount;
         private float chance;
         private byte[] item;
+        private String id;
         private boolean affectedByFortune;
         private boolean silkTouchOnly;
-        private String alternateDrop;
+        private boolean noRollByDefault; // if enabled, entry will only be rolled by other drops
+        private ArrayList<String> extraDrops; // roll these entries and if none of them drop roll this one
 
         /**
          * @param itemStack The item to be dropped
@@ -161,12 +246,14 @@ public class BlockDrops implements Serializable {
          * @param maxAmount The maximum amount of the item to be dropped
          * @param chance The chance of the item dropping from the block
          */
-        public Entry(@NotNull ItemStack itemStack, int minAmount, int maxAmount, float chance) {
+        public Entry(String id, @NotNull ItemStack itemStack, int minAmount, int maxAmount, float chance) {
+            this.id = id;
             this.itemStack = itemStack;
             this.minAmount = minAmount;
             this.maxAmount = maxAmount;
             this.chance = chance;
             this.item = itemStack.serializeAsBytes();
+            this.extraDrops = new ArrayList<>();
         }
 
         /**
@@ -176,22 +263,61 @@ public class BlockDrops implements Serializable {
          * @param chance The chance of the item dropping from the block
          * @param affectedByFortune Should this drop be affected by fortune if enabled in the config
          * @param silkTouchOnly Should this drop be rolled only when the tool has silk touch
-         * @param alternateDrop Id of a drop that should be dropped when this one doesn't
+         * @param noRollByDefault If enabled, this drop will only be rolled by other drops
+         * @param extraDrops Ids of drops that will be rolled before this one
          */
-        public Entry(ItemStack itemStack, int minAmount, int maxAmount, float chance, boolean affectedByFortune, boolean silkTouchOnly, String alternateDrop) {
+        public Entry(String id, ItemStack itemStack, int minAmount, int maxAmount, float chance, boolean affectedByFortune, boolean silkTouchOnly, boolean noRollByDefault, ArrayList<String> extraDrops) {
+            this.id = id;
             this.itemStack = itemStack;
             this.minAmount = minAmount;
             this.maxAmount = maxAmount;
             this.chance = chance;
             this.affectedByFortune = affectedByFortune;
             this.silkTouchOnly = silkTouchOnly;
-            this.alternateDrop = alternateDrop;
+            this.noRollByDefault = noRollByDefault;
+            this.extraDrops = extraDrops;
         }
 
         @Serial
         private void readObject(@NotNull ObjectInputStream stream) throws IOException, ClassNotFoundException {
             stream.defaultReadObject();
             itemStack = ItemStack.deserializeBytes(item);
+            if (extraDrops == null) extraDrops = new ArrayList<>();
+        }
+
+        public ArrayList<ItemStack> roll() {
+
+            ArrayList<ItemStack> droppedItems = new ArrayList<>();
+            if (new Random().nextDouble() <= chance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(minAmount, maxAmount + 1))));
+
+            return droppedItems;
+
+        }
+
+        public ArrayList<ItemStack> roll(ItemStack tool) {
+
+            if (tool == null) return roll();
+
+            ArrayList<ItemStack> droppedItems = new ArrayList<>();
+            if (silkTouchOnly && !tool.containsEnchantment(Enchantment.SILK_TOUCH)) return droppedItems;
+            int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
+
+            float rollChance = affectedByFortune ? chance + fortuneLevel * AdvancedMining.Config.fortuneDropChance : chance;
+            int rollMinAmount = affectedByFortune ? minAmount + fortuneLevel * AdvancedMining.Config.fortuneMinAmount : minAmount;
+            int rollMaxAmount = affectedByFortune ? maxAmount + fortuneLevel * AdvancedMining.Config.fortuneMaxAmount : maxAmount;
+
+            if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(rollMinAmount, rollMaxAmount + 1))));
+
+            return droppedItems;
+
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
         public ItemStack item() {
@@ -250,13 +376,22 @@ public class BlockDrops implements Serializable {
             this.silkTouchOnly = silkTouchOnly;
         }
 
-        public String alternateDrop() {
-            return alternateDrop;
+        public ArrayList<String> extraDrops() {
+            return extraDrops;
         }
 
-        public void setAlternateDrop(String alternateDrop) {
-            this.alternateDrop = alternateDrop;
+        public void setExtraDrops(ArrayList<String> extraDrops) {
+            this.extraDrops = extraDrops;
         }
+
+        public boolean noRollByDefault() {
+            return noRollByDefault;
+        }
+
+        public void setNoRollByDefault(boolean noRollByDefault) {
+            this.noRollByDefault = noRollByDefault;
+        }
+
     }
 
 }

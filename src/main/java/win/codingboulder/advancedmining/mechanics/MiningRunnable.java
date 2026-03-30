@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
@@ -38,6 +39,7 @@ public class MiningRunnable extends BukkitRunnable {
     private float miningProgress;
     public BossBar progressbar;
     private final Component barName;
+    private ItemStack tool;
     public int tick;
     public int pauseTicks;
 
@@ -133,7 +135,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         blockDrops = blockBreakEvent.blockDrops();
         if (blockDrops != null)
-            for (ItemStack item : blockDrops.rollDrops()) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+            for (ItemStack item : blockDrops.rollDrops(tool)) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 
         if (blockBreakEvent.removeBlockData()) BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
@@ -180,6 +182,14 @@ public class MiningRunnable extends BukkitRunnable {
 
     public float miningProgress() {
         return miningProgress;
+    }
+
+    public ItemStack tool() {
+        return tool;
+    }
+
+    public void setTool(@NonNull ItemStack tool) {
+        this.tool = tool.clone();
     }
 
 }

@@ -83,6 +83,7 @@ public class MiningEvents implements Listener {
             else { //Else create a new runnable
 
                 MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+                runnable.setTool(item);
                 runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                 playerRunnables.putLast(block, runnable);
 
@@ -100,6 +101,7 @@ public class MiningEvents implements Listener {
             miningRunnables.put(player, new LinkedHashMap<>());
 
             MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+            runnable.setTool(item);
             runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
             miningRunnables.get(player).putLast(block, runnable);
 

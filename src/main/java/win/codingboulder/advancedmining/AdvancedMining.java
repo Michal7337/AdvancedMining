@@ -72,6 +72,7 @@ public final class AdvancedMining extends JavaPlugin {
         public static boolean allowBreakingMultipleBlocks;
         public static int miningProgressResetTime;
         public static int simultaneousBrokenBlocksLimit;
+        public static boolean allowToolSwapping;
 
         public static boolean efficiencyEnable;
         public static String efficiencyEffectType;
@@ -101,6 +102,7 @@ public final class AdvancedMining extends JavaPlugin {
             miningProgressResetTime = config.getInt("mining-progress-reset-timer", 1200);
             simultaneousBrokenBlocksLimit = config.getInt("simultaneous-broken-blocks-limit", 8);
             progressBarColor = BossBar.Color.NAMES.valueOr(config.getString("progress-bar-color", "blue"), BossBar.Color.BLUE);
+            allowToolSwapping = config.getBoolean("allow-tool-swapping", false);
 
             efficiencyEnable = config.getBoolean("enchantments.efficiency.enable", false);
             efficiencyEffectType = config.getString("enchantments.efficiency.effect-type", "constant");
