@@ -26,8 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
 import win.codingboulder.advancedmining.mechanics.DefaultBlocks;
 import win.codingboulder.advancedmining.mechanics.DefaultTools;
+import win.codingboulder.advancedmining.util.BlockDropsArgument;
+import win.codingboulder.advancedmining.util.CustomBlockArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.papermc.paper.command.brigadier.Commands.literal;
@@ -573,11 +574,7 @@ public class AdvancedMiningCommand {
                             }))
                     )
                     .then(literal("edit")
-                        .then(argument("name", StringArgumentType.word())
-                            .suggests((context, builder) -> {
-                                BlockDrops.loadedDrops().keySet().forEach(builder::suggest);
-                                return builder.buildFuture();
-                            })
+                        .then(argument("name", BlockDropsArgument.dropsArgument())
 
                             .then(literal("add-entry")
                                 .then(argument("id", StringArgumentType.word())
@@ -587,11 +584,7 @@ public class AdvancedMiningCommand {
                                                 .then(argument("max-amount", IntegerArgumentType.integer(1))
                                                     .executes(context -> {
 
-                                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                        if (blockDrops == null) {
-                                                            context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                            return 1;
-                                                        }
+                                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
                                                         blockDrops.entries().add(new BlockDrops.Entry(
                                                             StringArgumentType.getString(context, "id"),
@@ -614,11 +607,7 @@ public class AdvancedMiningCommand {
                                                 .then(argument("max-amount", IntegerArgumentType.integer(1))
                                                     .executes(context -> {
 
-                                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                        if (blockDrops == null) {
-                                                            context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                            return 1;
-                                                        }
+                                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
                                                         Player player = (Player) context.getSource().getSender();
                                                         ItemStack itemStack = player.getInventory().getItemInMainHand();
@@ -643,10 +632,8 @@ public class AdvancedMiningCommand {
                             .then(literal("edit-entry")
                                 .then(argument("id", StringArgumentType.word())
                                     .suggests((context, builder) -> {
-                                        String name = StringArgumentType.getString(context, "name");
-                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(name);
-                                        if (blockDrops == null) return builder.buildFuture();
-                                        blockDrops.entries().forEach(entry -> builder.suggest(entry.id()));
+                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                        blockDrops.entries().forEach(entry -> {if (entry.id() != null) builder.suggest(entry.id());});
                                         return builder.buildFuture();
                                     })
 
@@ -654,21 +641,10 @@ public class AdvancedMiningCommand {
                                         .then(argument("value", BoolArgumentType.bool())
                                             .executes(context -> {
 
-                                                BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                if (blockDrops == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                    return 1;
-                                                }
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                if (entry == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                    return 1;
-                                                }
-
-                                                entry.setAffectedByFortune(BoolArgumentType.getBool(context, "value"));
-                                                blockDrops.saveToFile();
-                                                context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.setAffectedByFortune(BoolArgumentType.getBool(context, "value")));
 
                                                 return 1;
 
@@ -677,21 +653,10 @@ public class AdvancedMiningCommand {
                                         .then(argument("value", BoolArgumentType.bool())
                                             .executes(context -> {
 
-                                                BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                if (blockDrops == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                    return 1;
-                                                }
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                if (entry == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                    return 1;
-                                                }
-
-                                                entry.setSilkTouchOnly(BoolArgumentType.getBool(context, "value"));
-                                                blockDrops.saveToFile();
-                                                context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.setSilkTouchOnly(BoolArgumentType.getBool(context, "value")));
 
                                                 return 1;
 
@@ -700,21 +665,10 @@ public class AdvancedMiningCommand {
                                         .then(argument("value", BoolArgumentType.bool())
                                             .executes(context -> {
 
-                                                BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                if (blockDrops == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                    return 1;
-                                                }
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                if (entry == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                    return 1;
-                                                }
-
-                                                entry.setNoRollByDefault(BoolArgumentType.getBool(context, "value"));
-                                                blockDrops.saveToFile();
-                                                context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.setNoRollByDefault(BoolArgumentType.getBool(context, "value")));
 
                                                 return 1;
 
@@ -722,31 +676,19 @@ public class AdvancedMiningCommand {
                                     .then(literal("add-extra-drop")
                                         .then(argument("entry-id", StringArgumentType.word())
                                             .suggests((context, builder) -> {
-                                                String name = StringArgumentType.getString(context, "name");
-                                                BlockDrops blockDrops = BlockDrops.loadedDrops().get(name);
-                                                if (blockDrops == null) return builder.buildFuture();
-                                                blockDrops.entries().forEach(entry -> builder.suggest(entry.id()));
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                blockDrops.entries().forEach(entry -> {if (entry.id() != null) builder.suggest(entry.id());});
                                                 return builder.buildFuture();
                                             })
                                             .then(literal("first")
                                                 .executes(context -> {
 
-                                                    BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                    if (blockDrops == null) {
-                                                        context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                        return 1;
-                                                    }
+                                                    BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                    BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                    if (entry == null) {
-                                                        context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                        return 1;
-                                                    }
+                                                    blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                        entry.extraDrops().addFirst(StringArgumentType.getString(context, "entry-id")));
 
-                                                    entry.extraDrops().addFirst(StringArgumentType.getString(context, "entry-id"));
                                                     blockDrops.loadDropsMap();
-                                                    blockDrops.saveToFile();
-                                                    context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
 
                                                     return 1;
 
@@ -754,22 +696,12 @@ public class AdvancedMiningCommand {
                                             .then(literal("last")
                                                 .executes(context -> {
 
-                                                    BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                    if (blockDrops == null) {
-                                                        context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                        return 1;
-                                                    }
+                                                    BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                    BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                    if (entry == null) {
-                                                        context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                        return 1;
-                                                    }
+                                                    blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                        entry.extraDrops().addLast(StringArgumentType.getString(context, "entry-id")));
 
-                                                    entry.extraDrops().addLast(StringArgumentType.getString(context, "entry-id"));
                                                     blockDrops.loadDropsMap();
-                                                    blockDrops.saveToFile();
-                                                    context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
 
                                                     return 1;
 
@@ -777,35 +709,22 @@ public class AdvancedMiningCommand {
                                             .then(literal("replace")
                                                 .then(argument("replaced-entry-id", StringArgumentType.word())
                                                     .suggests((context, builder) -> {
-                                                        String name = StringArgumentType.getString(context, "name");
-                                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(name);
-                                                        if (blockDrops == null) return builder.buildFuture();
-                                                        String entryId = StringArgumentType.getString(context, "id");
-                                                        BlockDrops.Entry entry = blockDrops.entryMap().get(entryId);
-                                                        if (entryId == null) return builder.buildFuture();
+                                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                        BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
+                                                        if (entry == null) return builder.buildFuture();
                                                         entry.extraDrops().forEach(builder::suggest);
                                                         return builder.buildFuture();
                                                     })
                                                     .executes(context -> {
 
-                                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                        if (blockDrops == null) {
-                                                            context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                            return 1;
-                                                        }
+                                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                        BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                        if (entry == null) {
-                                                            context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                            return 1;
-                                                        }
-
-                                                        int index = entry.extraDrops().indexOf(StringArgumentType.getString(context, "entry-id"));
-                                                        if (index > -1) entry.extraDrops().set(index, StringArgumentType.getString(context, "replaced-entry-id"));
+                                                        blockDrops.modifyWithCommandContext(context, "id", entry -> {
+                                                            int index = entry.extraDrops().indexOf(StringArgumentType.getString(context, "entry-id"));
+                                                            if (index > -1) entry.extraDrops().set(index, StringArgumentType.getString(context, "replaced-entry-id"));
+                                                        });
 
                                                         blockDrops.loadDropsMap();
-                                                        blockDrops.saveToFile();
-                                                        context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
 
                                                         return 1;
 
@@ -813,36 +732,22 @@ public class AdvancedMiningCommand {
                                             .then(literal("insert-after")
                                                 .then(argument("after-entry-id", StringArgumentType.word())
                                                     .suggests((context, builder) -> {
-                                                        String name = StringArgumentType.getString(context, "name");
-                                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(name);
-                                                        if (blockDrops == null) return builder.buildFuture();
-                                                        String entryId = StringArgumentType.getString(context, "id");
-                                                        BlockDrops.Entry entry = blockDrops.entryMap().get(entryId);
-                                                        if (entryId == null) return builder.buildFuture();
+                                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                        BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
+                                                        if (entry == null) return builder.buildFuture();
                                                         entry.extraDrops().forEach(builder::suggest);
                                                         return builder.buildFuture();
                                                     })
                                                     .executes(context -> {
 
-                                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                        if (blockDrops == null) {
-                                                            context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                            return 1;
-                                                        }
+                                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                        BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                        if (entry == null) {
-                                                            context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                            return 1;
-                                                        }
-
-                                                        ArrayList<String> extraDrops = entry.extraDrops();
-                                                        int index = extraDrops.indexOf(StringArgumentType.getString(context, "entry-id"));
-                                                        extraDrops.add(index+1, StringArgumentType.getString(context, "after-entry-id"));
+                                                        blockDrops.modifyWithCommandContext(context, "id", entry -> {
+                                                            int index = entry.extraDrops().indexOf(StringArgumentType.getString(context, "entry-id"));
+                                                            entry.extraDrops().add(index+1, StringArgumentType.getString(context, "after-entry-id"));
+                                                        });
 
                                                         blockDrops.loadDropsMap();
-                                                        blockDrops.saveToFile();
-                                                        context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
 
                                                         return 1;
 
@@ -851,33 +756,20 @@ public class AdvancedMiningCommand {
                                     .then(literal("remove-extra-drop")
                                         .then(argument("entry-id", StringArgumentType.word())
                                             .suggests((context, builder) -> {
-                                                String name = StringArgumentType.getString(context, "name");
-                                                BlockDrops blockDrops = BlockDrops.loadedDrops().get(name);
-                                                if (blockDrops == null) return builder.buildFuture();
-                                                String entryId = StringArgumentType.getString(context, "id");
-                                                BlockDrops.Entry entry = blockDrops.entryMap().get(entryId);
-                                                if (entryId == null) return builder.buildFuture();
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
+                                                if (entry == null) return builder.buildFuture();
                                                 entry.extraDrops().forEach(builder::suggest);
                                                 return builder.buildFuture();
                                             })
                                             .executes(context -> {
 
-                                                BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                                if (blockDrops == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                                    return 1;
-                                                }
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
-                                                BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "id"));
-                                                if (entry == null) {
-                                                    context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
-                                                    return 1;
-                                                }
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.extraDrops().remove(StringArgumentType.getString(context, "entry-id")));
 
-                                                entry.extraDrops().remove(StringArgumentType.getString(context, "entry-id"));
                                                 blockDrops.loadDropsMap();
-                                                blockDrops.saveToFile();
-                                                context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
 
                                                 return 1;
 
@@ -885,19 +777,13 @@ public class AdvancedMiningCommand {
                             .then(literal("remove-entry")
                                 .then(argument("entry-id", StringArgumentType.word())
                                     .suggests((context, builder) -> {
-                                        String name = StringArgumentType.getString(context, "name");
-                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(name);
-                                        if (blockDrops == null) return builder.buildFuture();
-                                        blockDrops.entries().forEach(entry -> builder.suggest(entry.id()));
+                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                        blockDrops.entries().forEach(entry -> {if (entry.id() != null) builder.suggest(entry.id());});
                                         return builder.buildFuture();
                                     })
                                     .executes(context -> {
 
-                                        BlockDrops blockDrops = BlockDrops.loadedDrops().get(StringArgumentType.getString(context, "name"));
-                                        if (blockDrops == null) {
-                                            context.getSource().getSender().sendRichMessage("<red>That block drops config doesn't exist");
-                                            return 1;
-                                        }
+                                        BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
 
                                         BlockDrops.Entry entry = blockDrops.entryMap().get(StringArgumentType.getString(context, "entry-id"));
                                         if (entry == null) {

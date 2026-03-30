@@ -1,4 +1,4 @@
-package win.codingboulder.advancedmining;
+package win.codingboulder.advancedmining.util;
 
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -10,11 +10,10 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import org.jetbrains.annotations.NotNull;
+import win.codingboulder.advancedmining.CustomBlock;
 
 import java.util.concurrent.CompletableFuture;
 
-
-@SuppressWarnings("UnstableApiUsage")
 public class CustomBlockArgument implements CustomArgumentType.Converted<CustomBlock, String> {
 
     @Override

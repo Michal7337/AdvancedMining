@@ -1,5 +1,8 @@
 package win.codingboulder.advancedmining.mechanics;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +12,7 @@ import win.codingboulder.advancedmining.AdvancedMining;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Represents a list of items that can be dropped from a block.
@@ -200,6 +204,20 @@ public class BlockDrops implements Serializable {
         in.defaultReadObject();
         if (entryMap == null) entryMap = new HashMap<>();
         entries.forEach(entry -> entryMap.put(entry.id, entry));
+    }
+
+    public void modifyWithCommandContext(CommandContext<CommandSourceStack> context, String argName, Consumer<Entry> entry) {
+
+        BlockDrops.Entry dropEntry = entryMap().get(StringArgumentType.getString(context, argName));
+        if (entry == null) {
+            context.getSource().getSender().sendRichMessage("<red>That entry doesn't exist");
+            return;
+        }
+
+        entry.accept(dropEntry);
+        saveToFile();
+        context.getSource().getSender().sendRichMessage("<green>Block Drop Entry edited!");
+
     }
 
     public static HashMap<String, BlockDrops> loadedDrops() {
