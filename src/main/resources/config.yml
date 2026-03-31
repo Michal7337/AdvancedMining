@@ -63,3 +63,11 @@ enchantments:
 
     # Increases the amount of times drops are rolled on a block by the specified amount per level of fortune
     increase-drop-rolls: 0
+
+    # Sets how the vanilla option behaves. Possible options:
+    # additional-rolls - will roll the drop multiple times. Useful if you want players to be able to roll for rare drops multiple times
+    # increase-max-drop-amount - will just increase the max amount of items that can drop
+    vanilla-behaviour: additional-rolls
+
+    # Sets if the vanilla fortune behavior should trigger even when the tool has silk touch on it
+    vanilla-ignore-silk-touch: false

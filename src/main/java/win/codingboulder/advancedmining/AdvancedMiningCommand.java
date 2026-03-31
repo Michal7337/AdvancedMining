@@ -563,6 +563,7 @@ public class AdvancedMiningCommand {
                                 BlockDrops blockDrops = new BlockDrops(StringArgumentType.getString(context, "name"));
                                 BlockDrops.loadedDrops().put(blockDrops.id(), blockDrops);
                                 blockDrops.saveToFile();
+                                blockDrops.loadDropsMap();
 
                                 context.getSource().getSender().sendRichMessage("<green>Block drop created!");
 
@@ -592,6 +593,7 @@ public class AdvancedMiningCommand {
                                                         ));
 
                                                         blockDrops.saveToFile();
+                                                        blockDrops.loadDropsMap();
 
                                                         context.getSource().getSender().sendRichMessage("<green>Entry added to Block Drop!");
 
@@ -619,6 +621,7 @@ public class AdvancedMiningCommand {
                                                         ));
 
                                                         blockDrops.saveToFile();
+                                                        blockDrops.loadDropsMap();
 
                                                         context.getSource().getSender().sendRichMessage("<green>Entry added to Block Drop!");
 

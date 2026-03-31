@@ -94,15 +94,74 @@ public class BlockDrops implements Serializable {
 
     }
 
+    /**
+     * Iterates through all the entries and randomly rolls if they should be dropped and how many items should be dropped.
+     * Takes into account the enchantments of the tool used
+     * @return The randomly rolled items
+     */
     public ItemStack[] rollDrops(ItemStack tool) {
 
         if (tool == null) return rollDrops();
 
         ArrayList<ItemStack> droppedItems = new ArrayList<>();
 
+        if (AdvancedMining.Config.fortuneEnable) {
+
+            int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
+
+            if (AdvancedMining.Config.fortuneEffectType.equals("vanilla")) {
+
+                if (AdvancedMining.Config.fortuneVanillaBehavior.equals("additional-rolls")) {
+
+                    float normalDropChance = (float) 2 / (fortuneLevel+2);
+                    boolean noBonus = new Random().nextDouble() <= normalDropChance;
+
+                    int dropMultiplier = noBonus ? 1 : new Random().nextInt(2, fortuneLevel + 2); // If there is no bonus, roll once
+
+                    droppedItems.addAll(rollDropsWithExtras(tool)); // Roll once normally
+                    dropMultiplier--;
+
+                    while (dropMultiplier > 0) {
+
+                        droppedItems.addAll(rollDropsWithExtras(tool, true)); // Roll and skip entries that ignore fortune
+                        dropMultiplier--;
+
+                    }
+
+                } else droppedItems.addAll(rollDropsWithExtras(tool)); //
+
+            } else {
+
+                int rolls = 1 + AdvancedMining.Config.fortuneDropRolls * fortuneLevel;
+                while (rolls > 0) {
+
+                    droppedItems.addAll(rollDropsWithExtras(tool));
+                    rolls--;
+
+                }
+
+            }
+
+        } else droppedItems.addAll(rollDropsWithExtras(tool));
+
+        return droppedItems.toArray(new ItemStack[0]);
+
+    }
+
+    public ArrayList<ItemStack> rollDropsWithExtras(ItemStack tool) {
+        return rollDropsWithExtras(tool, false);
+    }
+
+    public ArrayList<ItemStack> rollDropsWithExtras(ItemStack tool, boolean skipNoFortune) {
+
+        ArrayList<ItemStack> droppedItems = new ArrayList<>();
+
         for (Entry entry : entries) { // for each entry
 
             if (!entry.noRollByDefault) { // if it can be rolled
+
+                // If the entry ignores fortune, don't roll. Used for extra roll fortune behavior
+                if (skipNoFortune && !entry.affectedByFortune) continue;
 
                 boolean extraDropSuccess = false;
                 for (String extraDropId : entry.extraDrops) { // for each extra drop
@@ -121,7 +180,7 @@ public class BlockDrops implements Serializable {
 
         }
 
-        return droppedItems.toArray(new ItemStack[0]);
+        return droppedItems;
 
     }
 
@@ -338,13 +397,42 @@ public class BlockDrops implements Serializable {
             if (silkTouchOnly && !tool.containsEnchantment(Enchantment.SILK_TOUCH)) return droppedItems;
             int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
 
-            float rollChance = affectedByFortune ? chance + fortuneLevel * AdvancedMining.Config.fortuneDropChance : chance;
-            int rollMinAmount = affectedByFortune ? minAmount + fortuneLevel * AdvancedMining.Config.fortuneMinAmount : minAmount;
-            int rollMaxAmount = affectedByFortune ? maxAmount + fortuneLevel * AdvancedMining.Config.fortuneMaxAmount : maxAmount;
+            if (AdvancedMining.Config.fortuneEnable) {
 
-            if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(rollMinAmount, rollMaxAmount + 1))));
+                if (affectedByFortune) {
 
-            return droppedItems;
+                    if (AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("vanilla")) {
+
+                        if (silkTouchOnly && !AdvancedMining.Config.fortuneVanillaIgnoreSilkTouch) return roll();
+
+                        float normalDropChance = (float) 2 / (fortuneLevel+2);
+                        boolean noBonus = new Random().nextDouble() <= normalDropChance;
+
+                        if (noBonus) return roll(); // If no bonus, roll normally
+                        int dropMultiplier = new Random().nextInt(2, fortuneLevel + 2);
+
+                        if (!AdvancedMining.Config.fortuneVanillaBehavior.equals("additional-rolls")) { // Increase the max drop amount if the option says that
+
+                            if (new Random().nextDouble() <= chance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(minAmount, maxAmount + 1) * dropMultiplier)));
+                            return droppedItems;
+
+                        } else return roll(); // If option is extra rolls, return a clean roll. That stuff is handled upstream
+
+                    } else { // Custom effect type
+
+                        float rollChance = chance + fortuneLevel * AdvancedMining.Config.fortuneDropChance;
+                        int rollMinAmount = minAmount + fortuneLevel * AdvancedMining.Config.fortuneMinAmount;
+                        int rollMaxAmount = maxAmount + fortuneLevel * AdvancedMining.Config.fortuneMaxAmount;
+
+                        if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(rollMinAmount, rollMaxAmount + 1))));
+
+                        return droppedItems;
+
+                    }
+
+                } else return roll(); // If unaffected by fortune, return normal roll
+
+            } else return roll();
 
         }
 

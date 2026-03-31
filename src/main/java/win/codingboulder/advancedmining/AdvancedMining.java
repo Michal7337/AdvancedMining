@@ -84,6 +84,8 @@ public final class AdvancedMining extends JavaPlugin {
         public static int fortuneMaxAmount;
         public static float fortuneDropChance;
         public static int fortuneDropRolls;
+        public static String fortuneVanillaBehavior;
+        public static boolean fortuneVanillaIgnoreSilkTouch;
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public static void loadConfig() {
@@ -114,6 +116,8 @@ public final class AdvancedMining extends JavaPlugin {
             fortuneMaxAmount = config.getInt("enchantments.fortune.increase-max-amount", 1);
             fortuneDropChance = (float) config.getDouble("enchantments.fortune.increase-drop-chance", 0.1d);
             fortuneDropRolls = config.getInt("enchantments.fortune.increase-drop-rolls", 0);
+            fortuneVanillaBehavior = config.getString("enchantments.fortune.vanilla-behaviour", "additional-rolls");
+            fortuneVanillaIgnoreSilkTouch = config.getBoolean("enchantments.fortune.vanilla-ignore-silk-touch", false);
 
             CustomBlock.loadAll();
             BlockDrops.loadAll();
