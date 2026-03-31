@@ -256,6 +256,7 @@ public class AdvancedMiningCommand {
 
                                     ItemStack item = ItemStack.of(customBlock.iconMaterial());
                                     item.setData(DataComponentTypes.ITEM_NAME, customBlock.name());
+                                    if (customBlock.texture() != null) item.setData(DataComponentTypes.ITEM_MODEL, customBlock.texture());
                                     item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, customBlock.id()));
 
                                     String dropsFile = customBlock.rawDropsFile();
@@ -374,23 +375,19 @@ public class AdvancedMiningCommand {
                     )
 
                     .then(literal("give")
-                        .then(argument("block", StringArgumentType.word())
-                            .suggests((context, builder) -> {
-                                CustomBlock.loadedBlocks().keySet().forEach(builder::suggest);
-                                return builder.buildFuture();
-                            })
+                        .then(argument("block", CustomBlockArgument.blockArgument())
                             .executes(context -> {
 
-                                String blockId = StringArgumentType.getString(context, "block");
                                 if (!(context.getSource().getSender() instanceof Player player)) return 1;
 
-                                CustomBlock customBlock = CustomBlock.loadedBlocks().get(blockId);
-                                Material material = customBlock == null ? Material.STONE : customBlock.iconMaterial();
-                                Component name = customBlock == null ? Component.text(blockId) : customBlock.name();
+                                CustomBlock customBlock = context.getArgument("block", CustomBlock.class);
+                                Material material = customBlock.iconMaterial();
+                                Component name = customBlock.name();
 
                                 ItemStack item = ItemStack.of(material);
                                 item.setData(DataComponentTypes.ITEM_NAME, name);
-                                item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, blockId));
+                                if (customBlock.texture() != null) item.setData(DataComponentTypes.ITEM_MODEL, customBlock.texture());
+                                item.editPersistentDataContainer(pdc -> pdc.set(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING, customBlock.id()));
 
                                 player.give(item);
 
@@ -773,7 +770,20 @@ public class AdvancedMiningCommand {
 
                                                 return 1;
 
+                                            })))
+                                    .then(literal("change-id")
+                                        .then(argument("new-id", StringArgumentType.word())
+                                            .executes(context -> {
+
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                blockDrops.changeEntryId(StringArgumentType.getString(context, "id"), StringArgumentType.getString(context, "new-id"));
+
+                                                context.getSource().getSender().sendRichMessage("<green>Changed entry Id!");
+
+                                                return 1;
+
                                             })))))
+
                             .then(literal("remove-entry")
                                 .then(argument("entry-id", StringArgumentType.word())
                                     .suggests((context, builder) -> {

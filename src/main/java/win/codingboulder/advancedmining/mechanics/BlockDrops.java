@@ -57,6 +57,7 @@ public class BlockDrops implements Serializable {
         entry.setId(newId);
         entryMap.remove(targetId);
         entryMap.put(newId, entry);
+        saveToFile();
 
     }
 

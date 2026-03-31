@@ -6,9 +6,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -16,7 +18,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
+import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
 import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
@@ -149,7 +153,7 @@ public class MiningEvents implements Listener {
         Block block = event.getBlock();
 
         if (AdvancedMining.Config.breakVanillaBlocks) {
-            AttributeInstance attrib =  player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
+            AttributeInstance attrib = player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
             assert attrib != null;
             attrib.setBaseValue(1d);
         }
@@ -175,6 +179,23 @@ public class MiningEvents implements Listener {
         String placedBlock = itemStack.getPersistentDataContainer().get(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING);
         if (placedBlock == null) return;
         CustomBlock.setCustomBlock(event.getBlock(), placedBlock);
+
+    }
+
+    @EventHandler
+    public void onBlockBreak(@NonNull BlockBreakEvent event) {
+
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+
+        if (!player.getGameMode().equals(GameMode.CREATIVE)) return;
+
+        CustomBlock customBlock = CustomBlock.getCustomBlock(block);
+        if (customBlock == null) return;
+
+        ItemDisplay display = CustomBlock.getDisplayEntity(block);
+        if (display != null) display.remove();
+        BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
     }
 
