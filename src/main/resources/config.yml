@@ -22,6 +22,7 @@ simultaneous-broken-blocks-limit: 1
 mining-progress-reset-timer: 1200
 
 # Sets if the player should be able to resume mining a block with a different tool to what they originally used to mine it
+# Note that this will use the new tool's stats from that point onwards
 allow-tool-swapping: false
 
 # Configures the behavior of enchantments on tools

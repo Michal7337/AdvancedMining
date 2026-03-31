@@ -5,6 +5,7 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -77,10 +78,42 @@ public class MiningEvents implements Listener {
 
         if (miningRunnables.containsKey(player)) { // If the player was mining something
 
-            LinkedHashMap<Block, MiningRunnable> playerRunnables = miningRunnables.get(player); //Get the blocks the player is mining
+            LinkedHashMap<Block, MiningRunnable> playerRunnables = miningRunnables.get(player); // Get the blocks the player is mining
 
-            if (playerRunnables.containsKey(block)) playerRunnables.get(block).unpauseMining(); //If the block was being mined, unpause it
-            else { //Else create a new runnable
+            if (playerRunnables.containsKey(block)) { //If the block was paused, unpause it
+
+                MiningRunnable runnable = playerRunnables.get(block);
+                if (!runnable.tool().equals(item)) { // If the tool changed
+
+                    if (AdvancedMining.Config.allowToolSwapping) { // If tool swapping is enabled, get new stats and unpause the runnable
+
+                        runnable.setTool(item);
+                        runnable.setMiningSpeed(miningSpeed);
+                        runnable.unpauseMining();
+
+                    } else { // If the tool changed, crate a new runnable
+
+                        player.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
+                        int range = AdvancedMining.Config.crackingAnimationRange;
+                        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
+
+                        MiningRunnable newRunnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+                        newRunnable.setTool(item);
+                        newRunnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+                        playerRunnables.putLast(block, newRunnable);
+
+                        // If the amount of broken blocks is above the limit, remove the oldest one
+                        if (playerRunnables.size() > AdvancedMining.Config.simultaneousBrokenBlocksLimit) {
+                            MiningRunnable miningRunnable = playerRunnables.firstEntry().getValue();
+                            miningRunnable.stopMining();
+                            playerRunnables.remove(playerRunnables.firstEntry().getKey());
+                        }
+
+                    }
+
+                } else runnable.unpauseMining(); // If the tool didn't change, unpause the runnable
+
+            } else { //Else create a new runnable
 
                 MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
                 runnable.setTool(item);

@@ -32,7 +32,7 @@ public class MiningRunnable extends BukkitRunnable {
     private final Block block;
     private final CustomBlock customBlock;
     private final Player player;
-    private final float miningSpeed;
+    private float miningSpeed;
     private final int breakingPower;
 
     public int randomId;
@@ -174,6 +174,10 @@ public class MiningRunnable extends BukkitRunnable {
 
     public float miningSpeed() {
         return miningSpeed;
+    }
+
+    public void setMiningSpeed(float miningSpeed) {
+        this.miningSpeed = miningSpeed;
     }
 
     public int breakingPower() {
