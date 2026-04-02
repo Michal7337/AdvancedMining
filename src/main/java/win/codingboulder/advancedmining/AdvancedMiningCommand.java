@@ -50,7 +50,7 @@ public class AdvancedMiningCommand {
                         .then(argument("id", StringArgumentType.word())
                             .then(argument("name", StringArgumentType.string())
                                 .then(argument("material", ArgumentTypes.blockState())
-                                    .then(argument("strength", FloatArgumentType.floatArg(0))
+                                    .then(argument("strength", FloatArgumentType.floatArg(-1))
                                         .then(argument("hardness", IntegerArgumentType.integer(0))
                                             .executes(context -> {
 
@@ -167,8 +167,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setDropsFile(context.getArgument("file", String.class)));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -177,8 +177,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setDropsFile(""));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -190,8 +190,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setBestTool(context.getArgument("tool", String.class)));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -203,8 +203,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setTexture(context.getArgument("texture", Key.class)));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -216,8 +216,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setIconMaterial(context.getArgument("material", BlockState.class).getType()));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -229,8 +229,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setBreakSound(context.getArgument("sound", TypedKey.class)));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -242,8 +242,8 @@ public class AdvancedMiningCommand {
 
                                         CustomBlock block = context.getArgument("block", CustomBlock.class);
                                         block.editAndSave(b -> b.setPlaceSound(context.getArgument("sound", TypedKey.class)));
-                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
 
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                         return 1;
 
                                     }))
@@ -292,11 +292,58 @@ public class AdvancedMiningCommand {
                                     }
 
                                     context.getSource().getSender().sendRichMessage("<green>Drop added!");
-
                                     return 1;
 
-                                }))
+                                })
+                            )
+                            .then(literal("material")
+                                .then(argument("material", ArgumentTypes.blockState())
+                                    .executes(context -> {
 
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setMaterial(context.getArgument("material", BlockState.class).getType()));
+
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                        return 1;
+
+                                    }))
+                            )
+                            .then(literal("name")
+                                .then(argument("new-name", StringArgumentType.string())
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setName(StringArgumentType.getString(context, "new-name")));
+
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                        return 1;
+
+                                    }))
+                            )
+                            .then(literal("strength")
+                                .then(argument("strength", IntegerArgumentType.integer(-1))
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setStrength(IntegerArgumentType.getInteger(context, "strength")));
+
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                        return 1;
+
+                                    }))
+                            )
+                            .then(literal("hardness")
+                                .then(argument("hardness", IntegerArgumentType.integer(0))
+                                    .executes(context -> {
+
+                                        CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                        block.editAndSave(b -> b.setHardness(IntegerArgumentType.getInteger(context, "hardness")));
+
+                                        context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                        return 1;
+
+                                    }))
+                            )
                         )
                     )
 
@@ -627,8 +674,8 @@ public class AdvancedMiningCommand {
 
                                                         return 1;
 
-                                                    })))))))
-
+                                                    }))))))
+                            )
                             .then(literal("edit-entry")
                                 .then(argument("id", StringArgumentType.word())
                                     .suggests((context, builder) -> {
@@ -637,6 +684,59 @@ public class AdvancedMiningCommand {
                                         return builder.buildFuture();
                                     })
 
+                                    .then(literal("item")
+                                        .then(argument("new-item", ArgumentTypes.itemStack())
+                                            .executes(context -> {
+
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.setItem(context.getArgument("new-item", ItemStack.class)));
+
+                                                return 1;
+
+                                            }))
+                                        .then(literal("hand")
+                                            .requires(commandSourceStack -> commandSourceStack.getExecutor() instanceof Player)
+                                            .executes(context -> {
+
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                Player player = (Player) context.getSource().getExecutor();
+                                                if (player == null) return 1;
+
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.setItem(player.getInventory().getItemInMainHand()));
+
+                                                return 1;
+
+                                            }))
+                                    )
+                                    .then(literal("chance")
+                                        .then(argument("new-chance", FloatArgumentType.floatArg(0f, 1f))
+                                            .executes(context -> {
+
+                                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                blockDrops.modifyWithCommandContext(context, "id", entry ->
+                                                    entry.setChance(FloatArgumentType.getFloat(context, "new-chance")));
+
+                                                return 1;
+
+                                            }))
+                                    )
+                                    .then(literal("drop-amount")
+                                        .then(argument("min-amount", IntegerArgumentType.integer(0))
+                                            .then(argument("max-amount", IntegerArgumentType.integer(0))
+                                                .executes(context -> {
+
+                                                    BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+                                                    blockDrops.modifyWithCommandContext(context, "id", entry -> {
+                                                        entry.setMinAmount(IntegerArgumentType.getInteger(context, "min-amount"));
+                                                        entry.setMaxAmount(IntegerArgumentType.getInteger(context, "max-amount"));
+                                                    });
+
+                                                    return 1;
+
+                                                })))
+                                    )
                                     .then(literal("affected-by-fortune")
                                         .then(argument("value", BoolArgumentType.bool())
                                             .executes(context -> {
@@ -648,7 +748,8 @@ public class AdvancedMiningCommand {
 
                                                 return 1;
 
-                                            })))
+                                            }))
+                                    )
                                     .then(literal("silk-touch-only")
                                         .then(argument("value", BoolArgumentType.bool())
                                             .executes(context -> {
@@ -660,7 +761,8 @@ public class AdvancedMiningCommand {
 
                                                 return 1;
 
-                                            })))
+                                            }))
+                                    )
                                     .then(literal("dont-roll-by-default")
                                         .then(argument("value", BoolArgumentType.bool())
                                             .executes(context -> {
@@ -672,7 +774,8 @@ public class AdvancedMiningCommand {
 
                                                 return 1;
 
-                                            })))
+                                            }))
+                                    )
                                     .then(literal("add-extra-drop")
                                         .then(argument("entry-id", StringArgumentType.word())
                                             .suggests((context, builder) -> {
@@ -752,7 +855,8 @@ public class AdvancedMiningCommand {
                                                         return 1;
 
                                                     })
-                                                ))))
+                                                )))
+                                    )
                                     .then(literal("remove-extra-drop")
                                         .then(argument("entry-id", StringArgumentType.word())
                                             .suggests((context, builder) -> {
