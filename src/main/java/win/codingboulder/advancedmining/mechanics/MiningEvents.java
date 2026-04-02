@@ -1,6 +1,7 @@
 package win.codingboulder.advancedmining.mechanics;
 
 import io.papermc.paper.persistence.PersistentDataContainerView;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -47,6 +48,8 @@ public class MiningEvents implements Listener {
         if (customBlock == null) return; // If the block isn't a custom block return
 
         event.setCancelled(true); // prevent breaking of the block if something were to go wrong with mining prevention
+
+        if (customBlock.strength() == -1) return; // Return if the block is unbreakable
 
         // Set the Block Break Speed attribute to 0 to remove the client-side block breaking mechanics
         AttributeInstance attrib =  player.getAttribute(Attribute.BLOCK_BREAK_SPEED);
@@ -176,9 +179,15 @@ public class MiningEvents implements Listener {
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
 
         ItemStack itemStack = event.getItemInHand();
+        Block block = event.getBlock();
         String placedBlock = itemStack.getPersistentDataContainer().get(AdvancedMining.PLACED_BLOCK_KEY, PersistentDataType.STRING);
         if (placedBlock == null) return;
-        CustomBlock.setCustomBlock(event.getBlock(), placedBlock);
+        CustomBlock.setCustomBlock(block, placedBlock);
+
+        CustomBlock customBlock = CustomBlock.loadedBlocks().get(placedBlock);
+        if (customBlock == null) return;
+
+        if (customBlock.placeSound() != null) block.getWorld().playSound(Sound.sound(customBlock.placeSound(), Sound.Source.BLOCK, 16, 1), block.getX(), block.getY(), block.getZ());
 
     }
 

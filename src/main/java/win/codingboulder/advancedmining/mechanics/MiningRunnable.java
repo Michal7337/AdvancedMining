@@ -1,6 +1,7 @@
 package win.codingboulder.advancedmining.mechanics;
 
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
@@ -130,7 +131,10 @@ public class MiningRunnable extends BukkitRunnable {
         BlockData blockData = display == null ? block.getBlockData() : customBlock.iconMaterial().createBlockData();
         if (display != null) display.remove();
 
-        if (blockBreakEvent.playBreakEffect()) block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, blockData);
+        if (blockBreakEvent.playBreakEffect()) {
+            block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, blockData);
+            if (customBlock.breakSound() != null) block.getWorld().playSound(Sound.sound(customBlock.breakSound(), Sound.Source.BLOCK, 16, 1), block.getX(), block.getY(), block.getZ());
+        }
         block.setType(Material.AIR);
 
         blockDrops = blockBreakEvent.blockDrops();
