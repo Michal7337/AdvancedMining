@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
@@ -28,6 +29,7 @@ import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class MiningEvents implements Listener {
 
@@ -72,6 +74,24 @@ public class MiningEvents implements Listener {
                 miningSpeed += miningSpeed * item.getEnchantmentLevel(Enchantment.EFFICIENCY) * AdvancedMining.Config.efficiencyAmount;
             } else {
                 miningSpeed += item.getEnchantmentLevel(Enchantment.EFFICIENCY) * AdvancedMining.Config.efficiencyAmount;
+            }
+        }
+
+        // Haste effect
+        if (AdvancedMining.Config.hasteEnable && player.hasPotionEffect(PotionEffectType.HASTE)) {
+            if (AdvancedMining.Config.hasteEffectType.equals("percent")) {
+                miningSpeed += miningSpeed * (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.HASTE)).getAmplifier() + 1) * AdvancedMining.Config.hasteAmount;
+            } else {
+                miningSpeed += (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.HASTE)).getAmplifier() + 1) * AdvancedMining.Config.hasteAmount;
+            }
+        }
+
+        // Mining Fatigue effect
+        if (AdvancedMining.Config.miningFatigueEnable && player.hasPotionEffect(PotionEffectType.MINING_FATIGUE)) {
+            if (AdvancedMining.Config.miningFatigueEffectType.equals("percent")) {
+                miningSpeed -= miningSpeed * (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.MINING_FATIGUE)).getAmplifier() + 1) * AdvancedMining.Config.miningFatigueAmount;
+            } else {
+                miningSpeed -= (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.MINING_FATIGUE)).getAmplifier() + 1) * AdvancedMining.Config.miningFatigueAmount;
             }
         }
 

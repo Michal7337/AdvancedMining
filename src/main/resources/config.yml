@@ -71,3 +71,31 @@ enchantments:
 
     # Sets if the vanilla fortune behavior should trigger even when the tool has silk touch on it
     vanilla-ignore-silk-touch: false
+
+effects:
+
+  haste:
+
+    # Sets if the potion should have any effect
+    enable: false
+
+    # Sets what kind of effect this potion should have. Possible options are:
+    # constant - Adds the specified amount of mining speed to the tool per level of haste. E.g. haste 1 - +100 MS | 2 - +200 MS
+    # percent - Increases the tool's mining speed by the specified percentage per level of haste. E.g. haste 1 - +10% MS | 2 - +20% MS
+    effect-type: constant
+
+    # Sets the amount of given mining speed. For constant, just set the amount added per level. For percent, set it to E.g. 0.1 for 10%, 0.35 for 35% or 1.5 for 150%
+    amount: 100.0
+
+  mining-fatigue:
+
+    # Sets if the potion should have any effect
+    enable: false
+
+    # Sets what kind of effect this potion should have. Possible options are:
+    # constant - Subtracts the specified amount of mining speed to the tool per level of mining fatigue. E.g. mining fatigue 1 - +100 MS | 2 - +200 MS
+    # percent - Decreases the tool's mining speed by the specified percentage per level of mining fatigue. E.g. mining fatigue 1 - +10% MS | 2 - +20% MS
+    effect-type: constant
+
+    # Sets the amount of subtracted mining speed. For constant, just set the amount subtracted per level. For percent, set it to E.g. 0.1 for 10%, 0.35 for 35% or 1.5 for 150%
+    amount: 100.0

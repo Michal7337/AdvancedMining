@@ -78,6 +78,14 @@ public final class AdvancedMining extends JavaPlugin {
         public static String efficiencyEffectType;
         public static float efficiencyAmount;
 
+        public static boolean hasteEnable;
+        public static String hasteEffectType;
+        public static float hasteAmount;
+
+        public static boolean miningFatigueEnable;
+        public static String miningFatigueEffectType;
+        public static float miningFatigueAmount;
+
         public static boolean fortuneEnable;
         public static String fortuneEffectType;
         public static int fortuneMinAmount;
@@ -118,6 +126,14 @@ public final class AdvancedMining extends JavaPlugin {
             fortuneDropRolls = config.getInt("enchantments.fortune.increase-drop-rolls", 0);
             fortuneVanillaBehavior = config.getString("enchantments.fortune.vanilla-behaviour", "additional-rolls");
             fortuneVanillaIgnoreSilkTouch = config.getBoolean("enchantments.fortune.vanilla-ignore-silk-touch", false);
+
+            hasteEnable = config.getBoolean("effects.haste.enable", false);
+            hasteEffectType = config.getString("effects.haste.effect-type", "constant");
+            hasteAmount = (float) config.getDouble("effects.haste.amount", 100.0d);
+
+            miningFatigueEnable = config.getBoolean("effects.mining-fatigue.enable", false);
+            miningFatigueEffectType = config.getString("effects.mining-fatigue.effect-type", "constant");
+            miningFatigueAmount = (float) config.getDouble("effects.mining-fatigue.amount", 100.0d);
 
             CustomBlock.loadAll();
             BlockDrops.loadAll();
