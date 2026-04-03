@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -146,6 +147,12 @@ public class BlockDrops implements Serializable {
 
         return droppedItems.toArray(new ItemStack[0]);
 
+    }
+
+    public ItemStack[] rollDrops(int fortuneLevel) {
+        ItemStack fakeTool = new ItemStack(Material.STICK);
+        fakeTool.addUnsafeEnchantment(Enchantment.FORTUNE, fortuneLevel);
+        return rollDrops(fakeTool);
     }
 
     public ArrayList<ItemStack> rollDropsWithExtras(ItemStack tool) {
@@ -434,6 +441,12 @@ public class BlockDrops implements Serializable {
 
             } else return roll();
 
+        }
+
+        public ArrayList<ItemStack> roll(int fortuneLevel) {
+            ItemStack fakeTool = new ItemStack(Material.STICK);
+            fakeTool.addUnsafeEnchantment(Enchantment.FORTUNE, fortuneLevel);
+            return roll(fakeTool);
         }
 
         public String id() {

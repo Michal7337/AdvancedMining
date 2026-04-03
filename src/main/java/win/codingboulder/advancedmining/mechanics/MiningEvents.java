@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
@@ -64,6 +65,15 @@ public class MiningEvents implements Listener {
         float miningSpeed = pdc.getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, defaultTool == null ? 0f : defaultTool.miningSpeed());
         int breakingPower = pdc.getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, defaultTool == null ? 0 : defaultTool.breakingPower());
         String toolType = item.isEmpty() ? "hand" : pdc.getOrDefault(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, defaultTool == null ? "" : defaultTool.toolType());
+
+        // Efficiency enchantment
+        if (AdvancedMining.Config.efficiencyEnable) {
+            if (AdvancedMining.Config.efficiencyEffectType.equals("percent")) {
+                miningSpeed += miningSpeed * item.getEnchantmentLevel(Enchantment.EFFICIENCY) * AdvancedMining.Config.efficiencyAmount;
+            } else {
+                miningSpeed += item.getEnchantmentLevel(Enchantment.EFFICIENCY) * AdvancedMining.Config.efficiencyAmount;
+            }
+        }
 
         // Create the event and return if it was canceled
         CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, miningSpeed, breakingPower, toolType);
