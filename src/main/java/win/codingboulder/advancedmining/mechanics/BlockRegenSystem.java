@@ -6,7 +6,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.BlockDataStorage;

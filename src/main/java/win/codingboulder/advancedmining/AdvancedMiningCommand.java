@@ -14,6 +14,8 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -346,6 +348,17 @@ public class AdvancedMiningCommand {
                             )
                             .then(literal("regeneration")
                                 .then(literal("set-primary-regen")
+                                    .then(literal("no-regen")
+                                        .executes(context -> {
+
+                                            CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                            block.editAndSave(customBlock -> customBlock.setBlockRegenType(null));
+
+                                            context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                            return 1;
+
+                                        })
+                                    )
                                     .then(literal("regen-vanilla")
                                         .then(argument("resulting-material", ArgumentTypes.blockState())
                                             .then(argument("regen-time", IntegerArgumentType.integer(-1))
@@ -452,6 +465,17 @@ public class AdvancedMiningCommand {
                                                     )))))
                                 )
                                 .then(literal("set-alternate-regen")
+                                    .then(literal("no-regen")
+                                        .executes(context -> {
+
+                                            CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                            block.editAndSave(customBlock -> customBlock.setRegenAlternativeType(null));
+
+                                            context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                            return 1;
+
+                                        })
+                                    )
                                     .then(argument("chance", FloatArgumentType.floatArg(0, 1))
                                         .then(literal("regen-vanilla")
                                             .then(argument("resulting-material", ArgumentTypes.blockState())
@@ -822,6 +846,50 @@ public class AdvancedMiningCommand {
                 )
 
                 .then(literal("drops")
+                    .then(literal("list-entries")
+                        .then(argument("name", BlockDropsArgument.dropsArgument())
+                            .executes(context -> {
+
+                                BlockDrops blockDrops = BlockDropsArgument.getBlockDrops(context, "name");
+
+                                if (blockDrops.entries().isEmpty()) {
+                                    context.getSource().getSender().sendRichMessage("<green>This Block Drop is empty!");
+                                    return 1;
+                                }
+
+                                TextComponent.Builder text = Component.text().append(Component.text("Displaying entries of drop '" + blockDrops.id() + "': ").color(NamedTextColor.GREEN));
+
+                                for (BlockDrops.Entry entry : blockDrops.entries()) {
+
+                                    text.appendNewline();
+                                    text
+                                        .append(Component.text("+ [").color(NamedTextColor.WHITE))
+                                        .append(Component.text(entry.id()).color(NamedTextColor.AQUA)).append(Component.text("]: Item: ").color(NamedTextColor.WHITE))
+                                        .append(entry.item().displayName())
+                                        .append(Component.text(" Chance: " + entry.chance()))
+                                        .append(Component.text(" Amount: " + entry.minAmount() + "~" + entry.maxAmount()))
+                                        .append(Component.text(" AffectedByFortune: " + entry.affectedByFortune()))
+                                        .append(Component.text(" SilkTouchOnly: " + entry.silkTouchOnly()))
+                                        .append(Component.text(" NoRollByDefault: " + entry.noRollByDefault()))
+                                    ;
+
+                                    if (!entry.extraDrops().isEmpty()) {
+                                        text.append(Component.text(" ExtraDrops: ["));
+                                        for (String extra : entry.extraDrops()) text.append(Component.text(extra + " "));
+                                        text.append(Component.text("]"));
+                                    }
+
+                                }
+
+                                context.getSource().getSender().sendMessage(text);
+
+                                //Displaying entries of drop []:
+                                //+ [ID]: [item] [chance] [amount] [abf] [so] [noRollByDef] extras: [ext]
+
+                                return 1;
+
+                            }))
+                    )
                     .then(literal("create")
                         .then(argument("name", StringArgumentType.word())
                             .executes(context -> {
