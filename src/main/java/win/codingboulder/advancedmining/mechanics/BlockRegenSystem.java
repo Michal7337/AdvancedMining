@@ -94,6 +94,8 @@ public class BlockRegenSystem extends BukkitRunnable {
 
         } else startRegen(block, customBlock, regenTime); // Start with no delay
 
+        if (regenTime < 1) return;
+
         PersistentDataContainer pdc = block.getWorld().getPersistentDataContainer();
         if (!pdc.has(REGENERATING_BLOCKS_LIST_KEY)) pdc.set(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER, pdc.getAdapterContext().newPersistentDataContainer());
         PersistentDataContainer blocksPdc = pdc.get(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER);
@@ -103,7 +105,9 @@ public class BlockRegenSystem extends BukkitRunnable {
         newPdc.set(REGEN_TIME, PersistentDataType.INTEGER, regenTime);
         newPdc.set(IS_ALTERNATE, PersistentDataType.BOOLEAN, isAlternate);
         newPdc.set(BLOCK, PersistentDataType.STRING, customBlock.id());
+
         blocksPdc.set(BlockDataStorage.getBockKey(block), PersistentDataType.TAG_CONTAINER, newPdc);
+        pdc.set(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER, blocksPdc);
 
     }
 
@@ -153,6 +157,7 @@ public class BlockRegenSystem extends BukkitRunnable {
         PersistentDataContainer blocksPdc = pdc.get(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER);
         if (blocksPdc == null) return;
         blocksPdc.remove(BlockDataStorage.getBockKey(block));
+        pdc.set(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER, blocksPdc);
 
     }
 
