@@ -58,6 +58,32 @@ public class CustomBlock {
     private transient File blockDropsFile;
     private transient BlockDrops blockDrops;
 
+    // Block regeneration system attributes
+    private String blockRegenType; // null | replace-vanilla | replace-custom
+    private int regenTime;
+    private int regenDelay;
+
+    // Regen result types
+    private Material regenVanillaMaterial;
+    private String regenCustomBlock;
+
+    // Temporary block types
+    private String regenTempBlockType; // null | vanilla | custom
+    private Material regenTempVanillaMaterial;
+    private String regenTempCustomBlock;
+
+    // Alternate regen stuff
+    private String regenAlternativeType; // null | vanilla | custom
+    private float regenAlternativeChance;
+    private int regenAlternativeDelay;
+    private int regenAlternativeTime;
+
+    private Material regenAltVanillaMaterial;
+    private String regenAltCustomBlock;
+
+    // break -> delay -> replace(type) for [regenTime] -> set block back
+    // if regenTime = -1 don't set block back
+
     /**
      * @param id The ID of the block
      * @param name The name of the block in MiniMessage format
@@ -101,6 +127,37 @@ public class CustomBlock {
 
     }
 
+    public CustomBlock(String id, String name, Material material, float strength, int hardness, String bestTool, String texture, String breakSound, String placeSound, Material iconMaterial, String dropsFile, String blockRegenType, int regenTime, int regenDelay, Material regenVanillaMaterial, String regenCustomBlock, String regenTempBlockType, Material regenTempVanillaMaterial, String regenTempCustomBlock, String regenAlternativeType, float regenAlternativeChance, int regenAlternativeDelay, int regenAlternativeTime, Material regenAltVanillaMaterial, String regenAltCustomBlock) {
+
+        this.id = id;
+        this.name = name;
+        this.material = material;
+        this.strength = strength;
+        this.hardness = hardness;
+        this.bestTool = bestTool;
+        this.texture = texture;
+        this.breakSound = breakSound;
+        this.placeSound = placeSound;
+        this.iconMaterial = iconMaterial;
+        this.dropsFile = dropsFile;
+        this.blockRegenType = blockRegenType;
+        this.regenTime = regenTime;
+        this.regenDelay = regenDelay;
+        this.regenVanillaMaterial = regenVanillaMaterial;
+        this.regenCustomBlock = regenCustomBlock;
+        this.regenTempBlockType = regenTempBlockType;
+        this.regenTempVanillaMaterial = regenTempVanillaMaterial;
+        this.regenTempCustomBlock = regenTempCustomBlock;
+        this.regenAlternativeType = regenAlternativeType;
+        this.regenAlternativeChance = regenAlternativeChance;
+        this.regenAlternativeDelay = regenAlternativeDelay;
+        this.regenAlternativeTime = regenAlternativeTime;
+        this.regenAltVanillaMaterial = regenAltVanillaMaterial;
+        this.regenAltCustomBlock = regenAltCustomBlock;
+
+        constructAttributes();
+
+    }
 
     /**
      * @param id The ID of the block
@@ -161,6 +218,8 @@ public class CustomBlock {
         this.dropsFile = blockDrops;
 
     }
+
+
 
     public void constructAttributes() {
 
@@ -236,6 +295,9 @@ public class CustomBlock {
         CustomBlock customBlock = loadedBlocks.get(id);
         if (customBlock == null) return;
         block.setType(customBlock.material);
+
+        ItemDisplay display = getDisplayEntity(block);
+        if (display != null) display.remove();
         customBlock.summonDisplayEntity(block);
 
     }
@@ -443,6 +505,118 @@ public class CustomBlock {
 
     public void setBlockDrops(BlockDrops blockDrops) {
         this.blockDrops = blockDrops;
+    }
+
+    public String blockRegenType() {
+        return blockRegenType;
+    }
+
+    public void setBlockRegenType(String blockRegenType) {
+        this.blockRegenType = blockRegenType;
+    }
+
+    public int regenTime() {
+        return regenTime;
+    }
+
+    public void setRegenTime(int regenTime) {
+        this.regenTime = regenTime;
+    }
+
+    public int regenDelay() {
+        return regenDelay;
+    }
+
+    public void setRegenDelay(int regenDelay) {
+        this.regenDelay = regenDelay;
+    }
+
+    public Material regenVanillaMaterial() {
+        return regenVanillaMaterial;
+    }
+
+    public void setRegenVanillaMaterial(Material regenVanillaMaterial) {
+        this.regenVanillaMaterial = regenVanillaMaterial;
+    }
+
+    public String regenCustomBlock() {
+        return regenCustomBlock;
+    }
+
+    public void setRegenCustomBlock(String regenCustomBlock) {
+        this.regenCustomBlock = regenCustomBlock;
+    }
+
+    public String regenTempBlockType() {
+        return regenTempBlockType;
+    }
+
+    public void setRegenTempBlockType(String regenTempBlockType) {
+        this.regenTempBlockType = regenTempBlockType;
+    }
+
+    public Material regenTempVanillaMaterial() {
+        return regenTempVanillaMaterial;
+    }
+
+    public void setRegenTempVanillaMaterial(Material regenTempVanillaMaterial) {
+        this.regenTempVanillaMaterial = regenTempVanillaMaterial;
+    }
+
+    public String regenTempCustomBlock() {
+        return regenTempCustomBlock;
+    }
+
+    public void setRegenTempCustomBlock(String regenTempCustomBlock) {
+        this.regenTempCustomBlock = regenTempCustomBlock;
+    }
+
+    public String regenAlternativeType() {
+        return regenAlternativeType;
+    }
+
+    public void setRegenAlternativeType(String regenAlternativeType) {
+        this.regenAlternativeType = regenAlternativeType;
+    }
+
+    public float regenAlternativeChance() {
+        return regenAlternativeChance;
+    }
+
+    public void setRegenAlternativeChance(float regenAlternativeChance) {
+        this.regenAlternativeChance = regenAlternativeChance;
+    }
+
+    public int regenAlternativeDelay() {
+        return regenAlternativeDelay;
+    }
+
+    public void setRegenAlternativeDelay(int regenAlternativeDelay) {
+        this.regenAlternativeDelay = regenAlternativeDelay;
+    }
+
+    public int regenAlternativeTime() {
+        return regenAlternativeTime;
+    }
+
+    public void setRegenAlternativeTime(int regenAlternativeTime) {
+        this.regenAlternativeTime = regenAlternativeTime;
+    }
+
+    public Material regenAltVanillaMaterial() {
+        return regenAltVanillaMaterial;
+    }
+
+    public void setRegenAltVanillaMaterial(Material regenAltVanillaMaterial) {
+        this.regenAltVanillaMaterial = regenAltVanillaMaterial;
+    }
+
+    public String regenAltCustomBlock() {
+        return regenAltCustomBlock;
+    }
+
+    public void setRegenAltCustomBlock(String regenAltCustomBlock) {
+        this.regenAltCustomBlock = regenAltCustomBlock;
     }
 
 }

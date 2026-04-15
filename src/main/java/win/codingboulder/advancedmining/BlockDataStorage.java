@@ -1,15 +1,19 @@
 package win.codingboulder.advancedmining;
 
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 /**
- * <h3>A class for storing data "in blocks"</h3>
+ * A class for storing data "in blocks".
  * It works by saving data in the {@link PersistentDataContainer} of the chunk the block is in.
  */
 public class BlockDataStorage {
@@ -148,6 +152,34 @@ public class BlockDataStorage {
      */
     public static @NotNull NamespacedKey getBockKey(@NotNull Block block, String namespace) {
         return new NamespacedKey(namespace, block.getX() + "_" + block.getY() + "_" + block.getZ());
+    }
+
+    public static @Nullable Location getBlockFromKey(@NonNull NamespacedKey key) {
+
+        String val = key.value();
+        String[] cords = val.split("_");
+
+        try {
+
+            int x = Integer.parseInt(cords[0]);
+            int y = Integer.parseInt(cords[1]);
+            int z = Integer.parseInt(cords[2]);
+
+            return new Location(null, x, y, z);
+
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+    }
+
+    public static @Nullable Block getBlockFromKey(@NonNull NamespacedKey key, World world) {
+
+        Location location = getBlockFromKey(key);
+        if (location == null) return null;
+        location.setWorld(world);
+        return location.getBlock();
+
     }
 
 }

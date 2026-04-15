@@ -6,10 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
-import win.codingboulder.advancedmining.mechanics.BlockDrops;
-import win.codingboulder.advancedmining.mechanics.DefaultBlocks;
-import win.codingboulder.advancedmining.mechanics.DefaultTools;
-import win.codingboulder.advancedmining.mechanics.MiningEvents;
+import win.codingboulder.advancedmining.mechanics.*;
 
 import java.io.File;
 
@@ -40,6 +37,8 @@ public final class AdvancedMining extends JavaPlugin {
         getServer().getPluginManager().addPermission(new Permission("advancedmining.command.admin", "Enables access to the /advmining command", PermissionDefault.OP));
 
         new AdvancedMiningCommand(this);
+
+        BlockRegenSystem.loadSystem(this);
 
         getLogger().info("AdvancedMining enabled!");
 
