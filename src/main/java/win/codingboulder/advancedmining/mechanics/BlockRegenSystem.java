@@ -80,10 +80,11 @@ public class BlockRegenSystem extends BukkitRunnable {
         if ("vanilla".equalsIgnoreCase(altRegenType) || "custom".equalsIgnoreCase(altRegenType))
             isAlternate = new Random().nextDouble() <= customBlock.regenAlternativeChance();
         alternateRolls.put(block, isAlternate);
+        customBlockMap.put(block, customBlock);
 
-        int regenTime = isAlternate ? customBlock.regenTime() : customBlock.regenAlternativeTime();
+        int regenTime = isAlternate ? customBlock.regenAlternativeTime() : customBlock.regenTime();
 
-        int delay = isAlternate ? customBlock.regenDelay() : customBlock.regenAlternativeDelay();
+        int delay = isAlternate ? customBlock.regenAlternativeDelay() : customBlock.regenDelay();
         if (delay > 0) { // Start with delay
 
             AdvancedMining.getInstance().getServer().getScheduler().runTaskLater(AdvancedMining.getInstance(),
@@ -146,6 +147,12 @@ public class BlockRegenSystem extends BukkitRunnable {
 
         customBlockMap.remove(block);
         alternateRolls.remove(block);
+
+        PersistentDataContainer pdc = block.getWorld().getPersistentDataContainer();
+        if (!pdc.has(REGENERATING_BLOCKS_LIST_KEY)) pdc.set(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER, pdc.getAdapterContext().newPersistentDataContainer());
+        PersistentDataContainer blocksPdc = pdc.get(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER);
+        if (blocksPdc == null) return;
+        blocksPdc.remove(BlockDataStorage.getBockKey(block));
 
     }
 

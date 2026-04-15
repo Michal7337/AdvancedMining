@@ -143,6 +143,8 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (blockBreakEvent.removeBlockData()) BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
+        BlockRegenSystem.registerBlock(block, customBlock);
+
     }
 
     public void stopMining() {
