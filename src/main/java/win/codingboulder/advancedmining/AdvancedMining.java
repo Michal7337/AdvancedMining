@@ -46,7 +46,9 @@ public final class AdvancedMining extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+
+        BlockRegenSystem.saveBlocksToContainers();
+
     }
 
     public static AdvancedMining getInstance() {

@@ -6,6 +6,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.BlockDataStorage;
@@ -173,6 +174,28 @@ public class BlockRegenSystem extends BukkitRunnable {
             activeBlocks.replace(block, time - 1);
 
         }));
+
+    }
+
+    public static void saveBlocksToContainers() {
+
+        for (Map.Entry<Block, Integer> entry : activeBlocks.entrySet()) {
+
+            Block block = entry.getKey();
+            Integer time = entry.getValue();
+            NamespacedKey blockKey = BlockDataStorage.getBockKey(block);
+
+            PersistentDataContainer pdc = block.getWorld().getPersistentDataContainer();
+            PersistentDataContainer listPdc = pdc.get(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER);
+            if (listPdc == null) continue;
+            PersistentDataContainer blockPdc = listPdc.get(blockKey, PersistentDataType.TAG_CONTAINER);
+            if (blockPdc == null) continue;
+
+            blockPdc.set(REGEN_TIME, PersistentDataType.INTEGER, time);
+            listPdc.set(blockKey, PersistentDataType.TAG_CONTAINER, blockPdc);
+            pdc.set(REGENERATING_BLOCKS_LIST_KEY, PersistentDataType.TAG_CONTAINER, listPdc);
+
+        }
 
     }
 
