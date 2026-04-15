@@ -1,6 +1,6 @@
 # AdvancedMining  
 AdvancedMining is a plugin that adds a custom mining system. It functions like the one seen on Hypixel Skyblock.<br><br>
-This plugin is still new so if you find any issues or have a suggestion, please create an Issue.
+If you find any issues or have a suggestion, please create an Issue on the GitHub.
 ## How it works
 The plugin adds Custom Blocks, which specify properties of the block. 
 The required properties are:
@@ -15,7 +15,7 @@ There also are optional properties:
 * A Custom Texture (explained later)
 * The Icon Material (explained later)
 * The Drops File Id (explained later)
-* The Break and Place sounds, which are not implemented as of now
+* The Break and Place sounds
 
 Custom Blocks are stored as JSON files in the `plugins/AdvancedMining/Blocks` directory.<br>
 To create a Custom Block you can use the `/advmining block create` command.<br>
@@ -36,7 +36,7 @@ To mine a block the player needs to have **Breaking Power** equal to or higher t
 
 The block can optionally specify the **Tool Type** required to mine it. The tool type is just a string that can be anything. If the block doesn't specify anything, it can be broken by any tool. If it does, only the specified tool type can mine the block. If the player isn't holding any items, their tool type is set to `hand`.<br>
 
-When mining a Custom Block the plugin sets the player's `block_break_speed` attribute to 0 in order to get rid of the client side cracking animation and destroying the block. It then sends the cracking animation to the player when it needs to. With this system block breaking is completely server-side, so players can't use cheats like FastBreak. Currently, the system allows a player to break one block at a time. If the player somehow starts mining a block when they are still mining another, it will be ignored.
+When mining a Custom Block the plugin sets the player's `block_break_speed` attribute to 0 in order to get rid of the client side cracking animation and destroying the block. It then sends the cracking animation to the player when it needs to. With this system block breaking is completely server-side, so players can't use cheats like FastBreak. 
 
 ### Configuration
 In the plugin's folder is a file named `config.yml` (as is in pretty much all plugins). In the config you can set:
@@ -47,8 +47,45 @@ In the plugin's folder is a file named `config.yml` (as is in pretty much all pl
 * `allow-breaking-multiple-blocks` - If set to true, players will be able to pause mining a block and start mining another one without loosing progress. Note: when block mining is paused, the mining task is still ticking, just not calculating the mining, so setting a high block limit *may* cause performance issues at a large scale.
 * `simultaneous-broken-blocks-limit` - Sets the amount of blocks a player can have mining progress on at the same time. Set to one if you simply want to be able to stop mining a block and resume later. 
 * `mining-progress-reset-timer` - Sets the amount of ticks after which progress on perviously mined blocks is reset.
+* `allow-tool-swapping` - Sets if the player should be able to resume mining a block with a different tool to what they originally used to mine it.
+* `enchantments` - This section defines the behavior of enchantments. Efficiency can increase Mining Speed and Fortune can increase Block Drops. Both are disabled by default. If you are updating from an older version, copy the settings form the config file [here](https://github.com/Michal7337/AdvancedMining/blob/master/src/main/resources/config.yml).
+* `effects` - This section defines the behavior of potion effects. haste can increase Mining Speed and Mining Fatigue can decrease it. Both are disabled by default. If you are updating from an older version, copy the settings form the config file [here](https://github.com/Michal7337/AdvancedMining/blob/master/src/main/resources/config.yml).
 
 ## More Advanced Stuff
+
+### Block Drops
+The optional `DropsFile` property is the id of a **Block Drops** file inside the `plugins/AdvancedMining/BlockDrops` directory (it's not the name of the file, but the name you specify when making the drops). The files are in a binary format, so you can't really edit them outside the in-game command or in code.<br>
+The Drops File is a list of **Entries**. Each Entry has an **ID**, a **chance** to be rolled (a value between 0.0 and 1.0), a **minimum and maximum amount** of items and the **Item** itself that will be rolled. <br>
+It also has optional properties: 
+* `AffectedByFortune` - Sets if the drop is affected by the Fortune enchantment. Off by default.
+* `SilkTouchOnly` - Sets if the drop should only be rolled when the tool has Silk Touch. Off by default.
+* `NoRollByDefault` - If enabled, this entry will only be rolled as an **Extra Drop**. Off by default. Explained below.
+
+Each entry can have multiple **Extra Drops**. These are just other entries. These entries will be rolled before the actual entry that has them. If any one of them drops, the chain is stopped and the item it rolled is dropped.<br>
+This is used for creating chains of drops. For example: You have a stone block that you want to drop resources. Some may be rarer than others. So you set a main entry of **Cobblestone** and add entries for your resources. So: first entry: [diamond, 2% chance], second entry: [iron_ingot, 10% chance], third entry: [copper_ingot, 40% chance].<br>
+Then you set **NoRollByDefault** of all three of them to **true**. This will result in them not be rolled when breaking the block. Instead, we add them as **Extra Drops** on the main cobblestone Entry in order from rarest to most common.<br>
+The result of all this is that when the block is broken the **Cobblestone** Entry will be rolled, but since it has Extra Drops set, those will be rolled first. So: 2% for a diamond to drop. If It drops, then stop here, else continue to the iron. 10% for it to drop. If it does, stop here, else continue to the copper. If it drops, stop here, else drop the main entry - Cobblestone. 
+
+
+To create a Drops File use the `/advmining drops create`command.<br>
+There is a convenience command `/advmining block edit <BlockId> add-drop-itself` command that adds a guaranteed placeable Custom Block of the edited block to the drops file or creates a new one if it doesn't exist.<br>
+To edit a Drop config us the `/advmining drops edit <drops-id>` command. It has subcommands for Cresting, Editing and Removing Entries.<br>
+<br>
+Note: Block Drop configurations from previous versions are automatically migrated and their entries are named
+
+### Block regeneration
+
+Each Custom Block can be set to automatically regenerate after being broken.<br>
+For that the command `/advmining block edit <block-id> regeneration` is used. <br>
+There you can set the **Primary** Block Regeneration properties and **Alternate** Block Regeneration Properties.<br>
+The Primary Block Regen fires every time a Block is broken. You can also set an Alternate regeneration, which has a chance to happen instead of the primary one. 
+This is useful if you want to e.g. create something similar to Hypixel Skyblock, where if you break Mythril, there is a chance for a Titanium block to spawn instead of Mythril regenerating.<br>
+In both Regen Types you first need to specify either `regen-vanilla` or `regen-custom` and then set a Material or a Custom Block. This specifies the block that will be placed after the **Regen Time** is over.<br>
+Regen Time specifies in Ticks, how long the block will be regenerating. During this time the block is replaced with a temporary block, which you can choose to be a vanilla block or a Custom Block.<br>
+You can also specify the **delay** after which the regeneration will start.<br>
+You can specify `no-regen` in the command to disable the respective block regeneration. 
+
+
 
 ### Custom Textures
 The **Custom Texture** property you can optionally specify works by summoning an Item Display entity at the block's location. The entity displays an item with the `item_model` data component. The block property itself is just the key:value of the texture. <br>
@@ -66,13 +103,6 @@ Example of a working custom texture:<br>
 [![FTMvqk7.md.png](https://iili.io/FTMvqk7.md.png)](https://freeimage.host/i/FTMvqk7)<br>
 [![FTMv3rl.md.png](https://iili.io/FTMv3rl.md.png)](https://freeimage.host/i/FTMv3rl)<br>
 [![FTMvK22.md.png](https://iili.io/FTMvK22.md.png)](https://freeimage.host/i/FTMvK22)<br>
-
-### Block Drops
-The optional `DropsFile` property is the id of a **Block Drops** file inside the `plugins/AdvancedMining/BlockDrops` directory (it's not the name of the file, but the name you specify when making the drops). The files are in a binary format, so you can't really edit them outside the in-game command or in code.<br>
-The drops is basically a list of items, each having a **Chance** to drop (a value between 0.0 and 1.0), a **Minimum Amount** and a **Maximum Amount**. When a block is broken, if it has a valid drops id specified, it will roll each of these Items with the specified chance and a random amount between the specified min and max values. It will then drop all the rolled items. <br>
-With the system using IDs for referencing these drops, you can set the same drops to multiple blocks.<br>
-To create a Drops File use the `/advmining drops create` command. To add an item to said drop, use `/advmining drops edit {dropId}`.<br>
-There is a convenience command `/advmining block edit {BlockId} add-drop-itself` command that adds a guaranteed placeable Custom Block of the edited block to the drops file or creates a new one if it doesn't exist.<br>
 
 ## Miscellaneous 
 

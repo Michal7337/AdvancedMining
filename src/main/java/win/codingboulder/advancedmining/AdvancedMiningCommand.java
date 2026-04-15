@@ -476,8 +476,8 @@ public class AdvancedMiningCommand {
 
                                         })
                                     )
-                                    .then(argument("chance", FloatArgumentType.floatArg(0, 1))
-                                        .then(literal("regen-vanilla")
+                                    .then(literal("regen-vanilla")
+                                        .then(argument("chance", FloatArgumentType.floatArg(0, 1))
                                             .then(argument("resulting-material", ArgumentTypes.blockState())
                                                 .then(argument("regen-time", IntegerArgumentType.integer(-1))
                                                     .then(argument("regen-delay", IntegerArgumentType.integer(0))
@@ -529,9 +529,11 @@ public class AdvancedMiningCommand {
                                                                     return 1;
 
                                                                 }))
-                                                        ))))
+                                                        )))))
                                         )
-                                        .then(literal("regen-custom")
+
+                                    .then(literal("regen-custom")
+                                        .then(argument("chance", FloatArgumentType.floatArg(0, 1))
                                             .then(argument("resulting-custom-block", CustomBlockArgument.blockArgument())
                                                 .then(argument("regen-time", IntegerArgumentType.integer(-1))
                                                     .then(argument("regen-delay", IntegerArgumentType.integer(0))
@@ -582,9 +584,8 @@ public class AdvancedMiningCommand {
                                                                     context.getSource().getSender().sendRichMessage("<green>Block edited!");
                                                                     return 1;
 
-                                                                })
-                                                            )
-                                                        )))))))
+                                                                }))))))))
+                                )
                             )
                             // Block edit args here
                         )
