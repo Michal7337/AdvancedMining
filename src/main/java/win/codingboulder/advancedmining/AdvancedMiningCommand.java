@@ -344,6 +344,225 @@ public class AdvancedMiningCommand {
 
                                     }))
                             )
+                            .then(literal("regeneration")
+                                .then(literal("set-primary-regen")
+                                    .then(literal("regen-vanilla")
+                                        .then(argument("resulting-material", ArgumentTypes.blockState())
+                                            .then(argument("regen-time", IntegerArgumentType.integer(-1))
+                                                .then(argument("regen-delay", IntegerArgumentType.integer(0))
+
+                                                    .then(literal("temporary-block-vanilla")
+                                                        .then(argument("temporary-material", ArgumentTypes.blockState())
+                                                            .executes(context -> {
+
+                                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                block.editAndSave(customBlock -> {
+
+                                                                    customBlock.setBlockRegenType("vanilla");
+                                                                    customBlock.setRegenVanillaMaterial(context.getArgument("resulting-material", BlockState.class).getType());
+
+                                                                    customBlock.setRegenTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                    customBlock.setRegenDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                    customBlock.setRegenTempBlockType("vanilla");
+                                                                    customBlock.setRegenTempVanillaMaterial(context.getArgument("temporary-material", BlockState.class).getType());
+
+                                                                });
+
+                                                                context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                return 1;
+
+                                                            }))
+                                                    )
+                                                    .then(literal("temporary-block-custom")
+                                                        .then(argument("temporary-custom-block", CustomBlockArgument.blockArgument())
+                                                            .executes(context -> {
+
+                                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                block.editAndSave(customBlock -> {
+
+                                                                    customBlock.setBlockRegenType("vanilla");
+                                                                    customBlock.setRegenVanillaMaterial(context.getArgument("resulting-material", BlockState.class).getType());
+
+                                                                    customBlock.setRegenTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                    customBlock.setRegenDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                    customBlock.setRegenTempBlockType("custom");
+                                                                    customBlock.setRegenTempCustomBlock(context.getArgument("temporary-custom-block", CustomBlock.class).id());
+
+                                                                });
+
+                                                                context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                return 1;
+
+                                                            }))
+                                                    ))))
+                                    )
+                                    .then(literal("regen-custom")
+                                        .then(argument("resulting-custom-block", CustomBlockArgument.blockArgument())
+                                            .then(argument("regen-time", IntegerArgumentType.integer(-1))
+                                                .then(argument("regen-delay", IntegerArgumentType.integer(0))
+
+                                                    .then(literal("temporary-block-vanilla")
+                                                        .then(argument("temporary-material", ArgumentTypes.blockState())
+                                                            .executes(context -> {
+
+                                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                block.editAndSave(customBlock -> {
+
+                                                                    customBlock.setBlockRegenType("custom");
+                                                                    customBlock.setRegenCustomBlock(context.getArgument("resulting-custom-block", CustomBlock.class).id());
+
+                                                                    customBlock.setRegenTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                    customBlock.setRegenDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                    customBlock.setRegenTempBlockType("vanilla");
+                                                                    customBlock.setRegenTempVanillaMaterial(context.getArgument("temporary-material", BlockState.class).getType());
+
+                                                                });
+
+                                                                context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                return 1;
+
+                                                            }))
+                                                    )
+                                                    .then(literal("temporary-block-custom")
+                                                        .then(argument("temporary-custom-block", CustomBlockArgument.blockArgument())
+                                                            .executes(context -> {
+
+                                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                block.editAndSave(customBlock -> {
+
+                                                                    customBlock.setBlockRegenType("custom");
+                                                                    customBlock.setRegenCustomBlock(context.getArgument("resulting-custom-block", CustomBlock.class).id());
+
+                                                                    customBlock.setRegenTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                    customBlock.setRegenDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                    customBlock.setRegenTempBlockType("custom");
+                                                                    customBlock.setRegenTempCustomBlock(context.getArgument("temporary-custom-block", CustomBlock.class).id());
+
+                                                                });
+
+                                                                context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                return 1;
+
+                                                            })
+                                                        )
+                                                    )))))
+                                )
+                                .then(literal("set-alternate-regen")
+                                    .then(argument("chance", FloatArgumentType.floatArg(0, 1))
+                                        .then(literal("regen-vanilla")
+                                            .then(argument("resulting-material", ArgumentTypes.blockState())
+                                                .then(argument("regen-time", IntegerArgumentType.integer(-1))
+                                                    .then(argument("regen-delay", IntegerArgumentType.integer(0))
+
+                                                        .then(literal("temporary-block-vanilla")
+                                                            .then(argument("temporary-material", ArgumentTypes.blockState())
+                                                                .executes(context -> {
+
+                                                                    CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                    block.editAndSave(customBlock -> {
+
+                                                                        customBlock.setRegenAlternativeType("vanilla");
+                                                                        customBlock.setRegenAltVanillaMaterial(context.getArgument("resulting-material", BlockState.class).getType());
+
+                                                                        customBlock.setRegenAlternativeChance(FloatArgumentType.getFloat(context, "chance"));
+                                                                        customBlock.setRegenAlternativeTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                        customBlock.setRegenAlternativeDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                        customBlock.setRegenTempBlockType("vanilla");
+                                                                        customBlock.setRegenTempVanillaMaterial(context.getArgument("temporary-material", BlockState.class).getType());
+
+                                                                    });
+
+                                                                    context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                    return 1;
+
+                                                                }))
+                                                        )
+                                                        .then(literal("temporary-block-custom")
+                                                            .then(argument("temporary-custom-block", CustomBlockArgument.blockArgument())
+                                                                .executes(context -> {
+
+                                                                    CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                    block.editAndSave(customBlock -> {
+
+                                                                        customBlock.setRegenAlternativeType("vanilla");
+                                                                        customBlock.setRegenAltVanillaMaterial(context.getArgument("resulting-material", BlockState.class).getType());
+
+                                                                        customBlock.setRegenAlternativeChance(FloatArgumentType.getFloat(context, "chance"));
+                                                                        customBlock.setRegenAlternativeTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                        customBlock.setRegenAlternativeDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                        customBlock.setRegenTempBlockType("custom");
+                                                                        customBlock.setRegenTempCustomBlock(context.getArgument("temporary-custom-block", CustomBlock.class).id());
+
+                                                                    });
+
+                                                                    context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                    return 1;
+
+                                                                }))
+                                                        ))))
+                                        )
+                                        .then(literal("regen-custom")
+                                            .then(argument("resulting-custom-block", CustomBlockArgument.blockArgument())
+                                                .then(argument("regen-time", IntegerArgumentType.integer(-1))
+                                                    .then(argument("regen-delay", IntegerArgumentType.integer(0))
+
+                                                        .then(literal("temporary-block-vanilla")
+                                                            .then(argument("temporary-material", ArgumentTypes.blockState())
+                                                                .executes(context -> {
+
+                                                                    CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                    block.editAndSave(customBlock -> {
+
+                                                                        customBlock.setRegenAlternativeType("custom");
+                                                                        customBlock.setRegenAltCustomBlock(context.getArgument("resulting-custom-block", CustomBlock.class).id());
+
+                                                                        customBlock.setRegenAlternativeChance(FloatArgumentType.getFloat(context, "chance"));
+                                                                        customBlock.setRegenAlternativeTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                        customBlock.setRegenAlternativeDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                        customBlock.setRegenTempBlockType("vanilla");
+                                                                        customBlock.setRegenTempVanillaMaterial(context.getArgument("temporary-material", BlockState.class).getType());
+
+                                                                    });
+
+                                                                    context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                    return 1;
+
+                                                                }))
+                                                        )
+                                                        .then(literal("temporary-block-custom")
+                                                            .then(argument("temporary-custom-block", CustomBlockArgument.blockArgument())
+                                                                .executes(context -> {
+
+                                                                    CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                                    block.editAndSave(customBlock -> {
+
+                                                                        customBlock.setRegenAlternativeType("custom");
+                                                                        customBlock.setRegenAltCustomBlock(context.getArgument("resulting-custom-block", CustomBlock.class).id());
+
+                                                                        customBlock.setRegenAlternativeChance(FloatArgumentType.getFloat(context, "chance"));
+                                                                        customBlock.setRegenAlternativeTime(IntegerArgumentType.getInteger(context, "regen-time"));
+                                                                        customBlock.setRegenAlternativeDelay(IntegerArgumentType.getInteger(context, "regen-delay"));
+
+                                                                        customBlock.setRegenTempBlockType("custom");
+                                                                        customBlock.setRegenTempCustomBlock(context.getArgument("temporary-custom-block", CustomBlock.class).id());
+
+                                                                    });
+
+                                                                    context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                                    return 1;
+
+                                                                })
+                                                            )
+                                                        )))))))
+                            )
+                            // Block edit args here
                         )
                     )
 
