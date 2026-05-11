@@ -346,6 +346,22 @@ public class AdvancedMiningCommand {
 
                                     }))
                             )
+                            .then(literal("dropped-xp")
+                                .then(argument("min-amount", IntegerArgumentType.integer(0))
+                                    .then(argument("max-amount", IntegerArgumentType.integer(0))
+                                        .executes(context -> {
+
+                                            CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                            block.editAndSave(b -> {
+                                                b.setMinXpDrop(IntegerArgumentType.getInteger(context, "min-amount"));
+                                                b.setMaxXpDrop(IntegerArgumentType.getInteger(context, "max-amount"));
+                                            });
+
+                                            context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                            return 1;
+
+                                        })))
+                            )
                             .then(literal("regeneration")
                                 .then(literal("set-primary-regen")
                                     .then(literal("no-regen")

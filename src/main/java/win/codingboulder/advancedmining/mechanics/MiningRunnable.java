@@ -8,9 +8,7 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -140,6 +138,12 @@ public class MiningRunnable extends BukkitRunnable {
         blockDrops = blockBreakEvent.blockDrops();
         if (blockDrops != null)
             for (ItemStack item : blockDrops.rollDrops(tool)) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+
+        if (customBlock.minXpDrop() > 0) {
+            ExperienceOrb orb = block.getWorld().createEntity(block.getLocation(), ExperienceOrb.class);
+            orb.setExperience(new Random().nextInt(customBlock().minXpDrop(), customBlock.maxXpDrop()+1));
+            orb.spawnAt(block.getLocation().toCenterLocation());
+        }
 
         if (blockBreakEvent.removeBlockData()) BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 

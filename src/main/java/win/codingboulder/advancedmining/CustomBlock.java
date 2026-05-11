@@ -49,6 +49,8 @@ public class CustomBlock {
     private String placeSound;
     private Material iconMaterial;
     private String dropsFile;
+    private int minXpDrop;
+    private int maxXpDrop;
 
     // Converted attributes
     private transient Component nameComponent;
@@ -505,6 +507,22 @@ public class CustomBlock {
 
     public void setBlockDrops(BlockDrops blockDrops) {
         this.blockDrops = blockDrops;
+    }
+
+    public int minXpDrop() {
+        return minXpDrop;
+    }
+
+    public void setMinXpDrop(int minXpDrop) {
+        this.minXpDrop = minXpDrop;
+    }
+
+    public int maxXpDrop() {
+        return maxXpDrop;
+    }
+
+    public void setMaxXpDrop(int maxXpDrop) {
+        this.maxXpDrop = maxXpDrop;
     }
 
     public String blockRegenType() {
