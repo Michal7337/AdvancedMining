@@ -39,6 +39,7 @@ public final class AdvancedMining extends JavaPlugin {
         new AdvancedMiningCommand(this);
 
         BlockRegenSystem.loadSystem(this);
+        PlayerStats.registerDefaultStatModifiers();
 
         getLogger().info("AdvancedMining enabled!");
 

@@ -1,12 +1,10 @@
 package win.codingboulder.advancedmining.mechanics;
 
-import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
@@ -19,17 +17,16 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
+import win.codingboulder.advancedmining.PlayerStats;
 import win.codingboulder.advancedmining.api.CustomBlockBreakStartEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Objects;
 
 public class MiningEvents implements Listener {
 
@@ -60,40 +57,12 @@ public class MiningEvents implements Listener {
         attrib.setBaseValue(0d);
         attrib.getModifiers().forEach(attrib::removeModifier);
 
-        // Get player stats. If a stat is not defined check default tools
-        ItemStack item = player.getInventory().getItemInMainHand();
-        PersistentDataContainerView pdc = item.getPersistentDataContainer();
-        DefaultTools.Tool defaultTool = DefaultTools.getDefaultMapping(item.getType()); // Get the default tool
-        float miningSpeed = pdc.getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, defaultTool == null ? 0f : defaultTool.miningSpeed());
-        int breakingPower = pdc.getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, defaultTool == null ? 0 : defaultTool.breakingPower());
-        String toolType = item.isEmpty() ? "hand" : pdc.getOrDefault(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, defaultTool == null ? "" : defaultTool.toolType());
+        PlayerStats playerStats = new PlayerStats(player);
+        playerStats.calculateStats();
 
-        // Efficiency enchantment
-        if (AdvancedMining.Config.efficiencyEnable) {
-            if (AdvancedMining.Config.efficiencyEffectType.equals("percent")) {
-                miningSpeed += miningSpeed * item.getEnchantmentLevel(Enchantment.EFFICIENCY) * AdvancedMining.Config.efficiencyAmount;
-            } else {
-                miningSpeed += item.getEnchantmentLevel(Enchantment.EFFICIENCY) * AdvancedMining.Config.efficiencyAmount;
-            }
-        }
-
-        // Haste effect
-        if (AdvancedMining.Config.hasteEnable && player.hasPotionEffect(PotionEffectType.HASTE)) {
-            if (AdvancedMining.Config.hasteEffectType.equals("percent")) {
-                miningSpeed += miningSpeed * (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.HASTE)).getAmplifier() + 1) * AdvancedMining.Config.hasteAmount;
-            } else {
-                miningSpeed += (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.HASTE)).getAmplifier() + 1) * AdvancedMining.Config.hasteAmount;
-            }
-        }
-
-        // Mining Fatigue effect
-        if (AdvancedMining.Config.miningFatigueEnable && player.hasPotionEffect(PotionEffectType.MINING_FATIGUE)) {
-            if (AdvancedMining.Config.miningFatigueEffectType.equals("percent")) {
-                miningSpeed -= miningSpeed * (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.MINING_FATIGUE)).getAmplifier() + 1) * AdvancedMining.Config.miningFatigueAmount;
-            } else {
-                miningSpeed -= (Objects.requireNonNull(player.getPotionEffect(PotionEffectType.MINING_FATIGUE)).getAmplifier() + 1) * AdvancedMining.Config.miningFatigueAmount;
-            }
-        }
+        float miningSpeed = playerStats.miningSpeed();
+        int breakingPower = playerStats.breakingPower();
+        String toolType = playerStats.toolType();
 
         // Create the event and return if it was canceled
         CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, miningSpeed, breakingPower, toolType);
@@ -108,6 +77,7 @@ public class MiningEvents implements Listener {
         //checks for tool and hardness
         if (!customBlock.bestTool().isEmpty() && !toolType.equals(customBlock.bestTool())) return;
 
+        ItemStack item = player.getInventory().getItemInMainHand();
         if (customBlock.hardness() > breakingPower) {
             if (!item.isEmpty()) player.sendRichMessage("<red>You need at least Breaking Power " + customBlock.hardness() + " to mine this!");
             return;
