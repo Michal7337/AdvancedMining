@@ -97,6 +97,10 @@ public final class AdvancedMining extends JavaPlugin {
         public static String fortuneVanillaBehavior;
         public static boolean fortuneVanillaIgnoreSilkTouch;
 
+        public static boolean miningFortuneEnable;
+        public static float miningFortuneBonusDivider;
+        public static float miningFortunePerLevel;
+
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public static void loadConfig() {
 
@@ -136,6 +140,10 @@ public final class AdvancedMining extends JavaPlugin {
             miningFatigueEnable = config.getBoolean("effects.mining-fatigue.enable", false);
             miningFatigueEffectType = config.getString("effects.mining-fatigue.effect-type", "constant");
             miningFatigueAmount = (float) config.getDouble("effects.mining-fatigue.amount", 100.0d);
+
+            miningFortuneEnable = config.getBoolean("enable-mining-fortune", false);
+            miningFortuneBonusDivider = (float) config.getDouble("mining-fortune-bonus-divisor", 100d);
+            miningFortunePerLevel = (float) config.getDouble("mining-fortune-per-fortune-level", 40d);
 
             CustomBlock.loadAll();
             BlockDrops.loadAll();

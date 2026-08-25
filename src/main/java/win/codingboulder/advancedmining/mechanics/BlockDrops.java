@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
+import win.codingboulder.advancedmining.PlayerStats;
 
 import java.io.*;
 import java.util.*;
@@ -134,9 +135,13 @@ public class BlockDrops implements Serializable {
             } else {
 
                 int rolls = 1 + AdvancedMining.Config.fortuneDropRolls * fortuneLevel;
+
+                droppedItems.addAll(rollDropsWithExtras(tool));
+                rolls--;
+
                 while (rolls > 0) {
 
-                    droppedItems.addAll(rollDropsWithExtras(tool));
+                    droppedItems.addAll(rollDropsWithExtras(tool, true));
                     rolls--;
 
                 }
@@ -402,17 +407,27 @@ public class BlockDrops implements Serializable {
 
             ArrayList<ItemStack> droppedItems = new ArrayList<>();
             if (silkTouchOnly && !tool.containsEnchantment(Enchantment.SILK_TOUCH)) return droppedItems;
-            int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
 
-            if (AdvancedMining.Config.fortuneEnable) {
+            // Player null check
+            PlayerStats playerStats = new PlayerStats(null);
+            playerStats.calculateStats();
 
-                if (affectedByFortune) {
+            if (affectedByFortune) {
+
+                int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
+
+                float miningFortuneFraction = playerStats.miningFortune() / AdvancedMining.Config.miningFortuneBonusDivider;
+                int miningFortuneBonus = (int) miningFortuneFraction;
+                if (new Random().nextDouble() <= miningFortuneFraction - miningFortuneBonus) miningFortuneBonus++;
+                miningFortuneBonus++; // Need to have at least one
+
+                if (AdvancedMining.Config.fortuneEnable) {
 
                     if (AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("vanilla")) {
 
                         if (silkTouchOnly && !AdvancedMining.Config.fortuneVanillaIgnoreSilkTouch) return roll();
 
-                        float normalDropChance = (float) 2 / (fortuneLevel+2);
+                        float normalDropChance = (float) 2 / (fortuneLevel + 2);
                         boolean noBonus = new Random().nextDouble() <= normalDropChance;
 
                         if (noBonus) return roll(); // If no bonus, roll normally
@@ -431,15 +446,24 @@ public class BlockDrops implements Serializable {
                         int rollMinAmount = minAmount + fortuneLevel * AdvancedMining.Config.fortuneMinAmount;
                         int rollMaxAmount = maxAmount + fortuneLevel * AdvancedMining.Config.fortuneMaxAmount;
 
-                        if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(rollMinAmount, rollMaxAmount + 1))));
+                        int amount = new Random().nextInt(rollMinAmount, rollMaxAmount + 1);
+                        if (AdvancedMining.Config.miningFortuneEnable) amount *= miningFortuneBonus;
+
+                        if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, amount)));
 
                         return droppedItems;
 
                     }
 
-                } else return roll(); // If unaffected by fortune, return normal roll
+                } else if (AdvancedMining.Config.miningFortuneEnable) {
+
+
+
+                }
 
             } else return roll();
+
+            return null;
 
         }
 
