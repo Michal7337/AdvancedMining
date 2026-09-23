@@ -12,9 +12,9 @@ import win.codingboulder.advancedmining.mechanics.DefaultTools;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static win.codingboulder.advancedmining.AdvancedMining.NAMESPACE;
-import static win.codingboulder.advancedmining.AdvancedMining.TOOL_TYPE_KEY;
 
 public class PlayerStats {
 
@@ -95,9 +95,14 @@ public class PlayerStats {
         return null;
     }
 
-    public void addStatsFromItem(ItemStack item) {
+    public PlayerStats withStats(@NonNull Consumer<PlayerStats> stats) {
+        stats.accept(this);
+        return this;
+    }
 
-        if (item == null) return;
+    public PlayerStats addStatsFromItem(ItemStack item) {
+
+        if (item == null) return this;
 
         miningFortune += item.getPersistentDataContainer().getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, 0f);
         breakingPower += item.getPersistentDataContainer().getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, 0);
@@ -113,6 +118,8 @@ public class PlayerStats {
         dropChanceBonus += item.getPersistentDataContainer().getOrDefault(DROP_CHANCE_BONUS_KEY, PersistentDataType.FLOAT, 0f);
         dropRollsBonus += item.getPersistentDataContainer().getOrDefault(DROP_ROLLS_BONUS_KEY, PersistentDataType.INTEGER, 0);
 
+        return this;
+
     }
 
     public static void registerDefaultStatModifiers() {
@@ -124,7 +131,7 @@ public class PlayerStats {
             PersistentDataContainerView pdc = item.getPersistentDataContainer();
 
             // Check if the item is a tool. If it doesn't have the tag assume it's a legacy item from older versions which didn't have the tag
-            if (pdc.has(TOOL_TYPE_KEY) && !pdc.getOrDefault(TOOL_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("tool")) return;
+            if (pdc.has(ITEM_TYPE_KEY) && !pdc.getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("tool")) return;
 
             DefaultTools.Tool defaultTool = DefaultTools.getDefaultMapping(item.getType()); // Get the default tool
             float miningSpeed = pdc.getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, defaultTool == null ? 0f : defaultTool.miningSpeed());
@@ -160,6 +167,20 @@ public class PlayerStats {
 
         });
 
+        PlayerStats.statModifiers().put("default_offhand_modifier", (player, playerStats) -> {
+
+            ItemStack item = player.getInventory().getItemInOffHand();
+            if (item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("offhand")) playerStats.addStatsFromItem(item);
+
+        });
+
+        PlayerStats.statModifiers().put("default_accessory_modifier", (player, playerStats) -> {
+
+            ItemStack[] items = player.getInventory().getContents();
+            for (ItemStack item : items) if (item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("accessory")) playerStats.addStatsFromItem(item);
+
+        });
+
         PlayerStats.statModifiers().put("default_potion_modifier", (player, playerStats) -> {
 
             float miningSpeed = playerStats.miningSpeed();
@@ -186,17 +207,15 @@ public class PlayerStats {
 
         });
 
-        PlayerStats.statModifiers().put("default_offhand_modifier", (player, playerStats) -> {
+        PlayerStats.statModifiers().put("default_fortune_stats_modifier", (player, stats) -> {
 
-            ItemStack item = player.getInventory().getItemInOffHand();
-            if (item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("offhand")) playerStats.addStatsFromItem(item);
+            if (!AdvancedMining.Config.fortuneEnable || !AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("custom")) return;
 
-        });
-
-        PlayerStats.statModifiers().put("default_accessory_modifier", (player, playerStats) -> {
-
-            ItemStack[] items = player.getInventory().getContents();
-            for (ItemStack item : items) if (item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("accessory")) playerStats.addStatsFromItem(item);
+            int fortuneLevel = stats.fortuneLevel();
+            stats.dropMinAmountBonus += fortuneLevel * AdvancedMining.Config.fortuneMinAmount;
+            stats.dropMaxAmountBonus += fortuneLevel * AdvancedMining.Config.fortuneMaxAmount;
+            stats.dropChanceBonus += fortuneLevel * AdvancedMining.Config.fortuneDropChance;
+            stats.dropRollsBonus += fortuneLevel * AdvancedMining.Config.fortuneDropRolls;
 
         });
 
@@ -286,7 +305,7 @@ public class PlayerStats {
         this.dropMaxAmountBonus = dropMaxAmountBonus;
     }
 
-    public float dropChanceIBonus() {
+    public float dropChanceBonus() {
         return dropChanceBonus;
     }
 

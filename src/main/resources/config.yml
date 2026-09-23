@@ -58,7 +58,7 @@ enchantments:
     # Increases the maximum item drop amount by the specified amount per level of fortune
     increase-max-amount: 1
 
-    # Increases the item drop chance by the specified amount per level of fortune. Note: over 100% chance doesn't do anything
+    # Increases the item drop chance by the specified amount per level of fortune
     increase-drop-chance: 0.1
 
     # Increases the amount of times drops are rolled on a block by the specified amount per level of fortune
@@ -100,18 +100,22 @@ effects:
     # Sets the amount of subtracted mining speed. For constant, just set the amount subtracted per level. For percent, set it to E.g. 0.1 for 10%, 0.35 for 35% or 1.5 for 150%
     amount: 100.0
 
+# Sets the behavior of the drop chance bonus. Possible options are:
+# multiply - multiplies the base chance by 1 + bonus (so if the chance is 10% (0.1) and bonus is 20% (0.2) the result is 12% (0.12)
+# add - directly adds the bonus to the base (so base 10% and bonus 20% results in 30%)
+drop-chance-bonus-behavior: multiply
+
 # Enables the Mining Fortune stat mechanic. It functions like in Hypixel Skyblock.
 # Meaning that every 'mining-fortune-bonus-divisor' Mining Fortune a Player has, the drops get multiplied by that amount and any extra fortune is a chance to multiply another one time.
 # This means that if the Min and Max drop amount is 1, it will multiply that 1. If the Min amount is 1 and Max is 4, it first rolls between that and then multiplies it.
 # If the divisor is 100 and the player has 140 Mining Fortune, the multiplier will be 1 and 40% for another 1. At 230, it will be 2 and 30% for 3.
 # The calculation formula is just MiningFortune / FortuneDivisor where the whole number is the MinAmount increase and the decimal is the chance at another drop.
 # The AffectedByFortune and SilkTouchOnly drop properties are respected
-# Note: You NEED to disable the earlier Fortune Enchantment behavior options because they use different logic and will lead to unexpected results when Mining Fortune is enabled
+# Note: The multiplier is applied to drops after normal fortune calculations
 enable-mining-fortune: false
 
 # Sets every how much Mining Fortune you get a guaranteed drop amount increase
 mining-fortune-bonus-divisor: 100
 
 # Sets how much Mining Fortune you get per level of the Fortune enchantment
-# This is separate from the earlier Fortune configuration because you will probably want to disable that fortune behavior when using Mining Fortune
 mining-fortune-per-fortune-level: 40

@@ -97,6 +97,8 @@ public final class AdvancedMining extends JavaPlugin {
         public static String fortuneVanillaBehavior;
         public static boolean fortuneVanillaIgnoreSilkTouch;
 
+        public static String dropChanceBonusBehavior;
+
         public static boolean miningFortuneEnable;
         public static float miningFortuneBonusDivider;
         public static float miningFortunePerLevel;
@@ -140,6 +142,8 @@ public final class AdvancedMining extends JavaPlugin {
             miningFatigueEnable = config.getBoolean("effects.mining-fatigue.enable", false);
             miningFatigueEffectType = config.getString("effects.mining-fatigue.effect-type", "constant");
             miningFatigueAmount = (float) config.getDouble("effects.mining-fatigue.amount", 100.0d);
+
+            dropChanceBonusBehavior = config.getString("drop-chance-bonus-behavior", "multiply");
 
             miningFortuneEnable = config.getBoolean("enable-mining-fortune", false);
             miningFortuneBonusDivider = (float) config.getDouble("mining-fortune-bonus-divisor", 100d);
