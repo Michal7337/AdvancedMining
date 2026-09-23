@@ -1,10 +1,13 @@
 package win.codingboulder.advancedmining;
 
+import com.mojang.brigadier.context.CommandContext;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.jspecify.annotations.NonNull;
@@ -104,7 +107,7 @@ public class PlayerStats {
 
         if (item == null) return this;
 
-        miningFortune += item.getPersistentDataContainer().getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, 0f);
+        miningSpeed += item.getPersistentDataContainer().getOrDefault(AdvancedMining.MINING_SPEED_KEY, PersistentDataType.FLOAT, 0f);
         breakingPower += item.getPersistentDataContainer().getOrDefault(AdvancedMining.BREAKING_POWER_KEY, PersistentDataType.INTEGER, 0);
         miningFortune += item.getPersistentDataContainer().getOrDefault(MINING_FORTUNE_KEY, PersistentDataType.FLOAT, 0f);
         minXpDropBonus += item.getPersistentDataContainer().getOrDefault(MIN_XP_DROP_BONUS_KEY, PersistentDataType.INTEGER, 0);
@@ -233,6 +236,17 @@ public class PlayerStats {
             }
 
         });
+
+    }
+
+    public static void editToolWithCommandContext(@NonNull CommandContext<CommandSourceStack> context, Consumer<PersistentDataContainer> pdc) {
+
+        Player player = (Player) context.getSource().getSender();
+        ItemStack item = player.getInventory().getItemInMainHand();
+
+        item.editPersistentDataContainer(pdc);
+
+        player.sendRichMessage("<green>Stat set!");
 
     }
 
