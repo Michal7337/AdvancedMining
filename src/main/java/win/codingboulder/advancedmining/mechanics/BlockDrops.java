@@ -405,9 +405,10 @@ public class BlockDrops implements Serializable {
                 int rollMaxAmount = maxAmount + stats.dropMaxAmountBonus();
 
                 int amount = new Random().nextInt(rollMinAmount, rollMaxAmount + 1);
-                if (AdvancedMining.Config.miningFortuneEnable) amount *= miningFortuneBonus;
+                amount *= miningFortuneBonus; // This is 1 by default
+                amount *= stats.vanillaFortuneDropBonus(); // This is 1 by default
 
-                if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, amount * miningFortuneBonus)));
+                if (new Random().nextDouble() <= rollChance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, amount)));
 
                 return droppedItems;
 

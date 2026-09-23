@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 import static win.codingboulder.advancedmining.AdvancedMining.NAMESPACE;
 
-public class PlayerStats {
+public class PlayerStats implements Cloneable{
 
     private static final LinkedHashMap<String, BiConsumer<Player, PlayerStats>> statModifiers = new LinkedHashMap<>();
 
@@ -55,6 +55,7 @@ public class PlayerStats {
     private int dropMaxAmountBonus;
     private float dropChanceBonus;
     private int dropRollsBonus;
+     private int vanillaFortuneDropBonus;
 
 
     private final HashMap<String, Object> otherStats = new HashMap<>();
@@ -125,6 +126,10 @@ public class PlayerStats {
 
     }
 
+    public void applyModifier(@NonNull BiConsumer<Player, PlayerStats> modifier) {
+        modifier.accept(player, this);
+    }
+
     public static void registerDefaultStatModifiers() {
 
         PlayerStats.statModifiers().putFirst("default_tool_modifier", (player, playerStats) -> {
@@ -180,7 +185,7 @@ public class PlayerStats {
         PlayerStats.statModifiers().put("default_accessory_modifier", (player, playerStats) -> {
 
             ItemStack[] items = player.getInventory().getContents();
-            for (ItemStack item : items) if (item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("accessory")) playerStats.addStatsFromItem(item);
+            for (ItemStack item : items) if (item != null && item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("accessory")) playerStats.addStatsFromItem(item);
 
         });
 
@@ -210,10 +215,11 @@ public class PlayerStats {
 
         });
 
-        PlayerStats.statModifiers().put("default_fortune_stats_modifier", (player, stats) -> {
+        PlayerStats.statModifiers().put("default_fortune_stat_modifier", (player, stats) -> {
 
             if (!AdvancedMining.Config.fortuneEnable) return;
             int fortuneLevel = stats.fortuneLevel();
+            stats.vanillaFortuneDropBonus = 1;
 
             if (AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("vanilla")) {
 
@@ -224,7 +230,7 @@ public class PlayerStats {
                 int dropBonus = new Random().nextInt(2, fortuneLevel + 2);
 
                 if (AdvancedMining.Config.fortuneVanillaBehavior.equals("additional-rolls")) stats.dropRollsBonus += dropBonus;
-                else stats.dropMaxAmountBonus += dropBonus;
+                else stats.vanillaFortuneDropBonus += dropBonus;
 
             } else {
 
@@ -366,4 +372,47 @@ public class PlayerStats {
         this.fortuneLevel = fortuneLevel;
     }
 
+    public int vanillaFortuneDropBonus() {
+        return vanillaFortuneDropBonus;
+    }
+
+    public void setVanillaFortuneDropBonus(int vanillaFortuneDropBonus) {
+        this.vanillaFortuneDropBonus = vanillaFortuneDropBonus;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerStats{" +
+            "player=" + player +
+            ", isCalculated=" + isCalculated +
+            ", miningSpeed=" + miningSpeed +
+            ", breakingPower=" + breakingPower +
+            ", toolType='" + toolType + '\'' +
+            ", miningFortune=" + miningFortune +
+            ", minXpDropBonus=" + minXpDropBonus +
+            ", maxXpDropBonus=" + maxXpDropBonus +
+            ", miningSpread=" + miningSpread +
+            ", hasTelekinesis=" + hasTelekinesis +
+            ", hasSilkTouch=" + hasSilkTouch +
+            ", fortuneLevel=" + fortuneLevel +
+            ", dropMinAmountBonus=" + dropMinAmountBonus +
+            ", dropMaxAmountBonus=" + dropMaxAmountBonus +
+            ", dropChanceBonus=" + dropChanceBonus +
+            ", dropRollsBonus=" + dropRollsBonus +
+            ", otherStats=" + otherStats +
+            '}';
+    }
+
+
+    @Override
+    public PlayerStats clone() {
+        try {
+            PlayerStats clone = (PlayerStats) super.clone();
+            clone.otherStats.clear();
+            clone.otherStats.putAll(otherStats);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
