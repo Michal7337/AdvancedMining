@@ -209,13 +209,28 @@ public class PlayerStats {
 
         PlayerStats.statModifiers().put("default_fortune_stats_modifier", (player, stats) -> {
 
-            if (!AdvancedMining.Config.fortuneEnable || !AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("custom")) return;
-
+            if (!AdvancedMining.Config.fortuneEnable) return;
             int fortuneLevel = stats.fortuneLevel();
-            stats.dropMinAmountBonus += fortuneLevel * AdvancedMining.Config.fortuneMinAmount;
-            stats.dropMaxAmountBonus += fortuneLevel * AdvancedMining.Config.fortuneMaxAmount;
-            stats.dropChanceBonus += fortuneLevel * AdvancedMining.Config.fortuneDropChance;
-            stats.dropRollsBonus += fortuneLevel * AdvancedMining.Config.fortuneDropRolls;
+
+            if (AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("vanilla")) {
+
+                float normalDropChance = (float) 2 / (fortuneLevel + 2);
+                boolean noBonus = new Random().nextDouble() <= normalDropChance;
+
+                if (noBonus) return; // If no bonus, no action is needed
+                int dropBonus = new Random().nextInt(2, fortuneLevel + 2);
+
+                if (AdvancedMining.Config.fortuneVanillaBehavior.equals("additional-rolls")) stats.dropRollsBonus += dropBonus;
+                else stats.dropMaxAmountBonus += dropBonus;
+
+            } else {
+
+                stats.dropMinAmountBonus += fortuneLevel * AdvancedMining.Config.fortuneMinAmount;
+                stats.dropMaxAmountBonus += fortuneLevel * AdvancedMining.Config.fortuneMaxAmount;
+                stats.dropChanceBonus += fortuneLevel * AdvancedMining.Config.fortuneDropChance;
+                stats.dropRollsBonus += fortuneLevel * AdvancedMining.Config.fortuneDropRolls;
+
+            }
 
         });
 

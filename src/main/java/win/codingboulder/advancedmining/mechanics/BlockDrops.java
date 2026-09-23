@@ -109,33 +109,15 @@ public class BlockDrops implements Serializable {
 
         if (stats == null) return rollDrops();
 
-        ArrayList<ItemStack> droppedItems = new ArrayList<>();
+        int rolls = 1 + stats.dropRollsBonus();
 
-        if (AdvancedMining.Config.fortuneEnable && AdvancedMining.Config.fortuneEffectType.equals("vanilla")) {
+        ArrayList<ItemStack> droppedItems = new ArrayList<>(rollDropsWithExtras(stats)); // Roll once normally
+        rolls--;
 
-            if (AdvancedMining.Config.fortuneVanillaBehavior.equals("additional-rolls")) {
+        while (rolls > 0) { // Roll bonus rolls
 
-                int fortuneLevel = stats.fortuneLevel();
-
-                float normalDropChance = (float) 2 / (fortuneLevel+2);
-                boolean noBonus = new Random().nextDouble() <= normalDropChance;
-
-                int dropMultiplier = noBonus ? 1 : new Random().nextInt(2, fortuneLevel + 2); // If there is no bonus, roll once
-                dropMultiplier += stats.dropRollsBonus(); // add bonus from stats because vanilla fortune behavior doesn't give them to items by itself
-
-                droppedItems.addAll(rollDropsWithExtras(stats)); // Roll once normally
-                dropMultiplier--;
-
-                while (dropMultiplier > 0) {
-
-                    droppedItems.addAll(rollDropsWithExtras(stats, true)); // Roll and skip entries that ignore fortune
-                    dropMultiplier--;
-
-                }
-
-            } else droppedItems.addAll(rollDropsWithExtras(stats)); // increase-max-drop-amount
-
-
+            droppedItems.addAll(rollDropsWithExtras(stats, true));
+            rolls--;
 
         }
 
@@ -261,17 +243,15 @@ public class BlockDrops implements Serializable {
     }
 
     public void loadDropsMap() {
-        entryMap = new HashMap<>();
-        entries.forEach(entry -> entryMap.put(entry.id, entry));
+        HashMap<String, Entry> newEntryMap = new HashMap<>();
+        entries.forEach(entry -> newEntryMap.put(entry.id, entry));
+        entryMap = newEntryMap;
     }
 
     @Serial
     private void readObject(@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException {
 
         in.defaultReadObject();
-
-        if (entryMap == null) entryMap = new HashMap<>();
-        entries.forEach(entry -> entryMap.put(entry.id, entry));
 
         // Automatic naming of entries from old versions
         boolean wasFromOldVersion = false;
@@ -280,11 +260,13 @@ public class BlockDrops implements Serializable {
             if (entry.id() == null) {
                 String newId = "auto-migrated-" + i + "-" + PlainTextComponentSerializer.plainText().serialize(entry.item().effectiveName()).replace(" ", "_");
                 entry.setId(newId);
-                    AdvancedMining.getInstance().getLogger().info("Automatically renamed legacy Entry " + i + " from Block Drop '" + id + "' to '" + newId + "'");
+                AdvancedMining.getInstance().getLogger().info("Automatically renamed legacy Entry " + i + " from Block Drop '" + id + "' to '" + newId + "'");
                 wasFromOldVersion = true;
             }
         }
+
         if (wasFromOldVersion) saveToFile();
+        loadDropsMap();
 
     }
 
@@ -417,25 +399,6 @@ public class BlockDrops implements Serializable {
                     miningFortuneBonus++; // Need to have at least one
 
                 } else miningFortuneBonus = 1;
-
-                if (AdvancedMining.Config.fortuneEnable && AdvancedMining.Config.fortuneEffectType.equalsIgnoreCase("vanilla")) {
-
-                    if (silkTouchOnly && !AdvancedMining.Config.fortuneVanillaIgnoreSilkTouch) return roll();
-
-                    float normalDropChance = (float) 2 / (fortuneLevel + 2);
-                    boolean noBonus = new Random().nextDouble() <= normalDropChance;
-
-                    if (noBonus) return roll(); // If no bonus, roll normally
-                    int dropMultiplier = new Random().nextInt(2, fortuneLevel + 2);
-
-                    if (!AdvancedMining.Config.fortuneVanillaBehavior.equals("additional-rolls")) { // Increase the max drop amount if the option says that
-
-                        if (new Random().nextDouble() <= chance) droppedItems.addAll(List.of(getItemAmountArray(itemStack, new Random().nextInt(minAmount, maxAmount + 1) * dropMultiplier * miningFortuneBonus)));
-                        return droppedItems;
-
-                    } else return roll(); // If option is extra rolls, return a clean roll. That stuff is handled upstream
-
-                }
 
                 float rollChance = AdvancedMining.Config.dropChanceBonusBehavior.equalsIgnoreCase("add") ? chance + stats.dropChanceBonus() : chance * (stats.dropChanceBonus() + 1);
                 int rollMinAmount = minAmount + stats.dropMinAmountBonus();
