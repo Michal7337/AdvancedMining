@@ -55,7 +55,7 @@ public class PlayerStats implements Cloneable{
     private int dropMaxAmountBonus;
     private float dropChanceBonus;
     private int dropRollsBonus;
-     private int vanillaFortuneDropBonus;
+    private int vanillaFortuneDropBonus;
 
 
     private final HashMap<String, Object> otherStats = new HashMap<>();
@@ -66,7 +66,6 @@ public class PlayerStats implements Cloneable{
 
     public void calculateStats() {
 
-        if (player == null) return;
         statModifiers.forEach((id, consumer) -> consumer.accept(player, this));
         isCalculated = true;
 
@@ -135,6 +134,8 @@ public class PlayerStats implements Cloneable{
 
         PlayerStats.statModifiers().putFirst("default_tool_modifier", (player, playerStats) -> {
 
+            if (player == null) return;
+
             // Get player stats. If a stat is not defined check default tools
             ItemStack item = player.getInventory().getItemInMainHand();
             PersistentDataContainerView pdc = item.getPersistentDataContainer();
@@ -170,6 +171,8 @@ public class PlayerStats implements Cloneable{
 
         PlayerStats.statModifiers().put("default_armor_modifier", (player, playerStats) -> {
 
+            if (player == null) return;
+
             for (ItemStack item : player.getInventory().getArmorContents())
                 if (item != null && item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("armor")) {
                     playerStats.addStatsFromItem(item);
@@ -179,6 +182,8 @@ public class PlayerStats implements Cloneable{
 
         PlayerStats.statModifiers().put("default_offhand_modifier", (player, playerStats) -> {
 
+            if (player == null) return;
+
             ItemStack item = player.getInventory().getItemInOffHand();
             if (item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("offhand")) playerStats.addStatsFromItem(item);
 
@@ -186,12 +191,16 @@ public class PlayerStats implements Cloneable{
 
         PlayerStats.statModifiers().put("default_accessory_modifier", (player, playerStats) -> {
 
+            if (player == null) return;
+
             ItemStack[] items = player.getInventory().getContents();
             for (ItemStack item : items) if (item != null && item.getPersistentDataContainer().getOrDefault(ITEM_TYPE_KEY, PersistentDataType.STRING, "").equalsIgnoreCase("accessory")) playerStats.addStatsFromItem(item);
 
         });
 
         PlayerStats.statModifiers().put("default_potion_modifier", (player, playerStats) -> {
+
+            if (player == null) return;
 
             float miningSpeed = playerStats.miningSpeed();
 
