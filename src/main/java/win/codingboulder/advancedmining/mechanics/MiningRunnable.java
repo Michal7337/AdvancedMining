@@ -139,12 +139,16 @@ public class MiningRunnable extends BukkitRunnable {
         block.setType(Material.AIR);
 
         blockDrops = blockBreakEvent.blockDrops();
-        if (blockDrops != null)
-            for (ItemStack item : blockDrops.rollDrops(playerStats)) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+        if (blockDrops != null) {
+            ItemStack[] drops = blockDrops.rollDrops(playerStats);
+            if (playerStats.hasTelekinesis() && player != null) player.getInventory().addItem(drops)
+                .forEach((integer, item) -> block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item)); // If not enough space, drop items on the ground
+            else for (ItemStack item : drops) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+        }
 
         if (customBlock.minXpDrop() > 0) {
             ExperienceOrb orb = block.getWorld().createEntity(block.getLocation(), ExperienceOrb.class);
-            orb.setExperience(new Random().nextInt(customBlock().minXpDrop(), customBlock.maxXpDrop()+1));
+            orb.setExperience(new Random().nextInt(customBlock().minXpDrop() + playerStats.minXpDropBonus(), customBlock.maxXpDrop()+1 + playerStats.maxXpDropBonus()));
             orb.spawnAt(block.getLocation().toCenterLocation());
         }
 
