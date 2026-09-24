@@ -66,6 +66,7 @@ public class PlayerStats implements Cloneable{
 
     public void calculateStats() {
 
+        if (player == null) return;
         statModifiers.forEach((id, consumer) -> consumer.accept(player, this));
         isCalculated = true;
 
@@ -155,6 +156,7 @@ public class PlayerStats implements Cloneable{
                 }
             }
 
+            if (item.containsEnchantment(Enchantment.SILK_TOUCH)) playerStats.hasSilkTouch = true;
             if (!pdc.has(FORTUNE_LEVEL_KEY)) playerStats.fortuneLevel += item.getEnchantmentLevel(Enchantment.FORTUNE); // If the item doesn't have a set fortune level stat, read its actual fortune enchantment level
 
             // Add all the stats then replace some with the above calculated values which take into account default tools

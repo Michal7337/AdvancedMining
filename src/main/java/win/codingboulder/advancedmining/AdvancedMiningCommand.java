@@ -991,6 +991,33 @@ public class AdvancedMiningCommand {
                                         })))))
 
                     )
+                    .then(literal("print-stats")
+                        .then(literal("hand").requires(source -> source.getSender() instanceof Player)
+                            .executes(context -> {
+
+                                Player player = (Player) context.getSource().getSender();
+                                ItemStack item = player.getInventory().getItemInMainHand();
+                                PlayerStats stats = new PlayerStats(null);
+                                stats.addStatsFromItem(item);
+
+                                context.getSource().getSender().sendMessage(stats.toString());
+
+                                return 1;
+
+                            }))
+                        .then(literal("player")
+                            .then(argument("player", ArgumentTypes.player())
+                                .executes(context -> {
+
+                                    Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
+                                    PlayerStats stats = new PlayerStats(player);
+                                    stats.calculateStats();
+
+                                    context.getSource().getSender().sendMessage(stats.toString());
+
+                                    return 1;
+
+                                }))))
 
                 )
 
@@ -1352,7 +1379,50 @@ public class AdvancedMiningCommand {
 
                                         return 1;
 
-                                    })))))
+                                    }))))
+                    )
+                    .then(literal("simulate")
+                        .then(argument("drops", BlockDropsArgument.dropsArgument())
+                            .then(argument("times", IntegerArgumentType.integer(1))
+                                .then(argument("player", ArgumentTypes.player())
+                                    .executes(commandContext -> {
+
+                                        BlockDrops drops = BlockDropsArgument.getBlockDrops(commandContext, "drops");
+                                        int times = IntegerArgumentType.getInteger(commandContext, "times");
+                                        Player player = commandContext.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(commandContext.getSource()).getFirst();
+
+                                        PlayerStats playerStats = new PlayerStats(player);
+                                        playerStats.calculateStats();
+
+                                        TextComponent.Builder text = Component.text().append(Component.text("Simulation results: "));
+
+                                        for (int i = 1; i <= times; i++) {
+                                            ItemStack[] rolled = drops.rollDrops(playerStats);
+                                            text.append(Component.text("\n" + i + ": "));
+                                            for (ItemStack item : rolled) text.append(Component.text(item.getAmount() + "x ")).append(item.displayName()).append(Component.text(", "));
+                                        }
+
+                                        commandContext.getSource().getSender().sendMessage(text.asComponent());
+
+                                        return 1;
+
+                                    }))
+                                .executes(commandContext -> {
+
+                                    BlockDrops drops = BlockDropsArgument.getBlockDrops(commandContext, "drops");
+                                    int times = IntegerArgumentType.getInteger(commandContext, "times");
+
+                                    TextComponent.Builder text = Component.text().append(Component.text("Simulation results: "));
+
+                                    for (int i = times; i > 0; i--) {
+                                        ItemStack[] rolled = drops.rollDrops();
+                                        text.append(Component.text("\n" + i + ": "));
+                                        for (ItemStack item : rolled) text.append(Component.text(item.getAmount() + "x ")).append(item.displayName()).append(Component.text(", "));
+                                    }
+
+                                    return 1;
+
+                                }))))
                 )
 
                 .then(literal("reload")

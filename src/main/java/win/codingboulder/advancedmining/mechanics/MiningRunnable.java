@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.AdvancedMining;
 import win.codingboulder.advancedmining.BlockDataStorage;
 import win.codingboulder.advancedmining.CustomBlock;
+import win.codingboulder.advancedmining.PlayerStats;
 import win.codingboulder.advancedmining.api.CustomBlockBreakEvent;
 import win.codingboulder.advancedmining.api.CustomBlockBreakProgressEvent;
 
@@ -121,6 +122,8 @@ public class MiningRunnable extends BukkitRunnable {
         }
 
         BlockDrops blockDrops = BlockDrops.loadedDrops().get(customBlock.rawDropsFile());
+        PlayerStats playerStats = new PlayerStats(player);
+        playerStats.calculateStats();
 
         CustomBlockBreakEvent blockBreakEvent = new CustomBlockBreakEvent(player, block, customBlock, blockDrops, true, true);
         if (!blockBreakEvent.callEvent()) return;
@@ -137,7 +140,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         blockDrops = blockBreakEvent.blockDrops();
         if (blockDrops != null)
-            for (ItemStack item : blockDrops.rollDrops(tool)) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+            for (ItemStack item : blockDrops.rollDrops(playerStats)) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 
         if (customBlock.minXpDrop() > 0) {
             ExperienceOrb orb = block.getWorld().createEntity(block.getLocation(), ExperienceOrb.class);
