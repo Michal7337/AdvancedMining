@@ -35,17 +35,19 @@ public class MiningRunnable extends BukkitRunnable {
     private float miningSpeed;
     private final int breakingPower;
 
-    public int randomId;
+    private PlayerStats playerStats;
+    private int randomId;
     private float miningProgress;
-    public BossBar progressbar;
+    private final BossBar progressbar;
     private final Component barName;
     private ItemStack tool;
-    public int tick;
-    public int pauseTicks;
+    private int tick;
+    private int pauseTicks;
 
-    public boolean isCanceled;
-    public boolean instaMine;
-    public boolean isPaused;
+    private boolean isCanceled;
+    private boolean instaMine;
+    private boolean isPaused;
+    private float lastState;
 
     public MiningRunnable(Block block, @NotNull CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
 
@@ -65,7 +67,12 @@ public class MiningRunnable extends BukkitRunnable {
 
     }
 
-    private float lastState;
+    public MiningRunnable(Block block, CustomBlock customBlock, Player player, @NonNull PlayerStats playerStats) {
+
+        this(block, customBlock, player, playerStats.miningSpeed(), playerStats.breakingPower());
+        this.playerStats = playerStats;
+
+    }
 
     @Override
     public void run() {
@@ -76,9 +83,8 @@ public class MiningRunnable extends BukkitRunnable {
             pauseTicks++;
             return;
         }
-        if (instaMine) {breakBlock(); this.cancel(); MiningEvents.miningRunnables.get(player).remove(block); return;}
 
-        if (miningProgress <= 0) {
+        if (miningProgress <= 0 || instaMine) {
             breakBlock();
             this.cancel();
             MiningEvents.miningRunnables.get(player).remove(block);
@@ -213,4 +219,63 @@ public class MiningRunnable extends BukkitRunnable {
         this.tool = tool.clone();
     }
 
+    public int randomId() {
+        return randomId;
+    }
+
+    public void setRandomId(int randomId) {
+        this.randomId = randomId;
+    }
+
+    public void setMiningProgress(float miningProgress) {
+        this.miningProgress = miningProgress;
+    }
+
+    public BossBar progressbar() {
+        return progressbar;
+    }
+
+    public int tick() {
+        return tick;
+    }
+
+    public void setTick(int tick) {
+        this.tick = tick;
+    }
+
+    public int pauseTicks() {
+        return pauseTicks;
+    }
+
+    public void setPauseTicks(int pauseTicks) {
+        this.pauseTicks = pauseTicks;
+    }
+
+    public boolean isCanceled() {
+        return isCanceled;
+    }
+
+    public boolean instaMine() {
+        return instaMine;
+    }
+
+    public void setInstaMine(boolean instaMine) {
+        this.instaMine = instaMine;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public float lastState() {
+        return lastState;
+    }
+
+    public PlayerStats playerStats() {
+        return playerStats;
+    }
+
+    public void setPlayerStats(PlayerStats playerStats) {
+        this.playerStats = playerStats;
+    }
 }

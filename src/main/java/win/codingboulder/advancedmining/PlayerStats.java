@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 import static win.codingboulder.advancedmining.AdvancedMining.NAMESPACE;
 
-public class PlayerStats implements Cloneable{
+public class PlayerStats implements Cloneable {
 
     private static final LinkedHashMap<String, BiConsumer<Player, PlayerStats>> statModifiers = new LinkedHashMap<>();
 
@@ -55,7 +55,7 @@ public class PlayerStats implements Cloneable{
     private int dropMaxAmountBonus;
     private float dropChanceBonus;
     private int dropRollsBonus;
-    private int vanillaFortuneDropBonus;
+    private int vanillaFortuneDropBonus; // Internal value for vanilla fortune multiplier
 
 
     private final HashMap<String, Object> otherStats = new HashMap<>();

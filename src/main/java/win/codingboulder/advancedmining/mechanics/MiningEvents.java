@@ -70,6 +70,7 @@ public class MiningEvents implements Listener {
 
         customBlock = breakStartEvent.getCustomBlock();
         if (customBlock == null) return;
+
         miningSpeed = breakStartEvent.getMiningSpeed();
         breakingPower = breakStartEvent.getBreakingPower();
         toolType = breakStartEvent.getToolType();
@@ -96,16 +97,18 @@ public class MiningEvents implements Listener {
 
                         runnable.setTool(item);
                         runnable.setMiningSpeed(miningSpeed);
+                        runnable.setPlayerStats(playerStats);
                         runnable.unpauseMining();
 
                     } else { // If the tool changed, crate a new runnable
 
-                        player.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
+                        player.sendBlockDamage(block.getLocation(), 0f, runnable.randomId());
                         int range = AdvancedMining.Config.crackingAnimationRange;
-                        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, runnable.randomId);
+                        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, runnable.randomId());
 
                         MiningRunnable newRunnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
                         newRunnable.setTool(item);
+                        runnable.setPlayerStats(playerStats);
                         newRunnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                         playerRunnables.putLast(block, newRunnable);
 
@@ -124,6 +127,7 @@ public class MiningEvents implements Listener {
 
                 MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
                 runnable.setTool(item);
+                runnable.setPlayerStats(playerStats);
                 runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                 playerRunnables.putLast(block, runnable);
 
@@ -142,6 +146,7 @@ public class MiningEvents implements Listener {
 
             MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
             runnable.setTool(item);
+            runnable.setPlayerStats(playerStats);
             runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
             miningRunnables.get(player).putLast(block, runnable);
 

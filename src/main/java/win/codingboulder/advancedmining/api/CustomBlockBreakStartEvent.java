@@ -6,7 +6,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import win.codingboulder.advancedmining.CustomBlock;
+import win.codingboulder.advancedmining.PlayerStats;
 
 public class CustomBlockBreakStartEvent extends Event implements Cancellable {
 
@@ -16,6 +18,8 @@ public class CustomBlockBreakStartEvent extends Event implements Cancellable {
     private final Player player;
     private final Block block;
     private CustomBlock customBlock;
+    private PlayerStats playerStats;
+
     private float miningSpeed;
     private int breakingPower;
     private String toolType;
@@ -28,6 +32,18 @@ public class CustomBlockBreakStartEvent extends Event implements Cancellable {
         this.miningSpeed = miningSpeed;
         this.breakingPower = breakingPower;
         this.toolType = toolType;
+
+    }
+
+    public CustomBlockBreakStartEvent(Player player, Block block, CustomBlock customBlock, @NonNull PlayerStats playerStats) {
+
+        this.player = player;
+        this.block = block;
+        this.customBlock = customBlock;
+        this.playerStats = playerStats;
+        this.miningSpeed = playerStats.miningSpeed();
+        this.breakingPower = playerStats.breakingPower();
+        this.toolType = playerStats.toolType();
 
     }
 
@@ -47,12 +63,21 @@ public class CustomBlockBreakStartEvent extends Event implements Cancellable {
         this.customBlock = customBlock;
     }
 
+    public PlayerStats playerStats() {
+        return playerStats;
+    }
+
+    public void setPlayerStats(PlayerStats playerStats) {
+        this.playerStats = playerStats;
+    }
+
     public float getMiningSpeed() {
         return miningSpeed;
     }
 
     public void setMiningSpeed(float miningSpeed) {
         this.miningSpeed = miningSpeed;
+        playerStats.setMiningSpeed(miningSpeed);
     }
 
     public int getBreakingPower() {
@@ -61,6 +86,7 @@ public class CustomBlockBreakStartEvent extends Event implements Cancellable {
 
     public void setBreakingPower(int breakingPower) {
         this.breakingPower = breakingPower;
+        playerStats.setBreakingPower(breakingPower);
     }
 
     public String getToolType() {
@@ -69,6 +95,7 @@ public class CustomBlockBreakStartEvent extends Event implements Cancellable {
 
     public void setToolType(String toolType) {
         this.toolType = toolType;
+        playerStats.setToolType(toolType);
     }
 
     public static HandlerList getHandlerList() {
