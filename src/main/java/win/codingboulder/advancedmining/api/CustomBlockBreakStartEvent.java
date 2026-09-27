@@ -32,6 +32,7 @@ public class CustomBlockBreakStartEvent extends Event implements Cancellable {
         this.miningSpeed = miningSpeed;
         this.breakingPower = breakingPower;
         this.toolType = toolType;
+        this.playerStats = new PlayerStats(null);
 
     }
 

@@ -128,8 +128,7 @@ public class MiningRunnable extends BukkitRunnable {
         }
 
         BlockDrops blockDrops = BlockDrops.loadedDrops().get(customBlock.rawDropsFile());
-        PlayerStats playerStats = new PlayerStats(player);
-        playerStats.calculateStats();
+        if (playerStats == null) playerStats = new PlayerStats(player);
 
         CustomBlockBreakEvent blockBreakEvent = new CustomBlockBreakEvent(player, block, customBlock, blockDrops, true, true);
         if (!blockBreakEvent.callEvent()) return;
@@ -277,5 +276,6 @@ public class MiningRunnable extends BukkitRunnable {
 
     public void setPlayerStats(PlayerStats playerStats) {
         this.playerStats = playerStats;
+        this.miningSpeed = playerStats().miningSpeed();
     }
 }

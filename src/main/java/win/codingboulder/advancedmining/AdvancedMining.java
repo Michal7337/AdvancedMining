@@ -98,6 +98,7 @@ public final class AdvancedMining extends JavaPlugin {
         public static boolean fortuneVanillaIgnoreSilkTouch;
 
         public static String dropChanceBonusBehavior;
+        public static boolean allowStatChangingDuringBlockBreak;
 
         public static boolean miningFortuneEnable;
         public static float miningFortuneBonusDivider;
@@ -144,6 +145,7 @@ public final class AdvancedMining extends JavaPlugin {
             miningFatigueAmount = (float) config.getDouble("effects.mining-fatigue.amount", 100.0d);
 
             dropChanceBonusBehavior = config.getString("drop-chance-bonus-behavior", "multiply");
+            allowStatChangingDuringBlockBreak = config.getBoolean("allow-stat-changing-during-block-break", true);
 
             miningFortuneEnable = config.getBoolean("enable-mining-fortune", false);
             miningFortuneBonusDivider = (float) config.getDouble("mining-fortune-bonus-divisor", 100d);

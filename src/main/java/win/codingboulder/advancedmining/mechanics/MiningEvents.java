@@ -5,7 +5,6 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,8 +42,7 @@ public class MiningEvents implements Listener {
         // Check if there is a default mapping for this material
         // If there is no default mapping or if a block is placed there normally set it normally
         CustomBlock customBlock = DefaultBlocks.getDefaultMapping(block.getType());
-        if (customBlock == null || CustomBlock.getCustomBlock(block) != null) customBlock = CustomBlock.getCustomBlock(block);
-
+        if (customBlock == null) customBlock = CustomBlock.getCustomBlock(block);
         if (customBlock == null) return; // If the block isn't a custom block return
 
         event.setCancelled(true); // prevent breaking of the block if something were to go wrong with mining prevention
@@ -57,29 +55,27 @@ public class MiningEvents implements Listener {
         attrib.setBaseValue(0d);
         attrib.getModifiers().forEach(attrib::removeModifier);
 
+        // Get and calculate PlayerStats
         PlayerStats playerStats = new PlayerStats(player);
         playerStats.calculateStats();
 
-        float miningSpeed = playerStats.miningSpeed();
-        int breakingPower = playerStats.breakingPower();
-        String toolType = playerStats.toolType();
-
         // Create the event and return if it was canceled
-        CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, miningSpeed, breakingPower, toolType);
+        CustomBlockBreakStartEvent breakStartEvent = new CustomBlockBreakStartEvent(player, block, customBlock, playerStats);
         if (!breakStartEvent.callEvent()) return;
 
+        // If the event changed the CustomBlock to null, return
         customBlock = breakStartEvent.getCustomBlock();
         if (customBlock == null) return;
 
-        miningSpeed = breakStartEvent.getMiningSpeed();
-        breakingPower = breakStartEvent.getBreakingPower();
-        toolType = breakStartEvent.getToolType();
+        // If the event changed PlayerStats to null, set them to a new empty instance
+        playerStats = breakStartEvent.playerStats();
+        if (playerStats == null) playerStats = new PlayerStats(player);
 
         //checks for tool and hardness
-        if (!customBlock.bestTool().isEmpty() && !toolType.equals(customBlock.bestTool())) return;
+        if (!customBlock.bestTool().isEmpty() && !playerStats.toolType().equals(customBlock.bestTool())) return;
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (customBlock.hardness() > breakingPower) {
+        if (customBlock.hardness() > playerStats.breakingPower()) {
             if (!item.isEmpty()) player.sendRichMessage("<red>You need at least Breaking Power " + customBlock.hardness() + " to mine this!");
             return;
         }
@@ -96,19 +92,15 @@ public class MiningEvents implements Listener {
                     if (AdvancedMining.Config.allowToolSwapping) { // If tool swapping is enabled, get new stats and unpause the runnable
 
                         runnable.setTool(item);
-                        runnable.setMiningSpeed(miningSpeed);
-                        runnable.setPlayerStats(playerStats);
+                        if (AdvancedMining.Config.allowStatChangingDuringBlockBreak) runnable.setPlayerStats(playerStats);
                         runnable.unpauseMining();
 
                     } else { // If the tool changed, crate a new runnable
 
-                        player.sendBlockDamage(block.getLocation(), 0f, runnable.randomId());
-                        int range = AdvancedMining.Config.crackingAnimationRange;
-                        for (Entity entity : player.getNearbyEntities(range, range, range)) if (entity instanceof Player pl) pl.sendBlockDamage(block.getLocation(), 0f, runnable.randomId());
+                        runnable.stopMining();
 
-                        MiningRunnable newRunnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+                        MiningRunnable newRunnable = new MiningRunnable(block, customBlock, player, playerStats);
                         newRunnable.setTool(item);
-                        runnable.setPlayerStats(playerStats);
                         newRunnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                         playerRunnables.putLast(block, newRunnable);
 
@@ -125,9 +117,8 @@ public class MiningEvents implements Listener {
 
             } else { //Else create a new runnable
 
-                MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+                MiningRunnable runnable = new MiningRunnable(block, customBlock, player, playerStats);
                 runnable.setTool(item);
-                runnable.setPlayerStats(playerStats);
                 runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                 playerRunnables.putLast(block, runnable);
 
@@ -144,9 +135,8 @@ public class MiningEvents implements Listener {
 
             miningRunnables.put(player, new LinkedHashMap<>());
 
-            MiningRunnable runnable = new MiningRunnable(block, customBlock, player, miningSpeed, breakingPower);
+            MiningRunnable runnable = new MiningRunnable(block, customBlock, player, playerStats);
             runnable.setTool(item);
-            runnable.setPlayerStats(playerStats);
             runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
             miningRunnables.get(player).putLast(block, runnable);
 
