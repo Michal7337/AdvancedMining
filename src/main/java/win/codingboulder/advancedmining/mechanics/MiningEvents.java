@@ -72,7 +72,7 @@ public class MiningEvents implements Listener {
         if (playerStats == null) playerStats = new PlayerStats(player);
 
         //checks for tool and hardness
-        if (!customBlock.bestTool().isEmpty() && !playerStats.toolType().equals(customBlock.bestTool())) return;
+        if (customBlock.bestTool() != null && !customBlock.bestTool().isEmpty() && !customBlock.bestTool().equals(playerStats.toolType())) return;
 
         ItemStack item = player.getInventory().getItemInMainHand();
         if (customBlock.hardness() > playerStats.breakingPower()) {

@@ -911,6 +911,13 @@ public class AdvancedMiningCommand {
                                             pdc.set(PlayerStats.SILK_TOUCH_KEY, PersistentDataType.BOOLEAN, BoolArgumentType.getBool(context, "value")));
                                         return 1;
                                     })))
+                            .then(literal("toolType")
+                                .then(argument("value", StringArgumentType.word())
+                                    .executes(context -> {
+                                        PlayerStats.editToolWithCommandContext(context, pdc ->
+                                            pdc.set(AdvancedMining.TOOL_TYPE_KEY, PersistentDataType.STRING, StringArgumentType.getString(context, "value")));
+                                        return 1;
+                                    })))
                         )
                     )
                     .then(literal("give")

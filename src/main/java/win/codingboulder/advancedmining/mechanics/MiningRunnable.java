@@ -4,6 +4,8 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,6 +24,8 @@ import win.codingboulder.advancedmining.api.CustomBlockBreakProgressEvent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -61,7 +65,7 @@ public class MiningRunnable extends BukkitRunnable {
         miningProgress = customBlock.strength();
         instaMine = miningSpeed >= customBlock.strength();
 
-        barName = customBlock.name().append(Component.text(" - ", NamedTextColor.GRAY));
+        barName = Component.empty().append(customBlock.name()).append(Component.text(" - ", NamedTextColor.GRAY));
         progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, AdvancedMining.Config.progressBarColor, BossBar.Overlay.NOTCHED_10);
         if (!instaMine && AdvancedMining.Config.showProgressBar && player != null) player.showBossBar(progressbar);
 

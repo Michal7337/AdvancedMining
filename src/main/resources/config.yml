@@ -120,7 +120,7 @@ mining-fortune-bonus-divisor: 100
 # Sets how much Mining Fortune you get per level of the Fortune enchantment
 mining-fortune-per-fortune-level: 40
 
-# Sets if after a Player's Stats change when they are resuming mining a block the new stats should be used.
+# Sets if after a Player's Stats change when they are resuming mining a block, the new stats should be used.
 # This means for example that when a player has +10% Drop Chance, stops mining, e.g. equips armor that gives them +50% Drop Chance instead of e.g. some Mining Speed,
 # and resumes mining, the new stats will be used when rolling drops. Of course this also applies to Mining Speed etc.
 # This was the default before v1.3
