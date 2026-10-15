@@ -39,7 +39,8 @@ The block can optionally specify the **Tool Type** required to mine it. The tool
 When mining a Custom Block the plugin sets the player's `block_break_speed` attribute to 0 in order to get rid of the client side cracking animation and destroying the block. It then sends the cracking animation to the player when it needs to. With this system block breaking is completely server-side, so players can't use cheats like FastBreak. 
 
 ### Configuration
-In the plugin's folder is a file named `config.yml` (as is in pretty much all plugins). In the config you can set:
+In the plugin's folder is a file named `config.yml` (as is in pretty much all plugins).<br>
+In the config you can set:
 * `show-progress-bar` - If set to true, a progress bar will be displayed when mining blocks.
 * `progress-bar-color` - Sets the color of the mining progress bar. Possible colors: blue, red, pink, green, yellow, purple, white
 * `break-vanilla-blocks` - If set to true, players will be able to break vanilla blocks as they normally would. If set to false, the players will only be able to break Custom Blocks. 
@@ -50,14 +51,42 @@ In the plugin's folder is a file named `config.yml` (as is in pretty much all pl
 * `allow-tool-swapping` - Sets if the player should be able to resume mining a block with a different tool to what they originally used to mine it.
 * `enchantments` - This section defines the behavior of enchantments. Efficiency can increase Mining Speed and Fortune can increase Block Drops. Both are disabled by default. If you are updating from an older version, copy the settings form the config file [here](https://github.com/Michal7337/AdvancedMining/blob/master/src/main/resources/config.yml).
 * `effects` - This section defines the behavior of potion effects. haste can increase Mining Speed and Mining Fatigue can decrease it. Both are disabled by default. If you are updating from an older version, copy the settings form the config file [here](https://github.com/Michal7337/AdvancedMining/blob/master/src/main/resources/config.yml).
+* `drop-chance-bonus-behavior` - Sets the behavior of the drop chance bonus.
+* `enable-mining-fortune` - Enables the Mining Fortune stat mechanic. It functions like in Hypixel Skyblock. (Every some amount of Mining Fortune, the multiplier of drops is increased by one) 
+* `mining-fortune-bonus-divisor` - Sets every how much Mining Fortune you get a guaranteed drop amount increase
+* `mining-fortune-per-fortune-level` - Sets how much Mining Fortune you get per level of the Fortune enchantment
+* `allow-stat-changing-during-block-break` - Sets if after a Player's Stats change when they are resuming mining a block, the new stats should be used.
+
+*Note: These options are also explained in the config file and some details that are missing here could be there. <br>*
 
 ## More Advanced Stuff
+
+### Player Stats
+
+Each Player has a "container" of stats. They are (by default) calculated each time a Player starts breaking a Block. Stats are calculated from items the Player has in their inventory and their Potion Effects. Negative stat modifiers will subtract stats.<br>
+To work with an item's stats the `/advmining item` command is used. The easiest way to work with items is to edit the item you're holding. This is done using the `hand` subcommand.
+After that you have the options: `set-type` and `set-stats`.<br> 
+First, you need to set the item's type.<br> 
+The default types are: 
+* `accessory` - works in any slot
+* `offhand` - works in the offhand
+* `armor` - works as armor
+
+They are set in the `other` category in the command. You can also just input anything you want there and implement it in your own plugin.<br>
+Then there is the `tool` item type. In the command you can optionally set its Mining Speed, Breaking Power and Tool Type for convenience. The tool is special because it can have a tool type, and it also gives you stats for enchantments if they are enabled.<br>
+All stats can be set with the `/advmining item hand set-stats <stat-name> <value>`command. Notable stats are:
+* `breakingPower` - Modifies your Breaking Power so you can make E.g. accessories that increase it.
+* `frotuneLevel` - Increases your level of fortune just like if you had the item enchanted with fortune.
+* `hasSilkTouch` - If any item has this stat drops will be rolled as if you had silk touch.
+* `hasTelekinesis` - If any of your items have this stat, block drops will go straight to the inventory of the Player who mined the block. Drops that don't fit will drop normally.
+
+To test stats you can use `/advmining item print-stats`. The `hand` option will print the stats of the item in your hand and the `player` option will print the stats of a Player.
 
 ### Block Drops
 The optional `DropsFile` property is the id of a **Block Drops** file inside the `plugins/AdvancedMining/BlockDrops` directory (it's not the name of the file, but the name you specify when making the drops). The files are in a binary format, so you can't really edit them outside the in-game command or in code.<br>
 The Drops File is a list of **Entries**. Each Entry has an **ID**, a **chance** to be rolled (a value between 0.0 and 1.0), a **minimum and maximum amount** of items and the **Item** itself that will be rolled. <br>
 It also has optional properties: 
-* `AffectedByFortune` - Sets if the drop is affected by the Fortune enchantment. Off by default.
+* `AffectedByFortune` - Sets if the drop is affected by the Fortune enchantment, drop enhancing stat bonuses and Mining Fortune. Off by default.
 * `SilkTouchOnly` - Sets if the drop should only be rolled when the tool has Silk Touch. Off by default.
 * `NoRollByDefault` - If enabled, this entry will only be rolled as an **Extra Drop**. Off by default. Explained below.
 
@@ -71,7 +100,14 @@ To create a Drops File use the `/advmining drops create`command.<br>
 There is a convenience command `/advmining block edit <BlockId> add-drop-itself` command that adds a guaranteed placeable Custom Block of the edited block to the drops file or creates a new one if it doesn't exist.<br>
 To edit a Drop config us the `/advmining drops edit <drops-id>` command. It has subcommands for Cresting, Editing and Removing Entries.<br>
 <br>
-Note: Block Drop configurations from previous versions are automatically migrated and their entries are named
+To test your Block Drop configurations you can use `/advmining drops simulate <drops-id> <amount-of-simulations> <player-to-get-stats-from>`<br><br>
+*Note: Block Drop configurations from previous versions are automatically migrated and their entries are named*<br>
+
+#### Mining Fortune
+
+Update v1.3 introduced the Mining Fortune stat. If you are familiar with Mining Fortune in Hypixel Skyblock, it works just the same. If not, then here's how it works:<br>
+The amount of items that drop from a block is multiplied by every `mining-fortune-bonus-divisor`(Default is 100) Mining Fortune a player has. And any extra is a chance for another bonus drop multiplier.
+This means that if a Player has 250 Mining Fortune, and they roll E.g. 2 Diamonds from a block, these 2 diamonds will be multiplied by 2 (since 200/100 = 2) and have a 50% chance to be multiplied by 3 (since 50/100 = 0.5).
 
 ### Block regeneration
 
