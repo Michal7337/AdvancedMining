@@ -125,3 +125,13 @@ mining-fortune-per-fortune-level: 40
 # and resumes mining, the new stats will be used when rolling drops. Of course this also applies to Mining Speed etc.
 # This was the default before v1.3
 allow-stat-changing-during-block-break: true
+
+# Enables the Mining Spread stat and it's mechanics.
+# This stat allows adjacent blocks to be broken when a block of the same type is mined.
+enable-mining-spread: true
+
+# Disables the default stat gathering and calculation. May be useful if working with integrations or custom additions.
+disable-default-stat-modifiers: false
+
+# Enables integration with the ExecutableItems plugin. Requires Score and ExecutableItems to be installed
+enable-executableitems-integration: false

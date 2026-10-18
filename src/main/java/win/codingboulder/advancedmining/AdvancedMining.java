@@ -104,6 +104,11 @@ public final class AdvancedMining extends JavaPlugin {
         public static float miningFortuneBonusDivider;
         public static float miningFortunePerLevel;
 
+        public static boolean miningSpreadEnable;
+
+        public static boolean disableDefaultStatModifiers;
+        public static boolean enableExecutableItemsIntegration;
+
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public static void loadConfig() {
 
@@ -150,6 +155,11 @@ public final class AdvancedMining extends JavaPlugin {
             miningFortuneEnable = config.getBoolean("enable-mining-fortune", false);
             miningFortuneBonusDivider = (float) config.getDouble("mining-fortune-bonus-divisor", 100d);
             miningFortunePerLevel = (float) config.getDouble("mining-fortune-per-fortune-level", 40d);
+
+            miningSpreadEnable = config.getBoolean("enable-mining-spread", true);
+
+            disableDefaultStatModifiers = config.getBoolean("disable-default-stat-modifiers", false);
+            enableExecutableItemsIntegration = config.getBoolean("enable-executableitems-integration", false);
 
             CustomBlock.loadAll();
             BlockDrops.loadAll();
