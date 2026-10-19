@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'win.codingboulder'
-version = '1.3'
+version = '1.4'
 
 repositories {
     mavenCentral()
@@ -15,11 +15,19 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        name = "spluginsRepositoryReleases"
+        url = "https://repo.ssomar.com/releases/"
+    }
 }
 
 dependencies {
+
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     implementation("net.kyori:adventure-api:5.2.0")
+
+    compileOnly("com.ssomar:SCore:5.26.10.17")
+
 }
 
 def targetJavaVersion = 21

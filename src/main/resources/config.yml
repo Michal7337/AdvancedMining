@@ -126,12 +126,22 @@ mining-fortune-per-fortune-level: 40
 # This was the default before v1.3
 allow-stat-changing-during-block-break: true
 
+# If enabled, XP dropped from mining blocks will go straight to the player if they have telekinesis.
+enable-xp-telekinesis: true
+
 # Enables the Mining Spread stat and it's mechanics.
 # This stat allows adjacent blocks to be broken when a block of the same type is mined.
 enable-mining-spread: true
 
+# Sets every how much Mining Spread you get a guaranteed extra block broken
+mining-spread-divisor: 100
+
+# Sets the maximum amount of Mining Spread a Player can have
+# Note: It's a virtual cap, meaning that the player can have more than this, but anymore will just be ignored
+mining-spread-cap: 10000
+
 # Disables the default stat gathering and calculation. May be useful if working with integrations or custom additions.
 disable-default-stat-modifiers: false
 
-# Enables integration with the ExecutableItems plugin. Requires Score and ExecutableItems to be installed
+# Enables integration with the ExecutableItems plugin. Requires SCore and ExecutableItems to be installed
 enable-executableitems-integration: false

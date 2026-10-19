@@ -48,6 +48,7 @@ public class MiningRunnable extends BukkitRunnable {
     private boolean instaMine;
     private boolean isPaused;
     private float lastState;
+    private boolean isOriginal;
 
     public MiningRunnable(Block block, @NotNull CustomBlock customBlock, Player player, float miningSpeed, int breakingPower) {
 
@@ -63,7 +64,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         barName = Component.empty().append(customBlock.name()).append(Component.text(" - ", NamedTextColor.GRAY));
         progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, AdvancedMining.Config.progressBarColor, BossBar.Overlay.NOTCHED_10);
-        if (!instaMine && AdvancedMining.Config.showProgressBar && player != null) player.showBossBar(progressbar);
+        if (!instaMine && AdvancedMining.Config.showProgressBar && player != null && isOriginal) player.showBossBar(progressbar);
 
     }
 
@@ -151,15 +152,24 @@ public class MiningRunnable extends BukkitRunnable {
             else for (ItemStack item : drops) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
         }
 
-        if (customBlock.minXpDrop() > 0) {
-            ExperienceOrb orb = block.getWorld().createEntity(block.getLocation(), ExperienceOrb.class);
-            orb.setExperience(new Random().nextInt(customBlock().minXpDrop() + playerStats.minXpDropBonus(), customBlock.maxXpDrop()+1 + playerStats.maxXpDropBonus()));
-            orb.spawnAt(block.getLocation().toCenterLocation());
+        if (customBlock.maxXpDrop() > 0) {
+
+            int expAmount = new Random().nextInt(customBlock().minXpDrop() + playerStats.minXpDropBonus(), customBlock.maxXpDrop()+1 + playerStats.maxXpDropBonus());
+            if (AdvancedMining.Config.enableXpTelekinesis && player != null && playerStats.hasTelekinesis()) {
+                player.giveExp(expAmount, true);
+            } else {
+                ExperienceOrb orb = block.getWorld().createEntity(block.getLocation(), ExperienceOrb.class);
+                orb.setExperience(expAmount);
+                orb.spawnAt(block.getLocation().toCenterLocation());
+            }
+
         }
 
         if (blockBreakEvent.removeBlockData()) BlockDataStorage.editDataContainer(block, pdc -> pdc.remove(CustomBlock.blockIdKey));
 
         BlockRegenSystem.registerBlock(block, customBlock);
+
+        if (isOriginal) MiningSpread.runMiningSpread(this);
 
     }
 
@@ -278,4 +288,13 @@ public class MiningRunnable extends BukkitRunnable {
         this.playerStats = playerStats;
         this.miningSpeed = playerStats().miningSpeed();
     }
+
+    public boolean isOriginal() {
+        return isOriginal;
+    }
+
+    public void setOriginal(boolean original) {
+        isOriginal = original;
+    }
+
 }

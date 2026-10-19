@@ -101,6 +101,7 @@ public class MiningEvents implements Listener {
 
                         MiningRunnable newRunnable = new MiningRunnable(block, customBlock, player, playerStats);
                         newRunnable.setTool(item);
+                        newRunnable.setOriginal(true);
                         newRunnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                         playerRunnables.putLast(block, newRunnable);
 
@@ -119,6 +120,7 @@ public class MiningEvents implements Listener {
 
                 MiningRunnable runnable = new MiningRunnable(block, customBlock, player, playerStats);
                 runnable.setTool(item);
+                runnable.setOriginal(true);
                 runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
                 playerRunnables.putLast(block, runnable);
 
@@ -137,6 +139,7 @@ public class MiningEvents implements Listener {
 
             MiningRunnable runnable = new MiningRunnable(block, customBlock, player, playerStats);
             runnable.setTool(item);
+            runnable.setOriginal(true);
             runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
             miningRunnables.get(player).putLast(block, runnable);
 

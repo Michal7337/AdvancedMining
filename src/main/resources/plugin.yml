@@ -1,7 +1,8 @@
 name: AdvancedMining
-version: '1.3'
+version: '1.4'
 main: win.codingboulder.advancedmining.AdvancedMining
 api-version: '1.21'
 authors: [ CodingBoulder ]
 description: A plugin that adds a custom mining system
 website: https://modrinth.com/plugin/advancedmining
+softdepend: [SCore, ExecutableItems]

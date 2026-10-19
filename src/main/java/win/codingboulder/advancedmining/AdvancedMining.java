@@ -99,12 +99,15 @@ public final class AdvancedMining extends JavaPlugin {
 
         public static String dropChanceBonusBehavior;
         public static boolean allowStatChangingDuringBlockBreak;
+        public static boolean enableXpTelekinesis;
 
         public static boolean miningFortuneEnable;
         public static float miningFortuneBonusDivider;
         public static float miningFortunePerLevel;
 
         public static boolean miningSpreadEnable;
+        public static float miningSpreadDivisor;
+        public static float miningSpreadCap;
 
         public static boolean disableDefaultStatModifiers;
         public static boolean enableExecutableItemsIntegration;
@@ -151,12 +154,15 @@ public final class AdvancedMining extends JavaPlugin {
 
             dropChanceBonusBehavior = config.getString("drop-chance-bonus-behavior", "multiply");
             allowStatChangingDuringBlockBreak = config.getBoolean("allow-stat-changing-during-block-break", true);
+            enableXpTelekinesis = allowStatChangingDuringBlockBreak = config.getBoolean("enable-xp-telekinesis", true);
 
             miningFortuneEnable = config.getBoolean("enable-mining-fortune", false);
             miningFortuneBonusDivider = (float) config.getDouble("mining-fortune-bonus-divisor", 100d);
             miningFortunePerLevel = (float) config.getDouble("mining-fortune-per-fortune-level", 40d);
 
             miningSpreadEnable = config.getBoolean("enable-mining-spread", true);
+            miningSpreadDivisor = (float) config.getDouble("mining-spread-divisor", 100d);
+            miningSpreadCap = (float) config.getDouble("mining-spread-cap", 10000d);
 
             disableDefaultStatModifiers = config.getBoolean("disable-default-stat-modifiers", false);
             enableExecutableItemsIntegration = config.getBoolean("enable-executableitems-integration", false);
