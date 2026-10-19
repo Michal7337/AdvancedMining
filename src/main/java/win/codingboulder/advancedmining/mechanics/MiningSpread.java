@@ -15,7 +15,12 @@ public class MiningSpread {
 
     public static void runMiningSpread(@NonNull MiningRunnable runnable) {
 
-        float miningSpreadFraction = runnable.playerStats().miningSpread() / AdvancedMining.Config.miningSpreadDivisor;
+        float miningSpread = runnable.playerStats().miningSpread();
+        if (miningSpread > AdvancedMining.Config.miningSpreadCap) miningSpread = AdvancedMining.Config.miningSpreadCap;
+
+        if (miningSpread <= 0) return;
+
+        float miningSpreadFraction = miningSpread / AdvancedMining.Config.miningSpreadDivisor;
         int miningSpreadBlocks = (int) miningSpreadFraction;
         if (new Random().nextDouble() <= miningSpreadFraction - miningSpreadBlocks) miningSpreadBlocks++;
 
