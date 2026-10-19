@@ -64,7 +64,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         barName = Component.empty().append(customBlock.name()).append(Component.text(" - ", NamedTextColor.GRAY));
         progressbar = BossBar.bossBar(barName.append(Component.text("0.0%", NamedTextColor.WHITE)), 0f, AdvancedMining.Config.progressBarColor, BossBar.Overlay.NOTCHED_10);
-        if (!instaMine && AdvancedMining.Config.showProgressBar && player != null && isOriginal) player.showBossBar(progressbar);
+        if (!instaMine && AdvancedMining.Config.showProgressBar && player != null) player.showBossBar(progressbar);
 
     }
 
@@ -169,7 +169,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         BlockRegenSystem.registerBlock(block, customBlock);
 
-        if (isOriginal) MiningSpread.runMiningSpread(this);
+        if (AdvancedMining.Config.miningSpreadEnable && isOriginal) MiningSpread.runMiningSpread(this);
 
     }
 
