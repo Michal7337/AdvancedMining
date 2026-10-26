@@ -20,6 +20,10 @@ public class MiningSpread {
 
         if (miningSpread <= 0) return;
 
+        CustomBlock brokenCustomBlock = runnable.customBlock();
+        float miningSpreadResistance = Math.max(brokenCustomBlock.miningSpreadResistance(), 1);
+        miningSpread /= miningSpreadResistance;
+
         float miningSpreadFraction = miningSpread / AdvancedMining.Config.miningSpreadDivisor;
         int miningSpreadBlocks = (int) miningSpreadFraction;
         if (new Random().nextDouble() <= miningSpreadFraction - miningSpreadBlocks) miningSpreadBlocks++;
@@ -40,7 +44,7 @@ public class MiningSpread {
 
                 CustomBlock customBlock = CustomBlock.getCustomBlock(block);
                 if (customBlock == null) return;
-                if (customBlock.id().equals(runnable.customBlock().id())) blocksInLayer.add(block); // Add compatibility list check here
+                if (customBlock.id().equals(brokenCustomBlock.id()) || brokenCustomBlock.miningSpreadCompatibleBlocks().contains(customBlock.id())) blocksInLayer.add(block);
 
             });
 
@@ -70,7 +74,7 @@ public class MiningSpread {
 
         validBlocks.forEach(block -> {
 
-            MiningRunnable miningRunnable = new MiningRunnable(block, runnable.customBlock(), runnable.player(), runnable.playerStats());
+            MiningRunnable miningRunnable = new MiningRunnable(block, CustomBlock.getCustomBlock(block), runnable.player(), runnable.playerStats());
             miningRunnable.breakBlock();
 
             LinkedHashMap<Block, MiningRunnable> playerRunnables = MiningEvents.miningRunnables.get(runnable.player());

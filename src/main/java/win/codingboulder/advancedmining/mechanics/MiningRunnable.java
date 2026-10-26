@@ -169,7 +169,7 @@ public class MiningRunnable extends BukkitRunnable {
 
         BlockRegenSystem.registerBlock(block, customBlock);
 
-        if (AdvancedMining.Config.miningSpreadEnable && isOriginal) MiningSpread.runMiningSpread(this);
+        if (AdvancedMining.Config.miningSpreadEnable && isOriginal && customBlock.enableMiningSpread()) MiningSpread.runMiningSpread(this);
 
     }
 

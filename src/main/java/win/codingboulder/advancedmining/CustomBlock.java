@@ -22,6 +22,7 @@ import org.joml.Vector3f;
 import win.codingboulder.advancedmining.mechanics.BlockDrops;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -82,6 +83,11 @@ public class CustomBlock {
 
     private Material regenAltVanillaMaterial;
     private String regenAltCustomBlock;
+
+    // Mining Spread system attributes
+    private boolean enableMiningSpread;
+    private float miningSpreadResistance;
+    private ArrayList<String> miningSpreadCompatibleBlocks;
 
     // break -> delay -> replace(type) for [regenTime] -> set block back
     // if regenTime = -1 don't set block back
@@ -156,6 +162,43 @@ public class CustomBlock {
         this.regenAlternativeTime = regenAlternativeTime;
         this.regenAltVanillaMaterial = regenAltVanillaMaterial;
         this.regenAltCustomBlock = regenAltCustomBlock;
+
+        constructAttributes();
+
+    }
+
+    public CustomBlock(String id, String name, Material material, float strength, int hardness, String bestTool, String texture, String breakSound, String placeSound, Material iconMaterial, String dropsFile, int minXpDrop, int maxXpDrop, String blockRegenType, int regenTime, int regenDelay, Material regenVanillaMaterial, String regenCustomBlock, String regenTempBlockType, Material regenTempVanillaMaterial, String regenTempCustomBlock, String regenAlternativeType, float regenAlternativeChance, int regenAlternativeDelay, int regenAlternativeTime, Material regenAltVanillaMaterial, String regenAltCustomBlock, boolean enableMiningSpread, float miningSpreadResistance, ArrayList<String> miningSpreadCompatibleBlocks) {
+
+        this.id = id;
+        this.name = name;
+        this.material = material;
+        this.strength = strength;
+        this.hardness = hardness;
+        this.bestTool = bestTool;
+        this.texture = texture;
+        this.breakSound = breakSound;
+        this.placeSound = placeSound;
+        this.iconMaterial = iconMaterial;
+        this.dropsFile = dropsFile;
+        this.minXpDrop = minXpDrop;
+        this.maxXpDrop = maxXpDrop;
+        this.blockRegenType = blockRegenType;
+        this.regenTime = regenTime;
+        this.regenDelay = regenDelay;
+        this.regenVanillaMaterial = regenVanillaMaterial;
+        this.regenCustomBlock = regenCustomBlock;
+        this.regenTempBlockType = regenTempBlockType;
+        this.regenTempVanillaMaterial = regenTempVanillaMaterial;
+        this.regenTempCustomBlock = regenTempCustomBlock;
+        this.regenAlternativeType = regenAlternativeType;
+        this.regenAlternativeChance = regenAlternativeChance;
+        this.regenAlternativeDelay = regenAlternativeDelay;
+        this.regenAlternativeTime = regenAlternativeTime;
+        this.regenAltVanillaMaterial = regenAltVanillaMaterial;
+        this.regenAltCustomBlock = regenAltCustomBlock;
+        this.enableMiningSpread = enableMiningSpread;
+        this.miningSpreadResistance = miningSpreadResistance;
+        this.miningSpreadCompatibleBlocks = miningSpreadCompatibleBlocks;
 
         constructAttributes();
 
@@ -635,6 +678,31 @@ public class CustomBlock {
 
     public void setRegenAltCustomBlock(String regenAltCustomBlock) {
         this.regenAltCustomBlock = regenAltCustomBlock;
+    }
+
+    public ArrayList<String> miningSpreadCompatibleBlocks() {
+        if (miningSpreadCompatibleBlocks == null) miningSpreadCompatibleBlocks = new ArrayList<>();
+        return miningSpreadCompatibleBlocks;
+    }
+
+    public void setMiningSpreadCompatibleBlocks(ArrayList<String> miningSpreadCompatibleBlocks) {
+        this.miningSpreadCompatibleBlocks = miningSpreadCompatibleBlocks;
+    }
+
+    public float miningSpreadResistance() {
+        return miningSpreadResistance;
+    }
+
+    public void setMiningSpreadResistance(float miningSpreadResistance) {
+        this.miningSpreadResistance = miningSpreadResistance;
+    }
+
+    public boolean enableMiningSpread() {
+        return enableMiningSpread;
+    }
+
+    public void setEnableMiningSpread(boolean enableMiningSpread) {
+        this.enableMiningSpread = enableMiningSpread;
     }
 
 }
