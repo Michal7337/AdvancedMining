@@ -9,7 +9,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -171,6 +173,12 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (AdvancedMining.Config.miningSpreadEnable && isOriginal && customBlock.enableMiningSpread()) MiningSpread.runMiningSpread(this);
 
+        if (playerStats.toolDurability() > -1) {
+            playerStats.setToolDurability(playerStats.toolDurability() - 1);
+            if (player != null) player.damageItemStack(EquipmentSlot.HAND, 1);
+            else if (tool.getItemMeta() instanceof Damageable damageable) damageable.setDamage(damageable.getMaxDamage() - playerStats().toolDurability());
+        }
+
     }
 
     public void stopMining() {
@@ -190,6 +198,12 @@ public class MiningRunnable extends BukkitRunnable {
         this.isPaused = false;
         pauseTicks = 0;
         player.showBossBar(progressbar);
+    }
+
+    public void scheduleRunnable(ItemStack tool, boolean original) {
+        setTool(tool);
+        setOriginal(original);
+        runTaskTimer(AdvancedMining.getInstance(), 0, 1);
     }
 
     public Block block() {

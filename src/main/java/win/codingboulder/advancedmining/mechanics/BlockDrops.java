@@ -388,8 +388,6 @@ public class BlockDrops implements Serializable {
 
             if (affectedByFortune) {
 
-                int fortuneLevel = stats.fortuneLevel();
-
                 int miningFortuneBonus;
                 if (AdvancedMining.Config.miningFortuneEnable) {
 

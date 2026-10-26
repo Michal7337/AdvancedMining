@@ -100,9 +100,7 @@ public class MiningEvents implements Listener {
                         runnable.stopMining();
 
                         MiningRunnable newRunnable = new MiningRunnable(block, customBlock, player, playerStats);
-                        newRunnable.setTool(item);
-                        newRunnable.setOriginal(true);
-                        newRunnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+                        newRunnable.scheduleRunnable(item, true);
                         playerRunnables.putLast(block, newRunnable);
 
                         // If the amount of broken blocks is above the limit, remove the oldest one
@@ -119,9 +117,7 @@ public class MiningEvents implements Listener {
             } else { //Else create a new runnable
 
                 MiningRunnable runnable = new MiningRunnable(block, customBlock, player, playerStats);
-                runnable.setTool(item);
-                runnable.setOriginal(true);
-                runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+                runnable.scheduleRunnable(item, true);
                 playerRunnables.putLast(block, runnable);
 
                 //If the amount of broken blocks is above the limit, remove the oldest one
@@ -138,9 +134,7 @@ public class MiningEvents implements Listener {
             miningRunnables.put(player, new LinkedHashMap<>());
 
             MiningRunnable runnable = new MiningRunnable(block, customBlock, player, playerStats);
-            runnable.setTool(item);
-            runnable.setOriginal(true);
-            runnable.runTaskTimer(AdvancedMining.getInstance(), 0, 1);
+            runnable.scheduleRunnable(item, true);
             miningRunnables.get(player).putLast(block, runnable);
 
         }

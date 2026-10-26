@@ -362,6 +362,63 @@ public class AdvancedMiningCommand {
 
                                         })))
                             )
+                            .then(literal("mining-spread")
+                                .then(literal("enable-mining-spread")
+                                    .then(argument("enable", BoolArgumentType.bool())
+                                        .executes(context -> {
+
+                                            CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                            block.editAndSave(b -> b.setEnableMiningSpread(BoolArgumentType.getBool(context, "enable")));
+
+                                            context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                            return 1;
+
+                                        }))
+                                )
+                                .then(literal("spread-resistance")
+                                    .then(argument("resistance", FloatArgumentType.floatArg(0.000000000001f))
+                                        .executes(context -> {
+
+                                            CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                            block.editAndSave(b -> b.setMiningSpreadResistance(FloatArgumentType.getFloat(context, "resistance")));
+
+                                            context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                            return 1;
+
+                                        }))
+                                )
+                                .then(literal("spread-compatible-blocks")
+                                    .then(literal("add-block")
+                                        .then(argument("block-id", CustomBlockArgument.blockArgument())
+                                            .executes(context -> {
+
+                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                block.editAndSave(b -> b.miningSpreadCompatibleBlocks().add(context.getArgument("block-id", CustomBlock.class).id()));
+
+                                                context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                return 1;
+
+                                            }))
+                                    )
+                                    .then(literal("remove-block")
+                                        .then(argument("block-id", StringArgumentType.word())
+                                            .suggests((context, builder) -> {
+                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                block.miningSpreadCompatibleBlocks().forEach(builder::suggest);
+                                                return builder.buildFuture();
+                                            })
+                                            .executes(context -> {
+
+                                                CustomBlock block = context.getArgument("block", CustomBlock.class);
+                                                block.editAndSave(b -> b.miningSpreadCompatibleBlocks().remove(context.getArgument("block-id", CustomBlock.class).id()));
+
+                                                context.getSource().getSender().sendRichMessage("<green>Block edited!");
+                                                return 1;
+
+                                            }))
+                                    )
+                                )
+                            )
                             .then(literal("regeneration")
                                 .then(literal("set-primary-regen")
                                     .then(literal("no-regen")
@@ -820,6 +877,13 @@ public class AdvancedMiningCommand {
                                     })))
                         )
                         .then(literal("set-stats")
+                            .then(literal("uses-durability")
+                                .then(argument("value", BoolArgumentType.bool())
+                                    .executes(context -> {
+                                        PlayerStats.editToolWithCommandContext(context, pdc ->
+                                            pdc.set(PlayerStats.USES_DURABILITY_KEY, PersistentDataType.BOOLEAN, BoolArgumentType.getBool(context, "value")));
+                                        return 1;
+                                    })))
                             .then(literal("miningSpeed")
                                 .then(argument("value", FloatArgumentType.floatArg())
                                     .executes(context -> {
