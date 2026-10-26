@@ -7,7 +7,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
@@ -59,7 +58,6 @@ public class PlayerStats implements Cloneable {
     private int dropRollsBonus;
 
     private int vanillaFortuneDropBonus; // Internal value for vanilla fortune multiplier
-    private int toolDurability = -1; // Internal value for representing the tool durability if it applies
 
 
     private final HashMap<String, Object> otherStats = new HashMap<>();
@@ -171,12 +169,6 @@ public class PlayerStats implements Cloneable {
             playerStats.setBreakingPower(breakingPower);
             playerStats.setToolType(toolType);
 
-            // Durability
-            int durability = -1;
-            if (pdc.getOrDefault(USES_DURABILITY_KEY, PersistentDataType.BOOLEAN, false) && !item.getItemMeta().isUnbreakable() && item.getItemMeta() instanceof Damageable damageable)
-                durability = damageable.hasMaxDamage() ? damageable.getMaxDamage() : item.getType().getMaxDurability() - damageable.getDamage();
-            playerStats.setToolDurability(durability);
-
         });
 
         PlayerStats.statModifiers().put("default_armor_modifier", (player, playerStats) -> {
@@ -275,6 +267,11 @@ public class PlayerStats implements Cloneable {
 
         player.sendRichMessage("<green>Stat set!");
 
+    }
+
+    public static boolean getToolUsesDurability(ItemStack tool) {
+        if (tool == null) return false;
+        return tool.getPersistentDataContainer().getOrDefault(USES_DURABILITY_KEY, PersistentDataType.BOOLEAN, false);
     }
 
     public float miningSpeed() {
@@ -399,14 +396,6 @@ public class PlayerStats implements Cloneable {
 
     public void setVanillaFortuneDropBonus(int vanillaFortuneDropBonus) {
         this.vanillaFortuneDropBonus = vanillaFortuneDropBonus;
-    }
-
-    public int toolDurability() {
-        return toolDurability;
-    }
-
-    public void setToolDurability(int toolDurability) {
-        this.toolDurability = toolDurability;
     }
 
     @Override

@@ -75,6 +75,7 @@ public class MiningSpread {
         validBlocks.forEach(block -> {
 
             MiningRunnable miningRunnable = new MiningRunnable(block, CustomBlock.getCustomBlock(block), runnable.player(), runnable.playerStats());
+            miningRunnable.setTool(runnable.tool());
             miningRunnable.breakBlock();
 
             LinkedHashMap<Block, MiningRunnable> playerRunnables = MiningEvents.miningRunnables.get(runnable.player());

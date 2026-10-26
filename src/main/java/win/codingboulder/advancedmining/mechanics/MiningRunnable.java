@@ -173,10 +173,10 @@ public class MiningRunnable extends BukkitRunnable {
 
         if (AdvancedMining.Config.miningSpreadEnable && isOriginal && customBlock.enableMiningSpread()) MiningSpread.runMiningSpread(this);
 
-        if (playerStats.toolDurability() > -1) {
-            playerStats.setToolDurability(playerStats.toolDurability() - 1);
+        if (PlayerStats.getToolUsesDurability(tool)) {
             if (player != null) player.damageItemStack(EquipmentSlot.HAND, 1);
-            else if (tool.getItemMeta() instanceof Damageable damageable) damageable.setDamage(damageable.getMaxDamage() - playerStats().toolDurability());
+            else if (tool.getItemMeta() instanceof Damageable damageable)
+                damageable.setDamage((damageable.hasMaxDamage() ? damageable.getMaxDamage() : tool.getType().getMaxDurability()) - 1);
         }
 
     }
